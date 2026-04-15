@@ -275,7 +275,7 @@ components:
           description: |
             Name of the Node Manager machine hosting this server. Empty
             string (not null) is common when Node Manager is not in use.
-          example: oel7
+          example: wls-host
         listenPortEnabled:
           type: boolean
           description: True if the plaintext listen port is enabled.
@@ -381,7 +381,7 @@ components:
         middlewareHome: /oracle/fmw_dev
         weblogicHome: /oracle/fmw_dev/wlserver
         currentDirectory: /oracle/domains/dev/.
-        currentMachine: oel7
+        currentMachine: wls-host
         listenPortEnabled: true
         SSLListenPortEnabled: false
         defaultURL: t3://127.0.0.1:7001
@@ -436,4 +436,4 @@ components:
             adminServer: true
             activationTime: 1776251676420
             weblogicVersion: WebLogic Server 12.2.1.4.0
-            currentMachine: oel7
+            currentMachine: wls-host
