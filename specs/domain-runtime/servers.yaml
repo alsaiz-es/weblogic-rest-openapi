@@ -1,0 +1,439 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Server Runtimes
+  description: |
+    Read-only monitoring endpoints for the `serverRuntimes` collection under
+    the `domainRuntime` bean tree. Exposed by the Administration Server and
+    aggregates runtime state for every managed server in the domain.
+
+    Collection entries represent `ServerRuntimeMBean` instances. Use the
+    server-name path to drill into a specific server; from there the HATEOAS
+    `links` array points to `threadPoolRuntime`, `JVMRuntime`,
+    `JDBCServiceRuntime`, and `applicationRuntimes`, which are documented in
+    sibling specs.
+  version: 0.1.1
+  contact:
+    name: wls_openapi_spec (unofficial)
+    url: https://github.com/alsaiz-es/wls_openapi_spec
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+        description: Administration Server hostname or IP.
+      port:
+        default: "7001"
+        description: Administration Server listen port.
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: serverRuntimes
+    description: Runtime monitoring of managed servers in the domain.
+
+paths:
+  /domainRuntime/serverRuntimes:
+    get:
+      operationId: listServerRuntimes
+      tags: [serverRuntimes]
+      summary: List all server runtimes in the domain.
+      description: |
+        Returns a collection of `ServerRuntimeMBean` instances, one per
+        running managed server (plus the Administration Server). Servers
+        that are not currently running do not appear in this collection;
+        their configured state is under the `edit` bean tree instead.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Collection of server runtime beans.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerRuntimeCollection'
+              examples:
+                twoServers:
+                  $ref: '#/components/examples/ServerRuntimeCollectionExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /domainRuntime/serverRuntimes/{serverName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        description: |
+          Name of the managed server as configured in the domain (for
+          example `AdminServer`, `ms1`). Case-sensitive.
+        schema:
+          type: string
+        example: AdminServer
+    get:
+      operationId: getServerRuntime
+      tags: [serverRuntimes]
+      summary: Get a single server runtime by name.
+      description: |
+        Returns the `ServerRuntimeMBean` for a specific managed server,
+        including state, health, activation time, JVM identity, and HATEOAS
+        links to child runtimes (thread pool, JVM, JDBC, applications).
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Server runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerRuntime'
+              examples:
+                adminServer:
+                  $ref: '#/components/examples/ServerRuntimeExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        WebLogic administration user credentials. The user must have at
+        least the `Monitor` role for GET operations on runtime resources.
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated user lacks the required role.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested server is not currently running or does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    ServerError:
+      description: Unexpected server-side error.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    ServerState:
+      type: string
+      description: |
+        Lifecycle state of a managed server. `RUNNING` is the normal
+        operating state; `ADMIN` allows only administrative traffic;
+        `STANDBY` has listen ports closed; `SHUTDOWN` is only visible
+        transiently during shutdown.
+      enum:
+        - STARTING
+        - STANDBY
+        - ADMIN
+        - RESUMING
+        - RUNNING
+        - SUSPENDING
+        - FORCE_SUSPENDING
+        - SHUTTING_DOWN
+        - FORCE_SHUTTING_DOWN
+        - SHUTDOWN
+        - FAILED
+        - FAILED_NOT_RESTARTABLE
+        - FAILED_RESTARTING
+        - UNKNOWN
+
+    ServerRuntime:
+      type: object
+      description: |
+        Subset of `ServerRuntimeMBean` properties most commonly used for
+        monitoring. Field set and types verified against a live WLS
+        12.2.1.4 OSB domain.
+
+        JVM details (`javaVersion`, heap, uptime) and listen-channel
+        details (`listenAddress`, `listenPort`) are **not** on this bean —
+        they live under the `JVMRuntime` and `serverChannelRuntimes`
+        children respectively, reachable via the `links` array.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `ServerRuntime` for this resource.
+          example: ServerRuntime
+        name:
+          type: string
+          description: Server name as configured in the domain.
+          example: AdminServer
+        state:
+          $ref: '#/components/schemas/ServerState'
+        stateVal:
+          type: integer
+          format: int32
+          description: |
+            Numeric encoding of `state`. Redundant with the string form;
+            included for clients that prefer integer comparisons.
+          example: 2
+        healthState:
+          $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+        overallHealthState:
+          allOf:
+            - $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+          description: |
+            Health roll-up across this server and all its subsystems.
+            In a fully healthy server this mirrors `healthState`.
+        activationTime:
+          type: integer
+          format: int64
+          description: |
+            Epoch milliseconds when the server reached its current state.
+            Useful for computing uptime against the current wall clock.
+          example: 1776251676420
+        restartRequired:
+          type: boolean
+          description: |
+            True if a pending configuration change requires a server
+            restart to take effect.
+        openSocketsCurrentCount:
+          type: integer
+          format: int32
+          description: Currently open socket connections to this server.
+          example: 2
+        weblogicVersion:
+          type: string
+          description: Full WebLogic Server version banner string.
+          example: WebLogic Server 12.2.1.4.0
+        patchList:
+          type: array
+          description: |
+            Installed OPatch entries as free-form strings. Each element is
+            typically `<patch-id>;<unique-patch-id>;<timestamp>;<description>`.
+          items:
+            type: string
+        middlewareHome:
+          type: string
+          description: Filesystem path of the FMW home (`$MW_HOME`).
+          example: /oracle/fmw_dev
+        weblogicHome:
+          type: string
+          description: Filesystem path of the WebLogic Server home.
+          example: /oracle/fmw_dev/wlserver
+        currentDirectory:
+          type: string
+          description: Working directory from which the JVM was launched.
+        currentMachine:
+          type: string
+          nullable: true
+          description: |
+            Name of the Node Manager machine hosting this server. Empty
+            string (not null) is common when Node Manager is not in use.
+          example: oel7
+        listenPortEnabled:
+          type: boolean
+          description: True if the plaintext listen port is enabled.
+        SSLListenPortEnabled:
+          type: boolean
+          description: True if the SSL listen port is enabled.
+        defaultURL:
+          type: string
+          description: Default T3 URL this server advertises to clients.
+          example: t3://127.0.0.1:7001
+        adminServer:
+          type: boolean
+          description: True if this server is the domain Administration Server.
+        adminServerHost:
+          type: string
+          description: Hostname/IP of the domain Administration Server.
+          example: 127.0.0.1
+        adminServerListenPort:
+          type: integer
+          format: int32
+          description: |
+            Listen port of the domain Administration Server (as seen from
+            this server). Present on every server, not only on the admin.
+          example: 7001
+        adminServerListenPortSecure:
+          type: boolean
+          description: True if `adminServerListenPort` is the SSL port.
+        administrationPortEnabled:
+          type: boolean
+          description: |
+            True if the domain-wide administration port is enabled. The
+            configured port number itself is on `ServerMBean` in the
+            `edit` tree, not here.
+        administrationURL:
+          type: string
+          nullable: true
+          description: |
+            URL of the administration channel for this server. When the
+            administration port is disabled this falls back to the default
+            T3 URL.
+          example: t3://127.0.0.1:7001
+        inSitConfigState:
+          type: boolean
+          description: |
+            True if a situational-configuration override is currently
+            active on this server.
+        serverClasspath:
+          type: string
+          description: |
+            Effective JVM classpath as a single string (colon-separated on
+            Unix). Often several kilobytes long — exclude it with
+            `excludeFields=serverClasspath` when listing collections.
+        links:
+          type: array
+          description: |
+            HATEOAS links. Always includes `self`, `canonical`, and
+            `parent`. Also includes child-runtime relations such as
+            `threadPoolRuntime`, `JVMRuntime`, `JDBCServiceRuntime`,
+            `applicationRuntimes`, `serverChannelRuntimes`, and
+            `clusterRuntime` (the latter only for clustered servers).
+
+            Lifecycle operations are exposed as `rel: action` entries with
+            a `title` naming the operation (`suspend`, `resume`,
+            `shutdown`, `forceShutdown`, etc.).
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+    ServerRuntimeCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+  examples:
+    ServerRuntimeExample:
+      summary: AdminServer RUNNING (verbatim from WLS 12.2.1.4)
+      value:
+        identity: []
+        type: ServerRuntime
+        name: AdminServer
+        state: RUNNING
+        stateVal: 2
+        healthState:
+          state: ok
+          subsystemName: null
+          partitionName: null
+          symptoms: []
+        overallHealthState:
+          state: ok
+          subsystemName: null
+          partitionName: null
+          symptoms: []
+        activationTime: 1776251676420
+        restartRequired: false
+        openSocketsCurrentCount: 2
+        weblogicVersion: WebLogic Server 12.2.1.4.0
+        middlewareHome: /oracle/fmw_dev
+        weblogicHome: /oracle/fmw_dev/wlserver
+        currentDirectory: /oracle/domains/dev/.
+        currentMachine: oel7
+        listenPortEnabled: true
+        SSLListenPortEnabled: false
+        defaultURL: t3://127.0.0.1:7001
+        adminServer: true
+        adminServerHost: 127.0.0.1
+        adminServerListenPort: 7001
+        adminServerListenPortSecure: false
+        administrationPortEnabled: false
+        administrationURL: t3://127.0.0.1:7001
+        inSitConfigState: false
+        links:
+          - rel: self
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer
+          - rel: canonical
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer
+          - rel: parent
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes
+          - rel: threadPoolRuntime
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/threadPoolRuntime
+          - rel: JVMRuntime
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JVMRuntime
+          - rel: JDBCServiceRuntime
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime
+          - rel: applicationRuntimes
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/applicationRuntimes
+          - rel: action
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/shutdown
+            title: shutdown
+          - rel: action
+            href: http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/suspend
+            title: suspend
+
+    ServerRuntimeCollectionExample:
+      summary: AdminServer-only response with links=none
+      value:
+        items:
+          - identity: []
+            type: ServerRuntime
+            name: AdminServer
+            state: RUNNING
+            stateVal: 2
+            healthState:
+              state: ok
+              subsystemName: null
+              partitionName: null
+              symptoms: []
+            overallHealthState:
+              state: ok
+              subsystemName: null
+              partitionName: null
+              symptoms: []
+            adminServer: true
+            activationTime: 1776251676420
+            weblogicVersion: WebLogic Server 12.2.1.4.0
+            currentMachine: oel7

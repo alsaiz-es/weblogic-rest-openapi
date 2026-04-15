@@ -1,0 +1,269 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Thread Pool Runtime
+  description: |
+    Read-only monitoring endpoint for the self-tuning `ThreadPoolRuntime`
+    on a managed server. Exposes execute-thread counts, work manager
+    throughput, stuck/hogging thread detection, and queue depth — the
+    primary signals for diagnosing server load and thread starvation.
+
+    Field set and types verified against a live WLS 12.2.1.4 OSB domain.
+  version: 0.1.1
+  contact:
+    name: wls_openapi_spec (unofficial)
+    url: https://github.com/alsaiz-es/wls_openapi_spec
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: threadPoolRuntime
+    description: Self-tuning thread pool metrics per server.
+
+paths:
+  /domainRuntime/serverRuntimes/{serverName}/threadPoolRuntime:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        description: Name of the managed server (case-sensitive).
+        schema:
+          type: string
+        example: osb_server1
+    get:
+      operationId: getThreadPoolRuntime
+      tags: [threadPoolRuntime]
+      summary: Get the self-tuning thread pool runtime for a server.
+      description: |
+        Returns a single `ThreadPoolRuntime` bean with execute-thread
+        accounting, throughput, queue depth, and stuck/hogging thread
+        counts.
+
+        Reading the WLDF / work-manager entries under the same server
+        (`workManagerRuntimes`, `maxThreadsConstraintRuntimes`,
+        `minThreadsConstraintRuntimes`) is not covered by this endpoint;
+        they are reachable via the server's `links` array.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Thread pool runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadPoolRuntime'
+              examples:
+                osbServer1:
+                  $ref: '#/components/examples/ThreadPoolRuntimeExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        WebLogic administration user credentials. `Monitor` role is
+        sufficient for GET operations on runtime resources.
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated user lacks the required role.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The server does not exist or is not running.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    ThreadPoolRuntime:
+      type: object
+      description: |
+        Self-tuning thread pool state. Counters marked "Count" are
+        cumulative since server start; counters marked "Current" are
+        point-in-time; counters with "High" in the name are watermarks
+        (highest value seen since start).
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `ThreadPoolRuntime`.
+          example: ThreadPoolRuntime
+        name:
+          type: string
+          description: |
+            Bean name. Always `ThreadPoolRuntime` (not the server name —
+            unlike `JDBCServiceRuntime`, which uses the server name).
+          example: ThreadPoolRuntime
+        healthState:
+          $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+        suspended:
+          type: boolean
+          description: True if the thread pool is suspended.
+
+        # --- Thread accounting ---
+        executeThreadTotalCount:
+          type: integer
+          format: int32
+          description: |
+            Total execute threads currently allocated by the self-tuning
+            pool (active + idle + standby).
+          example: 44
+        executeThreadIdleCount:
+          type: integer
+          format: int32
+          description: Threads alive but not currently processing a request.
+          example: 1
+        standbyThreadCount:
+          type: integer
+          format: int32
+          description: |
+            Threads the self-tuning algorithm has kept alive in reserve.
+            These are above the steady-state active count and can be
+            promoted to active without paying the creation cost.
+          example: 40
+        stuckThreadCount:
+          type: integer
+          format: int32
+          description: |
+            Threads currently classified as stuck (exceeded the
+            configured `StuckThreadMaxTime`). A sustained non-zero count
+            is usually a correctness signal, not a load signal.
+        hoggingThreadCount:
+          type: integer
+          format: int32
+          description: |
+            Threads currently classified as hogging (taking substantially
+            longer than the measured average). Precursor to `stuckThreadCount`.
+
+        # --- Request accounting ---
+        pendingUserRequestCount:
+          type: integer
+          format: int32
+          description: |
+            User-submitted requests currently queued waiting for an
+            execute thread. Distinct from `queueLength` which also
+            includes internal requests.
+        queueLength:
+          type: integer
+          format: int32
+          description: Total queued requests (user + internal).
+        completedRequestCount:
+          type: integer
+          format: int64
+          description: Cumulative completed requests since server start.
+          example: 23481
+        throughput:
+          type: number
+          format: double
+          description: |
+            Requests completed per second, averaged over the most recent
+            sampling window. Basis for the self-tuning algorithm.
+          example: 25.49
+        overloadRejectedRequestsCount:
+          type: integer
+          format: int64
+          description: |
+            Cumulative requests rejected because the server was in
+            overload protection (e.g. exceeded `MaxMessageSize` or
+            `Capacity Constraint`).
+
+        # --- Work-manager constraint plumbing ---
+        sharedCapacityForWorkManagers:
+          type: integer
+          format: int32
+          description: |
+            Total queue slots available across all work managers on this
+            server. Default 65536.
+          example: 65536
+        minThreadsConstraintsPending:
+          type: integer
+          format: int32
+          description: |
+            Requests currently queued because a `min-threads-constraint`
+            has not yet reserved their thread.
+        minThreadsConstraintsCompleted:
+          type: integer
+          format: int64
+          description: |
+            Cumulative requests that were processed under an active
+            `min-threads-constraint`.
+
+  examples:
+    ThreadPoolRuntimeExample:
+      summary: osb_server1 ThreadPoolRuntime (verbatim from WLS 12.2.1.4)
+      value:
+        identity: [threadPoolRuntime]
+        type: ThreadPoolRuntime
+        name: ThreadPoolRuntime
+        healthState:
+          state: ok
+          subsystemName: threadpool
+          partitionName: null
+          symptoms: []
+        suspended: false
+        executeThreadTotalCount: 44
+        executeThreadIdleCount: 1
+        standbyThreadCount: 40
+        stuckThreadCount: 0
+        hoggingThreadCount: 0
+        pendingUserRequestCount: 0
+        queueLength: 0
+        completedRequestCount: 23481
+        throughput: 25.487256371814095
+        overloadRejectedRequestsCount: 0
+        sharedCapacityForWorkManagers: 65536
+        minThreadsConstraintsPending: 0
+        minThreadsConstraintsCompleted: 833

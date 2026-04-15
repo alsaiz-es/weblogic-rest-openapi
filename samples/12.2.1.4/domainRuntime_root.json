@@ -1,0 +1,124 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime"
+        },
+        {
+            "rel": "migrationDataRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/migrationDataRuntimes"
+        },
+        {
+            "rel": "systemComponentLifeCycleRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/systemComponentLifeCycleRuntimes"
+        },
+        {
+            "rel": "domainPartitionRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/domainPartitionRuntimes"
+        },
+        {
+            "rel": "nodeManagerRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/nodeManagerRuntimes"
+        },
+        {
+            "rel": "serviceMigrationDataRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serviceMigrationDataRuntimes"
+        },
+        {
+            "rel": "resourceGroupLifeCycleRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/resourceGroupLifeCycleRuntimes"
+        },
+        {
+            "rel": "serverLifeCycleRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes"
+        },
+        {
+            "rel": "rolloutService",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/rolloutService"
+        },
+        {
+            "rel": "deploymentManager",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/deploymentManager"
+        },
+        {
+            "rel": "batchJobRepositoryRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/batchJobRepositoryRuntime"
+        },
+        {
+            "rel": "elasticServiceManagerRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/elasticServiceManagerRuntime"
+        },
+        {
+            "rel": "editSessionConfigurationManager",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/editSessionConfigurationManager"
+        },
+        {
+            "rel": "SNMPAgentRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/SNMPAgentRuntime"
+        },
+        {
+            "rel": "policySubjectManagerRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/policySubjectManagerRuntime"
+        },
+        {
+            "rel": "migratableServiceCoordinatorRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/migratableServiceCoordinatorRuntime"
+        },
+        {
+            "rel": "appRuntimeStateRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/appRuntimeStateRuntime"
+        },
+        {
+            "rel": "messageDrivenControlEJBRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/messageDrivenControlEJBRuntime"
+        },
+        {
+            "rel": "domainSecurityRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/domainSecurityRuntime"
+        },
+        {
+            "rel": "consoleRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/consoleRuntime"
+        },
+        {
+            "rel": "logRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/logRuntime"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/forceShutdownPartitionWait",
+            "title": "forceShutdownPartitionWait"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/startPartitionWait",
+            "title": "startPartitionWait"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/restartSystemResource",
+            "title": "restartSystemResource"
+        },
+        {
+            "rel": "serverRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes"
+        },
+        {
+            "rel": "search",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/search"
+        }
+    ],
+    "identity": [],
+    "name": "dev",
+    "activationTime": "2026-04-15T13:13:16.860+02:00",
+    "type": "DomainRuntime",
+    "currentDomainPartitionRuntime": null
+}

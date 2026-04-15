@@ -1,0 +1,542 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans"
+        }
+    ],
+    "items": [
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/OraSDPMDataSource"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/OraSDPMDataSource"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "OraSDPMDataSource"
+            ],
+            "connectionsTotalCount": 1,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 1,
+            "reserveRequestCount": 10,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 1,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 0,
+            "prepStmtCacheMissCount": 0,
+            "databaseProductName": "not available",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "OraSDPMDataSource",
+            "prepStmtCacheAddCount": 0,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "not available",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 50,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.xa.client.OracleXADataSource",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 0,
+            "numAvailable": 0,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 0,
+            "driverVersion": "not available",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 0,
+            "name": "OraSDPMDataSource",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 0,
+            "driverName": "not available",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "SendStreamAsBlob": "true",
+                "user": "DEV_UMS",
+                "oracle.net.CONNECT_TIMEOUT": "10000"
+            },
+            "highestNumAvailable": 1,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/SOADataSource"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/SOADataSource"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "SOADataSource"
+            ],
+            "connectionsTotalCount": 1,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 1,
+            "reserveRequestCount": 5,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 1,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 0,
+            "prepStmtCacheMissCount": 0,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "SOADataSource",
+            "prepStmtCacheAddCount": 0,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 32,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.xa.client.OracleXADataSource",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 0,
+            "numAvailable": 0,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 0,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 0,
+            "name": "SOADataSource",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 0,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "user": "DEV_SOAINFRA"
+            },
+            "highestNumAvailable": 1,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "wlsbjmsrpDataSource"
+            ],
+            "connectionsTotalCount": 5,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 1,
+            "reserveRequestCount": 2,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 5,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 0,
+            "prepStmtCacheMissCount": 0,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "wlsbjmsrpDataSource",
+            "prepStmtCacheAddCount": 0,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 43,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.xa.client.OracleXADataSource",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 0,
+            "numAvailable": 5,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 0,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 0,
+            "name": "wlsbjmsrpDataSource",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 5,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "user": "DEV_SOAINFRA"
+            },
+            "highestNumAvailable": 5,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/mds-owsm"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/mds-owsm"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "mds-owsm"
+            ],
+            "connectionsTotalCount": 2,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 2,
+            "reserveRequestCount": 1886,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 2,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 1531,
+            "prepStmtCacheMissCount": 12,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "mds-owsm",
+            "prepStmtCacheAddCount": 12,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 2,
+            "connectionDelayTime": 35,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.OracleDriver",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 2,
+            "numAvailable": 1,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 1543,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 10,
+            "name": "mds-owsm",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 1,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "SendStreamAsBlob": "true",
+                "user": "DEV_MDS",
+                "oracle.net.CONNECT_TIMEOUT": "120000"
+            },
+            "highestNumAvailable": 2,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/opss-audit-DBDS"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/opss-audit-DBDS"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "opss-audit-DBDS"
+            ],
+            "connectionsTotalCount": 1,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 0,
+            "reserveRequestCount": 0,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 1,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 0,
+            "prepStmtCacheMissCount": 0,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "opss-audit-DBDS",
+            "prepStmtCacheAddCount": 0,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 44,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.OracleDriver",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 0,
+            "numAvailable": 1,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 0,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 0,
+            "name": "opss-audit-DBDS",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 1,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "user": "DEV_IAU_APPEND"
+            },
+            "highestNumAvailable": 1,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/WLSSchemaDataSource"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/WLSSchemaDataSource"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "WLSSchemaDataSource"
+            ],
+            "connectionsTotalCount": 1,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 0,
+            "reserveRequestCount": 0,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 1,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 0,
+            "prepStmtCacheMissCount": 0,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "WLSSchemaDataSource",
+            "prepStmtCacheAddCount": 0,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 42,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.OracleDriver",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 0,
+            "numAvailable": 1,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 0,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 0,
+            "name": "WLSSchemaDataSource",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 1,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "user": "DEV_WLS_RUNTIME"
+            },
+            "highestNumAvailable": 1,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/opss-data-source"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/opss-data-source"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "opss-data-source"
+            ],
+            "connectionsTotalCount": 1,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 1,
+            "reserveRequestCount": 47,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 1,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 29,
+            "prepStmtCacheMissCount": 12,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "opss-data-source",
+            "prepStmtCacheAddCount": 12,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 44,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.OracleDriver",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 2,
+            "numAvailable": 1,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 41,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 10,
+            "name": "opss-data-source",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 1,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "user": "DEV_OPSS"
+            },
+            "highestNumAvailable": 1,
+            "lastTask": null
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/opss-audit-viewDS"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/opss-audit-viewDS"
+                }
+            ],
+            "identity": [
+                "JDBCServiceRuntime",
+                "JDBCDataSourceRuntimeMBeans",
+                "opss-audit-viewDS"
+            ],
+            "connectionsTotalCount": 1,
+            "waitingForConnectionSuccessTotal": 0,
+            "highestNumUnavailable": 0,
+            "reserveRequestCount": 0,
+            "type": "JDBCDataSourceRuntime",
+            "waitingForConnectionTotal": 0,
+            "enabled": true,
+            "currCapacityHighCount": 1,
+            "resolvedAsNotCommittedTotalCount": 0,
+            "prepStmtCacheHitCount": 0,
+            "prepStmtCacheMissCount": 0,
+            "databaseProductName": "Oracle",
+            "commitOutcomeRetryTotalCount": 0,
+            "failedRepurposeCount": 0,
+            "state": "Running",
+            "moduleId": "opss-audit-viewDS",
+            "prepStmtCacheAddCount": 0,
+            "failuresToReconnectCount": 0,
+            "repurposeCount": 0,
+            "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+            "leakedConnectionCount": 0,
+            "waitingForConnectionFailureTotal": 0,
+            "activeConnectionsHighCount": 1,
+            "connectionDelayTime": 45,
+            "waitingForConnectionHighCount": 0,
+            "waitSecondsHighCount": 0,
+            "versionJDBCDriver": "oracle.jdbc.OracleDriver",
+            "failedReserveRequestCount": 0,
+            "prepStmtCacheDeleteCount": 0,
+            "numAvailable": 1,
+            "deploymentState": 2,
+            "unresolvedTotalCount": 0,
+            "prepStmtCacheAccessCount": 0,
+            "driverVersion": "19.3.0.0.0",
+            "resolvedAsCommittedTotalCount": 0,
+            "prepStmtCacheCurrentSize": 0,
+            "name": "opss-audit-viewDS",
+            "activeConnectionsCurrentCount": 0,
+            "currCapacity": 1,
+            "driverName": "Oracle JDBC driver",
+            "activeConnectionsAverageCount": 0,
+            "numUnavailable": 0,
+            "waitingForConnectionCurrentCount": 0,
+            "properties": {
+                "user": "DEV_IAU_VIEWER"
+            },
+            "highestNumAvailable": 1,
+            "lastTask": null
+        }
+    ]
+}

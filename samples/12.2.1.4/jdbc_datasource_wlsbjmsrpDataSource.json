@@ -1,0 +1,165 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource"
+        },
+        {
+            "rel": "workManagerRuntimes",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/workManagerRuntimes"
+        },
+        {
+            "rel": "tasks",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/tasks"
+        },
+        {
+            "rel": "JDBCDriverRuntime",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/JDBCDriverRuntime"
+        },
+        {
+            "rel": "JDBCReplayStatisticsRuntimeMBean",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/JDBCReplayStatisticsRuntimeMBean"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/suspend",
+            "title": "suspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/resume",
+            "title": "resume"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/asyncShutdown",
+            "title": "asyncShutdown"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/poolExists",
+            "title": "poolExists"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/resetStatistics",
+            "title": "resetStatistics"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/shrink",
+            "title": "shrink"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/start",
+            "title": "start"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/testPool",
+            "title": "testPool"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/dumpPoolProfile",
+            "title": "dumpPoolProfile"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/dumpPool",
+            "title": "dumpPool"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/asyncSuspend",
+            "title": "asyncSuspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/clearStatementCache",
+            "title": "clearStatementCache"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/forceSuspend",
+            "title": "forceSuspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/reset",
+            "title": "reset"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/forceShutdown",
+            "title": "forceShutdown"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/wlsbjmsrpDataSource/shutdown",
+            "title": "shutdown"
+        }
+    ],
+    "identity": [
+        "JDBCServiceRuntime",
+        "JDBCDataSourceRuntimeMBeans",
+        "wlsbjmsrpDataSource"
+    ],
+    "connectionsTotalCount": 5,
+    "waitingForConnectionSuccessTotal": 0,
+    "highestNumUnavailable": 1,
+    "reserveRequestCount": 2,
+    "type": "JDBCDataSourceRuntime",
+    "waitingForConnectionTotal": 0,
+    "enabled": true,
+    "currCapacityHighCount": 5,
+    "resolvedAsNotCommittedTotalCount": 0,
+    "prepStmtCacheHitCount": 0,
+    "prepStmtCacheMissCount": 0,
+    "databaseProductName": "Oracle",
+    "commitOutcomeRetryTotalCount": 0,
+    "failedRepurposeCount": 0,
+    "state": "Running",
+    "moduleId": "wlsbjmsrpDataSource",
+    "prepStmtCacheAddCount": 0,
+    "failuresToReconnectCount": 0,
+    "repurposeCount": 0,
+    "databaseProductVersion": "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.3.0.0.0",
+    "leakedConnectionCount": 0,
+    "waitingForConnectionFailureTotal": 0,
+    "activeConnectionsHighCount": 1,
+    "connectionDelayTime": 43,
+    "waitingForConnectionHighCount": 0,
+    "waitSecondsHighCount": 0,
+    "versionJDBCDriver": "oracle.jdbc.xa.client.OracleXADataSource",
+    "failedReserveRequestCount": 0,
+    "prepStmtCacheDeleteCount": 0,
+    "numAvailable": 5,
+    "deploymentState": 2,
+    "unresolvedTotalCount": 0,
+    "prepStmtCacheAccessCount": 0,
+    "driverVersion": "19.3.0.0.0",
+    "resolvedAsCommittedTotalCount": 0,
+    "prepStmtCacheCurrentSize": 0,
+    "name": "wlsbjmsrpDataSource",
+    "activeConnectionsCurrentCount": 0,
+    "currCapacity": 5,
+    "driverName": "Oracle JDBC driver",
+    "activeConnectionsAverageCount": 0,
+    "numUnavailable": 0,
+    "waitingForConnectionCurrentCount": 0,
+    "properties": {
+        "user": "DEV_SOAINFRA"
+    },
+    "highestNumAvailable": 5,
+    "lastTask": null
+}

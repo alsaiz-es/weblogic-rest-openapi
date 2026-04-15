@@ -1,0 +1,38 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime"
+        },
+        {
+            "rel": "JDBCDriverRuntimeMBeans",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime/JDBCDriverRuntimeMBeans"
+        },
+        {
+            "rel": "JDBCMultiDataSourceRuntimeMBeans",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime/JDBCMultiDataSourceRuntimeMBeans"
+        },
+        {
+            "rel": "JDBCDataSourceRuntimeMBeans",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans"
+        }
+    ],
+    "identity": [
+        "JDBCServiceRuntime"
+    ],
+    "healthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "symptoms": []
+    },
+    "name": "AdminServer",
+    "type": "JDBCServiceRuntime"
+}

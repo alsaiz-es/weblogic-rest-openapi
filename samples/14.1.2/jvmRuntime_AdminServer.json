@@ -1,0 +1,38 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JVMRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JVMRuntime"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/JVMRuntime/runGC",
+            "title": "runGC"
+        }
+    ],
+    "identity": [
+        "JVMRuntime"
+    ],
+    "javaVersion": "21.0.9",
+    "javaVMVendor": "Oracle Corporation",
+    "OSName": "Linux",
+    "javaVendor": "Oracle Corporation",
+    "type": "JVMRuntime",
+    "uptime": 3189216526,
+    "heapSizeCurrent": 268435456,
+    "heapFreeCurrent": 121052080,
+    "name": "AdminServer",
+    "javaVendorVersion": null,
+    "OSVersion": "5.15.0-200.131.27.el8uek.x86_64",
+    "heapSizeMax": 536870912,
+    "heapFreePercent": 72,
+    "processCpuLoad": 0
+}

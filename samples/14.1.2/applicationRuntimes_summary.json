@@ -1,0 +1,76 @@
+{
+    "items": [
+        {
+            "applicationVersion": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "jms-internal-xa-adp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jms-internal-xa-adp"
+        },
+        {
+            "applicationVersion": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "bea_wls_internal",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "bea_wls_internal"
+        },
+        {
+            "applicationVersion": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "wls-management-services",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "wls-management-services"
+        },
+        {
+            "applicationVersion": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "jamagent",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jamagent"
+        },
+        {
+            "applicationVersion": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "jms-internal-notran-adp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jms-internal-notran-adp"
+        },
+        {
+            "applicationVersion": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "mejb",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "mejb"
+        }
+    ]
+}

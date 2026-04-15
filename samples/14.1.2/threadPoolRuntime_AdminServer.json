@@ -1,0 +1,40 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/threadPoolRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/AdminServer/threadPoolRuntime"
+        }
+    ],
+    "identity": [
+        "threadPoolRuntime"
+    ],
+    "executeThreadIdleCount": 0,
+    "overloadRejectedRequestsCount": 0,
+    "queueLength": 0,
+    "completedRequestCount": 24949,
+    "executeThreadTotalCount": 12,
+    "type": "ThreadPoolRuntime",
+    "sharedCapacityForWorkManagers": 65536,
+    "minThreadsConstraintsPending": 0,
+    "suspended": false,
+    "pendingUserRequestCount": 0,
+    "healthState": {
+        "state": "ok",
+        "subsystemName": "threadpool",
+        "symptoms": []
+    },
+    "name": "ThreadPoolRuntime",
+    "stuckThreadCount": 0,
+    "throughput": 2.7438263906211025,
+    "hoggingThreadCount": 0,
+    "minThreadsConstraintsCompleted": 855,
+    "standbyThreadCount": 10
+}

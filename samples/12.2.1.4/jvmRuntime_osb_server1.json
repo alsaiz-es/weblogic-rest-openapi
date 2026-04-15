@@ -1,0 +1,32 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JVMRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes/osb_server1/JVMRuntime"
+        }
+    ],
+    "identity": [
+        "JVMRuntime"
+    ],
+    "javaVersion": "1.8.0_401",
+    "javaVMVendor": "Oracle Corporation",
+    "OSName": "Linux",
+    "javaVendor": "Oracle Corporation",
+    "type": "JVMRuntime",
+    "uptime": 1209188,
+    "heapSizeCurrent": 2860515328,
+    "heapFreeCurrent": 2094016464,
+    "name": "osb_server1",
+    "OSVersion": "4.1.12-124.57.1.el7uek.x86_64",
+    "heapSizeMax": 3817865216,
+    "heapFreePercent": 79,
+    "processCpuLoad": 0.002195217561740494
+}

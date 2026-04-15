@@ -1,0 +1,9 @@
+body={}
+Bad Request
+--- HTTP 400 ---
+body={"fields":["name"],"links":"none"}
+Bad Request
+--- HTTP 400 ---
+body={"fields":[],"links":"none","children":{"serverRuntimes":{"fields":["name","state"]}}}
+Bad Request
+--- HTTP 400 ---

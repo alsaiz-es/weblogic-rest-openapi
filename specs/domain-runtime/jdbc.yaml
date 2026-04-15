@@ -1,0 +1,619 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — JDBC Service Runtime
+  description: |
+    Read-only monitoring endpoints for JDBC resources on a managed server:
+    the parent `JDBCServiceRuntime` and the `JDBCDataSourceRuntimeMBeans`
+    collection that exposes per-datasource connection-pool metrics.
+
+    Field set and types verified against a live WLS 12.2.1.4 OSB domain
+    (SOA/OSB datasources connected to Oracle Database 19c).
+
+    Sibling collections under the same service runtime —
+    `JDBCMultiDataSourceRuntimeMBeans` and `JDBCDriverRuntimeMBeans` — are
+    reachable via HATEOAS links but out of scope for this file.
+  version: 0.1.1
+  contact:
+    name: wls_openapi_spec (unofficial)
+    url: https://github.com/alsaiz-es/wls_openapi_spec
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: jdbcServiceRuntime
+    description: JDBC service runtime on a managed server.
+  - name: jdbcDataSources
+    description: Connection-pool metrics per datasource.
+
+paths:
+  /domainRuntime/serverRuntimes/{serverName}/JDBCServiceRuntime:
+    parameters:
+      - $ref: '#/components/parameters/ServerNamePath'
+    get:
+      operationId: getJDBCServiceRuntime
+      tags: [jdbcServiceRuntime]
+      summary: Get the JDBC service runtime for a server.
+      description: |
+        Returns the `JDBCServiceRuntime` bean — essentially a container
+        that exposes health state and HATEOAS links to the datasource,
+        multi-datasource, and driver runtime collections.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: JDBC service runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCServiceRuntime'
+              examples:
+                osbServer1:
+                  $ref: '#/components/examples/JDBCServiceRuntimeExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans:
+    parameters:
+      - $ref: '#/components/parameters/ServerNamePath'
+    get:
+      operationId: listJDBCDataSourceRuntimes
+      tags: [jdbcDataSources]
+      summary: List all datasource runtimes on a server.
+      description: |
+        Returns every `JDBCDataSourceRuntimeMBean` currently deployed on
+        the target server, including FMW-internal datasources (OPSS, MDS,
+        WLS schema) and user-defined ones.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Collection of datasource runtime beans.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCDataSourceRuntimeCollection'
+              examples:
+                osbServer1Summary:
+                  $ref: '#/components/examples/JDBCDataSourceCollectionExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans/{dataSourceName}:
+    parameters:
+      - $ref: '#/components/parameters/ServerNamePath'
+      - name: dataSourceName
+        in: path
+        required: true
+        description: |
+          Datasource name as configured in the JDBC system resource.
+          Case-sensitive. Matches the `name` field of the datasource
+          runtime bean.
+        schema:
+          type: string
+        example: SOADataSource
+    get:
+      operationId: getJDBCDataSourceRuntime
+      tags: [jdbcDataSources]
+      summary: Get a single datasource runtime.
+      description: |
+        Returns the full `JDBCDataSourceRuntimeMBean` with every connection
+        pool metric, prepared statement cache counter, XA outcome counter,
+        and driver/database identity field.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Datasource runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCDataSourceRuntime'
+              examples:
+                soaDataSource:
+                  $ref: '#/components/examples/JDBCDataSourceExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        WebLogic administration user credentials. `Monitor` role is
+        sufficient for GET operations on runtime resources.
+
+  parameters:
+    ServerNamePath:
+      name: serverName
+      in: path
+      required: true
+      description: Name of the managed server (case-sensitive).
+      schema:
+        type: string
+      example: osb_server1
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated user lacks the required role.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The server or datasource does not exist or is not running.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    JDBCDataSourceState:
+      type: string
+      description: |
+        Lifecycle state of a datasource runtime. Serialized in **Title
+        Case** (`Running`, `Suspended`, ...) — distinct from
+        `ServerRuntime.state` which is UPPER CASE. Verified on WLS 12.2.1.4.
+      enum:
+        - Running
+        - Suspended
+        - Shutdown
+        - Overloaded
+        - Unhealthy
+        - Unknown
+
+    JDBCServiceRuntime:
+      type: object
+      description: |
+        Parent bean aggregating JDBC runtime data for a single server.
+        Carries health state and links to child collections; individual
+        datasource metrics live one level deeper.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `JDBCServiceRuntime`.
+          example: JDBCServiceRuntime
+        name:
+          type: string
+          description: |
+            Bean name. In this runtime bean it mirrors the server name
+            (not a JDBC-specific identifier).
+          example: osb_server1
+        healthState:
+          $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+        links:
+          type: array
+          description: |
+            HATEOAS links. Always includes `self`, `canonical`, `parent`,
+            plus `JDBCDataSourceRuntimeMBeans`,
+            `JDBCMultiDataSourceRuntimeMBeans`, and
+            `JDBCDriverRuntimeMBeans`.
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+    JDBCDataSourceRuntime:
+      type: object
+      description: |
+        Per-datasource runtime metrics. Every counter is cumulative since
+        the datasource was last deployed; "current" fields are
+        point-in-time and "High" fields are watermarks.
+
+        The bean also exposes prepared-statement cache counters and XA
+        transaction outcome counters for XA-enabled datasources.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `JDBCDataSourceRuntime`.
+          example: JDBCDataSourceRuntime
+        name:
+          type: string
+          description: Datasource name as configured.
+          example: SOADataSource
+        moduleId:
+          type: string
+          description: |
+            JDBC system-resource module identifier. Typically identical to
+            `name` for stand-alone datasources.
+          example: SOADataSource
+        state:
+          $ref: '#/components/schemas/JDBCDataSourceState'
+        enabled:
+          type: boolean
+          description: True if the datasource is currently enabled (not disabled/suspended).
+        deploymentState:
+          type: integer
+          format: int32
+          description: |
+            Numeric deployment state inherited from the generic deployment
+            framework. Typical values: `2` (active). Not identical to
+            `state`; use `state` for human-readable lifecycle.
+          example: 2
+
+        # --- Connection pool capacity ---
+        currCapacity:
+          type: integer
+          format: int32
+          description: Current total size of the connection pool.
+          example: 1
+        currCapacityHighCount:
+          type: integer
+          format: int32
+          description: Watermark — highest `currCapacity` seen since deployment.
+        numAvailable:
+          type: integer
+          format: int32
+          description: Connections currently idle and available for reservation.
+        highestNumAvailable:
+          type: integer
+          format: int32
+          description: Watermark — highest `numAvailable` seen.
+        numUnavailable:
+          type: integer
+          format: int32
+          description: |
+            Connections currently unavailable — in use, being tested, or
+            flagged bad awaiting replacement.
+        highestNumUnavailable:
+          type: integer
+          format: int32
+
+        # --- Active (in-use) connections ---
+        activeConnectionsCurrentCount:
+          type: integer
+          format: int32
+          description: Connections currently reserved by an application.
+        activeConnectionsHighCount:
+          type: integer
+          format: int32
+          description: Watermark — highest `activeConnectionsCurrentCount` seen.
+        activeConnectionsAverageCount:
+          type: integer
+          format: int32
+          description: |
+            Running average of active connections. Integer (not a float)
+            in the REST serialization.
+
+        # --- Waiters / reserve requests ---
+        waitingForConnectionCurrentCount:
+          type: integer
+          format: int32
+          description: Threads currently blocked waiting for a free connection.
+        waitingForConnectionHighCount:
+          type: integer
+          format: int32
+          description: Watermark — highest concurrent waiter count.
+        waitingForConnectionTotal:
+          type: integer
+          format: int64
+          description: Cumulative count of threads that have ever waited.
+        waitingForConnectionSuccessTotal:
+          type: integer
+          format: int64
+          description: Cumulative waiters that eventually obtained a connection.
+        waitingForConnectionFailureTotal:
+          type: integer
+          format: int64
+          description: |
+            Cumulative waiters that gave up before obtaining a
+            connection. A non-zero value here is the primary signal that
+            the pool is undersized for the workload.
+        waitSecondsHighCount:
+          type: integer
+          format: int32
+          description: Longest individual wait time observed, in seconds.
+        reserveRequestCount:
+          type: integer
+          format: int64
+          description: Cumulative successful connection reservations.
+        failedReserveRequestCount:
+          type: integer
+          format: int64
+          description: Cumulative reservation attempts that failed outright.
+        connectionDelayTime:
+          type: integer
+          format: int32
+          description: |
+            Average time, in milliseconds, to create a new physical
+            database connection.
+          example: 32
+        connectionsTotalCount:
+          type: integer
+          format: int64
+          description: Cumulative count of physical connections ever created.
+
+        # --- Connection lifecycle failures ---
+        leakedConnectionCount:
+          type: integer
+          format: int64
+          description: |
+            Cumulative connections reclaimed because the application
+            never returned them. Non-zero values indicate an application
+            bug — typically a missing `close()` in a `finally`.
+        failuresToReconnectCount:
+          type: integer
+          format: int64
+          description: |
+            Cumulative failures when the pool tried to replace a broken
+            connection. Sustained growth indicates DB-side instability.
+
+        # --- Repurpose (connection labelling) ---
+        repurposeCount:
+          type: integer
+          format: int64
+          description: Cumulative successful connection repurposes.
+        failedRepurposeCount:
+          type: integer
+          format: int64
+
+        # --- Prepared statement cache ---
+        prepStmtCacheAccessCount:
+          type: integer
+          format: int64
+          description: Cumulative cache lookups.
+        prepStmtCacheHitCount:
+          type: integer
+          format: int64
+        prepStmtCacheMissCount:
+          type: integer
+          format: int64
+        prepStmtCacheAddCount:
+          type: integer
+          format: int64
+        prepStmtCacheDeleteCount:
+          type: integer
+          format: int64
+        prepStmtCacheCurrentSize:
+          type: integer
+          format: int32
+          description: Number of prepared statements currently cached.
+
+        # --- XA transaction outcome counters ---
+        resolvedAsCommittedTotalCount:
+          type: integer
+          format: int64
+          description: Cumulative XA branches resolved as committed.
+        resolvedAsNotCommittedTotalCount:
+          type: integer
+          format: int64
+          description: Cumulative XA branches resolved as rolled back.
+        unresolvedTotalCount:
+          type: integer
+          format: int64
+          description: |
+            Cumulative XA branches whose outcome could not be determined.
+            Non-zero values usually indicate in-doubt transactions that
+            need DBA attention.
+        commitOutcomeRetryTotalCount:
+          type: integer
+          format: int64
+
+        # --- Driver / DB identity ---
+        driverName:
+          type: string
+          description: JDBC driver name as reported by the driver itself.
+          example: Oracle JDBC driver
+        driverVersion:
+          type: string
+          example: 19.3.0.0.0
+        versionJDBCDriver:
+          type: string
+          description: |
+            Fully-qualified class name of the configured DataSource or
+            Driver implementation.
+          example: oracle.jdbc.xa.client.OracleXADataSource
+        databaseProductName:
+          type: string
+          example: Oracle
+        databaseProductVersion:
+          type: string
+          description: |
+            Full DB version banner from the JDBC driver. Often multi-line
+            (newline-separated); clients should not split on whitespace.
+          example: |
+            Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+            Version 19.3.0.0.0
+
+        properties:
+          type: object
+          description: |
+            Subset of the JDBC connection properties that the pool
+            considers safe to expose. In practice this contains at least
+            `user`; the password is never returned.
+
+            **Sensitivity:** treat `user` as infrastructure metadata (DB
+            account name). Avoid logging it alongside query strings when
+            forwarding to metrics pipelines.
+          additionalProperties:
+            type: string
+          example:
+            user: DEV_SOAINFRA
+
+        lastTask:
+          type: object
+          nullable: true
+          description: |
+            Descriptor of the last administrative task (reset, clear,
+            shrink, etc.) executed against the pool. `null` when no
+            task has run.
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+    JDBCDataSourceRuntimeCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JDBCDataSourceRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+  examples:
+    JDBCServiceRuntimeExample:
+      summary: JDBCServiceRuntime on osb_server1
+      value:
+        identity: [JDBCServiceRuntime]
+        type: JDBCServiceRuntime
+        name: osb_server1
+        healthState:
+          state: ok
+          subsystemName: null
+          partitionName: null
+          symptoms: []
+
+    JDBCDataSourceExample:
+      summary: wlsbjmsrpDataSource — XA, Oracle 19c (verbatim from WLS 12.2.1.4)
+      value:
+        identity: [JDBCServiceRuntime, JDBCDataSourceRuntimeMBeans, wlsbjmsrpDataSource]
+        type: JDBCDataSourceRuntime
+        name: wlsbjmsrpDataSource
+        moduleId: wlsbjmsrpDataSource
+        state: Running
+        enabled: true
+        deploymentState: 2
+        currCapacity: 5
+        currCapacityHighCount: 5
+        numAvailable: 5
+        highestNumAvailable: 5
+        numUnavailable: 0
+        highestNumUnavailable: 1
+        activeConnectionsCurrentCount: 0
+        activeConnectionsHighCount: 1
+        activeConnectionsAverageCount: 0
+        waitingForConnectionCurrentCount: 0
+        waitingForConnectionHighCount: 0
+        waitingForConnectionTotal: 0
+        waitingForConnectionSuccessTotal: 0
+        waitingForConnectionFailureTotal: 0
+        waitSecondsHighCount: 0
+        reserveRequestCount: 1
+        failedReserveRequestCount: 0
+        connectionDelayTime: 43
+        connectionsTotalCount: 5
+        leakedConnectionCount: 0
+        failuresToReconnectCount: 0
+        repurposeCount: 0
+        failedRepurposeCount: 0
+        prepStmtCacheAccessCount: 0
+        prepStmtCacheHitCount: 0
+        prepStmtCacheMissCount: 0
+        prepStmtCacheAddCount: 0
+        prepStmtCacheDeleteCount: 0
+        prepStmtCacheCurrentSize: 0
+        resolvedAsCommittedTotalCount: 0
+        resolvedAsNotCommittedTotalCount: 0
+        unresolvedTotalCount: 0
+        commitOutcomeRetryTotalCount: 0
+        driverName: Oracle JDBC driver
+        driverVersion: 19.3.0.0.0
+        versionJDBCDriver: oracle.jdbc.xa.client.OracleXADataSource
+        databaseProductName: Oracle
+        databaseProductVersion: |-
+          Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+          Version 19.3.0.0.0
+        properties:
+          user: DEV_SOAINFRA
+        lastTask: null
+
+    JDBCDataSourceCollectionExample:
+      summary: Typical OSB+SOA domain (FMW internal datasources)
+      value:
+        items:
+          - name: OraSDPMDataSource
+            state: Running
+            currCapacity: 1
+            activeConnectionsCurrentCount: 0
+          - name: SOADataSource
+            state: Running
+            currCapacity: 1
+            activeConnectionsCurrentCount: 0
+          - name: wlsbjmsrpDataSource
+            state: Running
+            currCapacity: 5
+            activeConnectionsCurrentCount: 0
+          - name: mds-owsm
+            state: Running
+            currCapacity: 2
+            activeConnectionsCurrentCount: 0
+          - name: opss-audit-DBDS
+            state: Running
+            currCapacity: 1
+            activeConnectionsCurrentCount: 0
+          - name: WLSSchemaDataSource
+            state: Running
+            currCapacity: 1
+            activeConnectionsCurrentCount: 0
+          - name: opss-data-source
+            state: Running
+            currCapacity: 1
+            activeConnectionsCurrentCount: 0
+          - name: opss-audit-viewDS
+            state: Running
+            currCapacity: 1
+            activeConnectionsCurrentCount: 0

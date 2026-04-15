@@ -1,0 +1,356 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime"
+        },
+        {
+            "rel": "maxThreadsConstraintRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/maxThreadsConstraintRuntimes"
+        },
+        {
+            "rel": "webServerRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/webServerRuntimes"
+        },
+        {
+            "rel": "minThreadsConstraintRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/minThreadsConstraintRuntimes"
+        },
+        {
+            "rel": "pathServiceRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/pathServiceRuntimes"
+        },
+        {
+            "rel": "persistentStoreRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/persistentStoreRuntimes"
+        },
+        {
+            "rel": "partitionRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/partitionRuntimes"
+        },
+        {
+            "rel": "serverChannelRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/serverChannelRuntimes"
+        },
+        {
+            "rel": "requestClassRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/requestClassRuntimes"
+        },
+        {
+            "rel": "libraryRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/libraryRuntimes"
+        },
+        {
+            "rel": "executeQueueRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/executeQueueRuntimes"
+        },
+        {
+            "rel": "workManagerRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/workManagerRuntimes"
+        },
+        {
+            "rel": "messagingBridgeRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/messagingBridgeRuntimes"
+        },
+        {
+            "rel": "mailSessionRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/mailSessionRuntimes"
+        },
+        {
+            "rel": "applicationRuntimes",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/applicationRuntimes"
+        },
+        {
+            "rel": "MANAsyncReplicationRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/MANAsyncReplicationRuntime"
+        },
+        {
+            "rel": "singleSignOnServicesRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/singleSignOnServicesRuntime"
+        },
+        {
+            "rel": "wseeWsrmRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/wseeWsrmRuntime"
+        },
+        {
+            "rel": "batchJobRepositoryRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/batchJobRepositoryRuntime"
+        },
+        {
+            "rel": "JVMRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/JVMRuntime"
+        },
+        {
+            "rel": "asyncReplicationRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/asyncReplicationRuntime"
+        },
+        {
+            "rel": "serverSecurityRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/serverSecurityRuntime"
+        },
+        {
+            "rel": "entityCacheCurrentStateRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/entityCacheCurrentStateRuntime"
+        },
+        {
+            "rel": "SNMPAgentRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/SNMPAgentRuntime"
+        },
+        {
+            "rel": "clusterRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/clusterRuntime"
+        },
+        {
+            "rel": "joltRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/joltRuntime"
+        },
+        {
+            "rel": "threadPoolRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/threadPoolRuntime"
+        },
+        {
+            "rel": "timerRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/timerRuntime"
+        },
+        {
+            "rel": "defaultExecuteQueueRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/defaultExecuteQueueRuntime"
+        },
+        {
+            "rel": "wseeClusterFrontEndRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/wseeClusterFrontEndRuntime"
+        },
+        {
+            "rel": "logBroadcasterRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/logBroadcasterRuntime"
+        },
+        {
+            "rel": "concurrentManagedObjectsRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/concurrentManagedObjectsRuntime"
+        },
+        {
+            "rel": "entityCacheCumulativeRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/entityCacheCumulativeRuntime"
+        },
+        {
+            "rel": "entityCacheHistoricalRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/entityCacheHistoricalRuntime"
+        },
+        {
+            "rel": "JTARuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/JTARuntime"
+        },
+        {
+            "rel": "connectorServiceRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/connectorServiceRuntime"
+        },
+        {
+            "rel": "MANReplicationRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/MANReplicationRuntime"
+        },
+        {
+            "rel": "SAFRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/SAFRuntime"
+        },
+        {
+            "rel": "classLoaderRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/classLoaderRuntime"
+        },
+        {
+            "rel": "WLDFRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/WLDFRuntime"
+        },
+        {
+            "rel": "WTCRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/WTCRuntime"
+        },
+        {
+            "rel": "JMSRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/JMSRuntime"
+        },
+        {
+            "rel": "JDBCServiceRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/JDBCServiceRuntime"
+        },
+        {
+            "rel": "WANReplicationRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/WANReplicationRuntime"
+        },
+        {
+            "rel": "serverLogRuntime",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/serverLogRuntime"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/suspend",
+            "title": "suspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/resume",
+            "title": "resume"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/getIPv4URL",
+            "title": "getIPv4URL"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/getIPv6URL",
+            "title": "getIPv6URL"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/startResourceGroup",
+            "title": "startResourceGroup"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/suspendResourceGroup",
+            "title": "suspendResourceGroup"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/resumeResourceGroup",
+            "title": "resumeResourceGroup"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/forceSuspendResourceGroup",
+            "title": "forceSuspendResourceGroup"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/startPartitionInAdmin",
+            "title": "startPartitionInAdmin"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/getURL",
+            "title": "getURL"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/startPartition",
+            "title": "startPartition"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/bootPartition",
+            "title": "bootPartition"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/forceRestartPartition",
+            "title": "forceRestartPartition"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/shutdownResourceGroup",
+            "title": "shutdownResourceGroup"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/getRgState",
+            "title": "getRgState"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/forceSuspend",
+            "title": "forceSuspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/restartSSLChannels",
+            "title": "restartSSLChannels"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/startResourceGroupInAdmin",
+            "title": "startResourceGroupInAdmin"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/forceShutdown",
+            "title": "forceShutdown"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/shutdown",
+            "title": "shutdown"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/forceShutdownResourceGroup",
+            "title": "forceShutdownResourceGroup"
+        },
+        {
+            "rel": "search",
+            "href": "http://wls-admin.example.com:7003/management/weblogic/latest/serverRuntime/search"
+        }
+    ],
+    "identity": [],
+    "stateVal": 2,
+    "type": "ServerRuntime",
+    "weblogicVersion": "WebLogic Server 12.2.1.4.0",
+    "adminServerHost": "127.0.0.1",
+    "restartRequired": false,
+    "overallHealthState": {
+        "state": "ok",
+        "subsystemName": "ServerRuntime",
+        "partitionName": null,
+        "symptoms": []
+    },
+    "middlewareHome": "/oracle/fmw_dev",
+    "listenPortEnabled": true,
+    "weblogicHome": "/oracle/fmw_dev/wlserver",
+    "adminServer": false,
+    "SSLListenPortEnabled": false,
+    "state": "RUNNING",
+    "activationTime": 1776252570359,
+    "defaultURL": "t3://127.0.0.1:7003",
+    "adminServerListenPort": 7001,
+    "currentMachine": "wls-host",
+    "patchList": [
+        "36074941;25481791;Wed Feb 21 11:47:39 CET 2024;ADF BUNDLE PATCH 12.2.1.4.231205",
+        "36034300;25459648;Wed Feb 21 11:45:28 CET 2024;WebCenter Core Bundle Patch 12.2.1.4.231120",
+        "35950186;25434324;Wed Feb 21 11:44:46 CET 2024;OSB Bundle Patch 12.2.1.4.231026",
+        "35868571;25407132;Wed Feb 21 11:43:00 CET 2024;OWSM BUNDLE PATCH 12.2.1.4.231003",
+        "34809489;25012949;Wed Feb 21 11:41:59 CET 2024;One-off",
+        "34542329;24919025;Wed Feb 21 11:39:47 CET 2024;One-off",
+        "34065178;24731214;Wed Feb 21 11:38:42 CET 2024;One-off",
+        "33950717;24677093;Wed Feb 21 11:37:42 CET 2024;OPSS Bundle Patch 12.2.1.4.220311",
+        "36178550;25524691;Wed Feb 21 11:31:01 CET 2024;WLS STACK PATCH BUNDLE 12.2.1.4.240111 (Patch 36178496)",
+        "36155700;25515608;Wed Feb 21 11:30:56 CET 2024;WLS PATCH SET UPDATE 12.2.1.4.240104",
+        "36086980;25485176;Wed Feb 21 11:29:24 CET 2024;FMW Thirdparty Bundle Patch 12.2.1.4.231207",
+        "35965629;25445064;Wed Feb 21 11:28:32 CET 2024;ADR FOR WEBLOGIC SERVER 12.2.1.4.0 CPU JAN 2024",
+        "35922290;25425080;Wed Feb 21 11:28:22 CET 2024;RDA release 24.1-2024116 for OFM 12.2.1.4 SPB",
+        "32720458;24558359;Wed Feb 21 11:28:07 CET 2024;JDBC 19.3.0.0 FOR CPUJAN2022 (WLS 12.2.1.4, WLS 14.1.1)",
+        "1221420;25499738;Wed Feb 21 11:27:55 CET 2024;Coherence Cumulative Patch 12.2.1.4.20",
+        "30658875;23917622;Thu Nov 11 10:33:36 CET 2021;One-off",
+        "33093748;24325771;Thu Nov 11 10:27:25 CET 2021;One-off"
+    ],
+    "openSocketsCurrentCount": 6,
+    "administrationPortEnabled": false,
+    "administrationURL": "t3://127.0.0.1:7003",
+    "adminServerListenPortSecure": false,
+    "healthState": {
+        "state": "ok",
+        "subsystemName": "ServerRuntime",
+        "partitionName": null,
+        "symptoms": []
+    },
+    "currentDirectory": "/oracle/domains/dev/.",
+    "name": "osb_server1",
+    "inSitConfigState": false,
+    "serverClasspath": "/oracle/jdk/jre/lib/resources.jar:/oracle/jdk/jre/lib/rt.jar:/oracle/jdk/jre/lib/jsse.jar:/oracle/jdk/jre/lib/jce.jar:/oracle/jdk/jre/lib/charsets.jar:/oracle/jdk/jre/lib/jfr.jar:/oracle/jdk/jre/classes:/oracle/domains/dev/agent/jfr-extended-agent.jar:/oracle/fmw_dev/oracle_common/modules/features/com.oracle.db.jdbc7-dms.jar:/oracle/fmw_dev/oracle_common/modules/odsi_xquery2004_12.1.3/odsi.xquery.modules_12.1.3.0.jar:/oracle/jdk/lib/tools.jar:/oracle/fmw_dev/wlserver/server/lib/weblogic.jar:/oracle/fmw_dev/wlserver/../oracle_common/modules/thirdparty/ant-contrib-1.0b3.jar:/oracle/fmw_dev/wlserver/modules/features/oracle.wls.common.nodemanager.jar:/oracle/fmw_dev/oracle_common/communications/modules/config.jar:/oracle/fmw_dev/oracle_common/communications/modules/userprefs-config.jar:/oracle/fmw_dev/soa/soa/modules/oracle.soa.common.adapters_11.1.1/oracle.soa.common.adapters.jar:/oracle/fmw_dev/soa/soa/modules/oracle.cloud.adapter_12.1.3/oracle.cloud.adapter.jar:/oracle/fmw_dev/osb/lib/servicebus-common.jar:/oracle/fmw_dev/oracle_common/modules/internal/features/jrf_wlsFmw_oracle.jrf.wls.classpath.jar:/oracle/fmw_dev/osb/lib/version.jar:/oracle/fmw_dev/osb/lib/servicebus.jar:/oracle/domains/dev/config/osb/:/oracle/fmw_dev/wlserver/common/derby/lib/derbyclient.jar:/oracle/fmw_dev/wlserver/common/derby/lib/derby.jar"
+}
