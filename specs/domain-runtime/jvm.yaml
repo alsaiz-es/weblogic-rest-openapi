@@ -16,8 +16,8 @@ info:
     dump; otherwise every poll ships 100+ KB you will discard.
   version: 0.1.1
   contact:
-    name: wls_openapi_spec (unofficial)
-    url: https://github.com/alsaiz-es/wls_openapi_spec
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
