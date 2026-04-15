@@ -88,9 +88,10 @@ Confirmed in 14.1.2:
 - `JVMRuntime.OSName` / `OSVersion` (uppercase `OS` prefix)
 - `name` field semantics still vary per bean
 
-The `state` Title-Case quirk for `JDBCDataSourceRuntime` is unverifiable
-on this 14.1.2 capture (no datasources), but since every other casing
-and field set carries over unchanged, it almost certainly does too.
+The `state` Title-Case quirk for `JDBCDataSourceRuntime` was verified
+directly on 14.1.2 by creating a temporary Derby `TestDS` via WLST:
+the response carries `"state": "Running"` with the same Title Case used
+in 12.2.1.4.
 
 ## Actionable spec changes for v0.1.1
 

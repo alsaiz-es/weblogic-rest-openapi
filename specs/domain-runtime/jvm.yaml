@@ -251,11 +251,17 @@ components:
 
   examples:
     JVMRuntimeExample:
-      summary: osb_server1 JVMRuntime (verbatim from WLS 12.2.1.4, HotSpot 1.8.0_401)
+      summary: Composite example — 12.2.1.4 body with the 14.1.2 `javaVendorVersion` field
       description: |
-        `threadStackDump` is elided from this example — in a real
-        response it is a ~100 KB string. Request it explicitly with
-        `fields=threadStackDump` when you need it.
+        Values for every field except `javaVendorVersion` come verbatim
+        from a WLS 12.2.1.4 osb_server1 response (HotSpot 1.8.0_401).
+        `javaVendorVersion` was added in WLS 14.1.2 and is shown here as
+        `null`, matching what a 14.1.2 Oracle JDK install returns; on
+        12.2.1.4 the field is absent from the response entirely.
+
+        `threadStackDump` is elided — in a real response it is a ~100 KB
+        string. Request it explicitly with `fields=threadStackDump` when
+        you need it.
       value:
         identity: [JVMRuntime]
         type: JVMRuntime
