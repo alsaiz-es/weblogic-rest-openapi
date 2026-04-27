@@ -17,6 +17,88 @@ The WebLogic REST Management API is **dynamically generated at runtime** from th
 1. **Available resources depend on domain configuration.** A domain with 3 data sources exposes 3 JDBC runtime resources; a domain with none exposes zero. This spec documents the _structure_ and _operations_, not the specific instances.
 2. **The API is HATEOAS-driven.** Responses include `links` arrays for navigation between related resources. This spec documents the known link patterns but cannot capture the full dynamic graph.
 3. **Version-specific differences exist.** This spec targets **WebLogic Server 14.1.1.0 (14c)** and **14.1.2.0**. Earlier versions (12.2.1.x) share most of the structure but may differ in details.
+4. **Coverage is partial.** v0.3.x specifications cover monitoring and
+   administration of servers, clusters, and datasources, plus
+   lifecycle. Several large subsystems (deployments, full JMS
+   configuration, security, WLDF, JTA, work managers and others) are
+   not yet documented. See the [Project Status and Roadmap](#project-status-and-roadmap)
+   section below.
+
+## Project Status and Roadmap
+
+**Current coverage (v0.3.1).** This specification covers the most
+common monitoring and administration flows of a WebLogic domain:
+server runtimes, JVM, threading, JDBC datasources, applications and
+their components, server channels, JMS at server level, the bulk
+search DSL, the change session model, server/cluster/datasource CRUD,
+and server lifecycle operations. This is roughly the surface that the
+typical operator interacts with day-to-day, but it is not the whole
+WebLogic REST API.
+
+**What is not yet covered.** Several runtime and administration areas
+are intentionally absent from v0.3.x and are tracked as roadmap:
+
+- JTA runtime (transactions, recovery, retry counters)
+- WLDF — WebLogic Diagnostic Framework (harvesters, watches,
+  notifications, log filters, image generation)
+- Work managers, request classes, tuning constraints
+- Per-destination JMS drill-down (queues, topics with metrics)
+- JMS configuration (modules, queues, topics, connection factories,
+  distributed destinations, foreign servers, SAF agents, JMS bridges)
+- Application deployments (the multipart upload flow)
+- Security (realms, providers, users, groups, role mappers)
+- Mail sessions, foreign JNDI providers, file stores, JDBC stores
+- Coherence (clusters, caches, addresses)
+- Machines, NodeManager configuration
+- Self-tuning, server templates, dynamic clusters
+- Partitions (multi-tenant — only relevant on 12.2.1.x)
+- Path services, singleton services, migratable targets
+- WTC, mail, and other legacy subsystems
+
+Roughly speaking, the spec covers about 25–30% of the full REST API
+surface today. Reaching meaningful coverage of the rest manually
+would take a long time, and during early v0.3.x we identified a
+better path forward (see below).
+
+**Direction for the next major release.** Oracle's open-source
+WebLogic Remote Console
+([oracle/weblogic-remote-console](https://github.com/oracle/weblogic-remote-console))
+ships a directory of harvested MBean definitions in YAML — one set
+per WLS version, ~850 files each. These describe property names,
+types, descriptions, defaults, enums, deprecation flags and
+containment relationships. They are the same source of truth Oracle
+uses internally to drive the Remote Console UI.
+
+Upcoming work for v0.4.x will introduce a generator under
+`tools/openapi-generator/` that consumes those harvested YAMLs and
+produces OpenAPI schemas mechanically. The intent is to lift coverage
+dramatically while keeping what genuinely cannot be derived from the
+YAMLs as a manual layer:
+
+- Operations (`start`, `shutdown`, `suspend`, etc.) — captured from
+  the Remote Console's UI extension overlays and from its Java
+  `WebLogicRest*PageRepo` classes.
+- Response envelopes (`identity`, `links`, `items`, error envelopes
+  such as `wls:errorsDetails`).
+- Quirks documentation (the conditional CSRF gates, the JDBC
+  staged-create workflow, casing inconsistencies, and so on).
+- Live cross-version validation samples under `samples/`.
+
+Once that pipeline is in place, the spec is expected to cover most of
+the real REST surface across the supported WLS versions Oracle itself
+tracks (12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1).
+
+**What stays valuable from v0.3.x.** Everything in the current `specs/`
+directory has been verified against running WLS instances, not derived
+from documentation alone. The samples, the discovered quirks, and the
+empirical operations modelling will become the manual overlay layer
+that complements the generator.
+
+**A note on scope language.** Earlier wording in this README and in
+the v0.1.0 LinkedIn announcement framed the project as if it covered
+the whole API. It does not, and never did. The framing has been
+tightened in v0.3.1 to set realistic expectations for anyone arriving
+at the repository.
 
 ## Spec Structure
 
@@ -60,6 +142,12 @@ specs/
 | edit | Cluster CRUD | ✅ Verified (12.2.1.4, 14.1.2) — 73/69 fields, 4 14.1.2-only |
 | edit | JDBC resource CRUD | ✅ Verified (12.2.1.4, 14.1.2) — staged-create workflow, partial-create quirk |
 | lifecycle | Server lifecycle ops | ✅ Verified (12.2.1.4, 14.1.2) — 8 actions, async-task response shape |
+
+The table above lists what is **in** the current spec. For an explicit
+list of what is **not** yet covered (deployments, security, WLDF, JTA,
+work managers, full JMS configuration, and several other subsystems),
+see the [Project Status and Roadmap](#project-status-and-roadmap)
+section.
 
 "Verified" means the property set, field names, data types, and enum
 casings in the spec were cross-checked against the JSON emitted by a
