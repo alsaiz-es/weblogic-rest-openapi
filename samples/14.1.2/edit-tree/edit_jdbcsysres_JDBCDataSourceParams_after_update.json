@@ -1,0 +1,20 @@
+{
+    "identity": [
+        "JDBCSystemResources",
+        "OpenAPISpecTestDS",
+        "JDBCResource",
+        "JDBCDataSourceParams"
+    ],
+    "connectionPoolFailoverCallbackHandler": null,
+    "globalTransactionsProtocol": "OnePhaseCommit",
+    "algorithmType": "Failover",
+    "scope": "Global",
+    "failoverRequestIfBusy": false,
+    "proxySwitchingCallback": null,
+    "JNDINames": [
+        "jdbc/OpenAPISpecTestDS"
+    ],
+    "proxySwitchingProperties": null,
+    "dataSourceList": null,
+    "keepConnAfterGlobalTx": false
+}

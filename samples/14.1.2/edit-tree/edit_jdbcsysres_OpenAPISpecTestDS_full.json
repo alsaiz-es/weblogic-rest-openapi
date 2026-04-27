@@ -1,0 +1,24 @@
+{
+    "identity": [
+        "JDBCSystemResources",
+        "OpenAPISpecTestDS"
+    ],
+    "notes": null,
+    "moduleType": null,
+    "deploymentPrincipalName": null,
+    "descriptorFileName": "jdbc/OpenAPISpecTestDS-8372-jdbc.xml",
+    "name": "OpenAPISpecTestDS",
+    "compatibilityName": null,
+    "id": 0,
+    "deploymentOrder": 100,
+    "dynamicallyCreated": false,
+    "type": "JDBCSystemResource",
+    "sourcePath": "./config/jdbc/OpenAPISpecTestDS-8372-jdbc.xml",
+    "tags": [],
+    "resource": [
+        "JDBCSystemResources",
+        "OpenAPISpecTestDS",
+        "JDBCResource"
+    ],
+    "targets": []
+}

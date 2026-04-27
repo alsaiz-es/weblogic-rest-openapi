@@ -1,0 +1,17 @@
+{
+    "status": 400,
+    "type": "http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1",
+    "title": "ERRORS",
+    "wls:errorsDetails": [
+        {
+            "type": "http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1",
+            "title": "FAILURE",
+            "detail": "weblogic.management.provider.EditNotEditorException: Not edit lock owner"
+        },
+        {
+            "type": "http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1",
+            "title": "FAILURE",
+            "detail": "Failed to resolve the changes in this edit session with the global configuration."
+        }
+    ]
+}

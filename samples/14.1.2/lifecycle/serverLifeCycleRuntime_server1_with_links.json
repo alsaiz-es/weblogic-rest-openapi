@@ -1,0 +1,84 @@
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes"
+        },
+        {
+            "rel": "self",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1"
+        },
+        {
+            "rel": "canonical",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1"
+        },
+        {
+            "rel": "tasks",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/tasks"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/suspend",
+            "title": "suspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/resume",
+            "title": "resume"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/getIPv4URL",
+            "title": "getIPv4URL"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/startInStandby",
+            "title": "startInStandby"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/getIPv6URL",
+            "title": "getIPv6URL"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/start",
+            "title": "start"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/forceSuspend",
+            "title": "forceSuspend"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/forceShutdown",
+            "title": "forceShutdown"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/startInAdmin",
+            "title": "startInAdmin"
+        },
+        {
+            "rel": "action",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/shutdown",
+            "title": "shutdown"
+        },
+        {
+            "rel": "connectionStatus",
+            "href": "http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverLifeCycleRuntimes/server1/connectionStatus"
+        }
+    ],
+    "identity": [
+        "serverLifeCycleRuntimes",
+        "server1"
+    ],
+    "nodeManagerRestartCount": 0,
+    "middlewareHome": "/oracle/fmw",
+    "name": "server1",
+    "weblogicHome": "/oracle/fmw/wlserver",
+    "state": "RUNNING",
+    "type": "ServerLifeCycleRuntime"
+}

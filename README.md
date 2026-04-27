@@ -55,10 +55,11 @@ specs/
 | domainRuntime | Server channel runtime | ✅ Verified (12.2.1.4, 14.1.2) — identical 12-field set |
 | domainRuntime | Bulk search (`POST /search`) | ✅ Verified (12.2.1.4, 14.1.2) — DSL identical, CSRF header required on both |
 | domainRuntime | JMS runtime (container + per-`JMSServer`) | ✅ Container verified both versions; `JMSServer` detail (37 fields) verified on 12.2.1.4 OSB; per-destination drill-down deferred to v0.3.0 |
-| edit | Server CRUD | 🔲 Planned |
-| edit | Cluster CRUD | 🔲 Planned |
-| edit | JDBC resource CRUD | 🔲 Planned |
-| lifecycle | Server lifecycle ops | 🔲 Planned |
+| edit | Change session model | ✅ Verified (12.2.1.4, 14.1.2) — `wls:errorsDetails` envelope, FQCN-strip cross-version |
+| edit | Server CRUD | ✅ Verified (12.2.1.4, 14.1.2) — 136 fields, 5+5 cross-version delta |
+| edit | Cluster CRUD | ✅ Verified (12.2.1.4, 14.1.2) — 73/69 fields, 4 14.1.2-only |
+| edit | JDBC resource CRUD | ✅ Verified (12.2.1.4, 14.1.2) — staged-create workflow, partial-create quirk |
+| lifecycle | Server lifecycle ops | ✅ Verified (12.2.1.4, 14.1.2) — 8 actions, async-task response shape |
 
 "Verified" means the property set, field names, data types, and enum
 casings in the spec were cross-checked against the JSON emitted by a

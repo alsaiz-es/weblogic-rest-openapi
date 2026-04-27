@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Cluster CRUD (edit tree)
+  description: |
+    Cluster configuration. Same edit-session model as
+    `specs/edit/servers.yaml`. Cluster member assignment is
+    expressed by setting `cluster` on each `Server`.
+
+    `ClusterMBean` exposes 73 properties on 14.1.2 and 69 on
+    12.2.1.4. The four 14.1.2-only fields are documented in the
+    `Cluster` schema description. The 12.2.1.4 set is a strict
+    subset; nothing was removed in 14.1.2 on this surface.
+  version: 0.3.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: editClusters
+    description: Cluster configuration CRUD.
+
+paths:
+  /edit/clusters:
+    get:
+      operationId: listEditClusters
+      tags: [editClusters]
+      summary: List clusters defined in the domain.
+      description: Returns every `ClusterMBean` registered in the domain config, regardless of whether members are running.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Cluster collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterCollection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createCluster
+      tags: [editClusters]
+      summary: Create a cluster.
+      description: |
+        Minimum body is `{"name": "<unique>"}`. Other fields fall
+        back to defaults. Members are assigned later by setting
+        `cluster` on each `Server`.
+
+        Requires `X-Requested-By` and an active edit session.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cluster'
+            example:
+              name: myCluster
+      responses:
+        '201':
+          description: Cluster created in the pending session.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '400':
+          $ref: '#/components/responses/EditError'
+
+  /edit/clusters/{clusterName}:
+    parameters:
+      - name: clusterName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myCluster
+    get:
+      operationId: getEditCluster
+      tags: [editClusters]
+      summary: Get a cluster's configuration.
+      description: Returns the named `ClusterMBean` projection from the edit tree. Mirrors the schema documented under `Cluster`.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Cluster bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cluster'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: updateCluster
+      tags: [editClusters]
+      summary: Update cluster fields.
+      description: |
+        Patch-style update. Returns 200 with empty body. Some
+        fields take effect only on full cluster restart.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cluster'
+            example:
+              defaultLoadAlgorithm: weight-based
+      responses:
+        '200':
+          description: Cluster updated.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '400':
+          $ref: '#/components/responses/EditError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteCluster
+      tags: [editClusters]
+      summary: Delete a cluster.
+      description: |
+        Removes the cluster definition. The `cluster` reference on
+        each former member is cleared. Returns 200 with empty body.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      responses:
+        '200':
+          description: Cluster removed in the pending session.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    XRequestedByHeader:
+      name: X-Requested-By
+      in: header
+      required: true
+      description: Mandatory CSRF guard. Any non-empty value works.
+      schema:
+        type: string
+        minLength: 1
+      example: openapi-spec-client
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Cluster not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    EditError:
+      description: Validation error inside the edit session.
+      content:
+        application/json:
+          schema:
+            $ref: '../edit/change-manager.yaml#/components/schemas/EditErrorResponse'
+
+  schemas:
+    Cluster:
+      type: object
+      description: |
+        `ClusterMBean` projection. 73 properties on 14.1.2; 69 on
+        12.2.1.4. The 12.2.1.4 set is a strict subset; the four
+        new 14.1.2 fields are:
+
+        - `replicationTimeoutMillis` — explicit timeout for
+          session replication.
+        - `rebalanceDelayPeriods` — delay before triggering
+          cluster rebalance after membership change.
+        - `autoMigrationTableCreationDDLFile` and
+          `autoMigrationTableCreationPolicy` — control
+          auto-creation of the leasing table used by JTA / service
+          migration.
+
+        This schema documents the common subset and uses
+        `additionalProperties: true` to permit the rest.
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+          description: |
+            Cluster name — unique per domain. Required on creation,
+            cannot be changed.
+          example: myCluster
+        clusterAddress:
+          type: string
+          nullable: true
+          description: |
+            Comma-separated list of cluster addresses for client
+            connection. When null, the cluster auto-derives.
+        clusterMessagingMode:
+          type: string
+          description: |
+            Cluster transport. Common values include `unicast` and
+            `multicast`. Newer domains default to unicast; the
+            "Buzz" transport options visible in the 12.2.1.4 server
+            bean (`buzzEnabled`/`buzzAddress`/`buzzPort`) tied into
+            this when chosen.
+        defaultLoadAlgorithm:
+          type: string
+          description: |
+            EJB / RMI load distribution. Verified values include
+            `round-robin`, `random`, `weight-based`,
+            `round-robin-affinity`, `random-affinity`,
+            `weight-based-affinity`.
+          example: round-robin
+        multicastAddress:
+          type: string
+          description: |
+            IPv4 multicast address used when `clusterMessagingMode`
+            is `multicast`.
+        multicastPort:
+          type: integer
+          format: int32
+        memberWarmupTimeoutSeconds:
+          type: integer
+          format: int32
+          description: How long the cluster waits for new members to warm up.
+        clusterBroadcastChannel:
+          type: string
+          nullable: true
+        weblogicPluginEnabled:
+          type: boolean
+          description: Whether the WebLogic plugin is permitted to override `WL-Proxy-Client-IP`.
+        clientCertProxyEnabled:
+          type: boolean
+        type:
+          type: string
+          description: Bean discriminator. Always `Cluster` on this resource.
+          example: Cluster
+
+    ClusterCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cluster'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'

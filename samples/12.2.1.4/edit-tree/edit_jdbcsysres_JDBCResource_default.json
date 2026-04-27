@@ -1,0 +1,11 @@
+{
+    "identity": [
+        "JDBCSystemResources",
+        "OpenAPISpecTestDS",
+        "JDBCResource"
+    ],
+    "datasourceType": null,
+    "name": null,
+    "id": 0,
+    "version": null
+}

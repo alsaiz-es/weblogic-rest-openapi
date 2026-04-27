@@ -1,0 +1,12 @@
+{
+    "identity": [
+        "serverLifeCycleRuntimes",
+        "server1"
+    ],
+    "nodeManagerRestartCount": 0,
+    "middlewareHome": "/oracle/fmw",
+    "name": "server1",
+    "weblogicHome": "/oracle/fmw/wlserver",
+    "state": "RUNNING",
+    "type": "ServerLifeCycleRuntime"
+}

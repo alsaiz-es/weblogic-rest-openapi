@@ -1,0 +1,13 @@
+{
+    "identity": [
+        "JDBCSystemResources",
+        "OpenAPISpecTestDS",
+        "JDBCResource",
+        "JDBCDriverParams"
+    ],
+    "password": null,
+    "driverName": null,
+    "usePasswordIndirection": false,
+    "url": null,
+    "useXaDataSourceInterface": true
+}

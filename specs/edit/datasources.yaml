@@ -1,0 +1,657 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — JDBC SystemResource CRUD (edit tree)
+  description: |
+    Datasource configuration. A `JDBCSystemResource` is the
+    top-level wrapper; underneath it lives a `JDBCResource` which
+    in turn carries `JDBCDataSourceParams`, `JDBCDriverParams`, and
+    `JDBCConnectionPoolParams`. Every level is its own MBean and
+    has its own REST sub-path.
+
+    ## Important — staged creation, not single-shot
+
+    Posting the full nested tree to `/edit/JDBCSystemResources` in
+    one call **does not work** on either 12.2.1.4 or 14.1.2: the
+    nested fields under `JDBCResource` (its `name`, the params
+    sub-objects) are silently ignored, the parent shell is created,
+    the auto-created `JDBCResource` child has `name=null`, and the
+    server then fails its own validation pass and returns
+    `HTTP 400` — *with the partial bean still present in the edit
+    session*. Recovering requires `DELETE` on the partial parent.
+
+    The reliable workflow, verified on both versions, is staged:
+
+    1. `POST /edit/JDBCSystemResources {"name": "<ds>"}` —
+       this returns 400 ("JDBCDataSource: Name cannot be null")
+       but creates the parent shell anyway (intentional partial
+       create — the server is reporting that the validation
+       failed even though the shell got registered).
+    2. `POST /edit/JDBCSystemResources/<ds>/JDBCResource {"name": "<ds>"}`
+       — sets the `JDBCResource` name to match.
+    3. `POST /edit/JDBCSystemResources/<ds>/JDBCResource/JDBCDataSourceParams {...}`
+       — `JNDINames`, `globalTransactionsProtocol`, etc.
+    4. `POST /edit/JDBCSystemResources/<ds>/JDBCResource/JDBCDriverParams {...}`
+       — `driverName`, `URL`, optionally `password`, `properties`.
+    5. `POST /edit/JDBCSystemResources/<ds>/JDBCResource/JDBCConnectionPoolParams {...}`
+       — `initialCapacity`, `minCapacity`, `maxCapacity`,
+       `testTableName`, etc.
+    6. Configure `targets` either on the `JDBCSystemResource`
+       directly or via the dedicated subresource.
+    7. `activate` the change session.
+
+    Cancelling the edit session at any point cleanly reverts the
+    partial bean. Since the partial-create error is consistent on
+    both versions, treat the 400 from step 1 as a non-fatal status
+    rather than an exceptional one.
+
+    Cross-version note: the error `detail` text on **12.2.1.4**
+    includes the FQCN
+    (`weblogic.descriptor.DescriptorValidateException: ...`); on
+    **14.1.2** it is stripped to the message only. Same pattern
+    seen on `changeManager` validation errors.
+
+    Cross-version field-set delta on
+    `JDBCConnectionPoolParams`: 14.1.2 adds **one** field
+    (`invokeBeginEndRequest`); the rest are identical.
+  version: 0.3.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: editDatasources
+    description: JDBC system resource CRUD.
+
+paths:
+  /edit/JDBCSystemResources:
+    get:
+      operationId: listEditJDBCSystemResources
+      tags: [editDatasources]
+      summary: List JDBC system resources.
+      description: Returns every `JDBCSystemResource` shell defined in the domain config.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Datasource collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCSystemResourceCollection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createJDBCSystemResource
+      tags: [editDatasources]
+      summary: Create a JDBC system resource (partial-create quirk applies).
+      description: |
+        Creates the parent shell. **Always returns HTTP 400** with
+        body `JDBCDataSource: Name cannot be null` — but the
+        partial parent bean is registered in the edit session
+        anyway, and subsequent `POST` to the JDBCResource sub-path
+        will set its name and complete the tree.
+
+        The `JDBCResource`/`*Params` payload included in this body
+        is *ignored* by the server. Use the staged workflow
+        described in this file's top-level description.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JDBCSystemResource'
+            example:
+              name: myTestDS
+      responses:
+        '201':
+          description: |
+            Theoretical success. **Not observed in v0.3.0
+            verification** — the request always returned 400 with
+            partial-create. The schema entry exists for clients
+            that may encounter newer Oracle versions where the
+            single-shot create works.
+        '400':
+          description: |
+            Partial-create response. Body uses the standard
+            `ErrorResponse` shape with `detail` containing
+            `JDBCDataSource: Name cannot be null`. The parent
+            shell is still registered; complete the tree via the
+            staged sub-resource POSTs.
+          content:
+            application/json:
+              schema:
+                $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  /edit/JDBCSystemResources/{name}:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myTestDS
+    get:
+      operationId: getEditJDBCSystemResource
+      tags: [editDatasources]
+      summary: Get a JDBC system resource shell.
+      description: Returns the 15-field parent shell. The actual datasource definition lives at `/JDBCResource` and below.
+      responses:
+        '200':
+          description: Shell bean (15 fields).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCSystemResource'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteEditJDBCSystemResource
+      tags: [editDatasources]
+      summary: Delete the system resource (and its child tree).
+      description: Removes the JDBCSystemResource and the nested JDBCResource subtree from the pending session.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      responses:
+        '200':
+          description: Removed in the pending session.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /edit/JDBCSystemResources/{name}/JDBCResource:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getJDBCResource
+      tags: [editDatasources]
+      summary: Get the JDBCResource node.
+      description: Returns the inner `JDBCResource` bean (5 fields). After staged creation, `name` matches the parent shell.
+      responses:
+        '200':
+          description: |
+            5-field bean: `identity`, `name`, `datasourceType`,
+            `id`, `version`. After successful staging, `name`
+            equals the parent shell name.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCResource'
+    post:
+      operationId: updateJDBCResource
+      tags: [editDatasources]
+      summary: Update the JDBCResource (typically just `name`).
+      description: Setting `name` here is the second step of the staged create workflow.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JDBCResource'
+            example:
+              name: myTestDS
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+
+  /edit/JDBCSystemResources/{name}/JDBCResource/JDBCDataSourceParams:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getJDBCDataSourceParams
+      tags: [editDatasources]
+      summary: Get the datasource-binding parameters.
+      description: 11-field bean — JNDI bindings, transaction protocol, scope, and failover settings.
+      responses:
+        '200':
+          description: 11-field bean (identical 12.2.1.4 vs 14.1.2).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCDataSourceParams'
+    post:
+      operationId: updateJDBCDataSourceParams
+      tags: [editDatasources]
+      summary: Update binding parameters (JNDI names, transactions protocol, scope, ...).
+      description: Patch-style update of `JDBCDataSourceParams` fields. Returns 200 with empty body.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JDBCDataSourceParams'
+            example:
+              JNDINames: ["jdbc/myTestDS"]
+              globalTransactionsProtocol: OnePhaseCommit
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+
+  /edit/JDBCSystemResources/{name}/JDBCResource/JDBCDriverParams:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getJDBCDriverParams
+      tags: [editDatasources]
+      summary: Get the JDBC driver parameters.
+      description: 6-field bean — driver class, URL, password, and the XA-vs-regular toggle.
+      responses:
+        '200':
+          description: 6-field bean (identical 12.2.1.4 vs 14.1.2).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCDriverParams'
+    post:
+      operationId: updateJDBCDriverParams
+      tags: [editDatasources]
+      summary: Set driver class, URL, password, and properties.
+      description: Patch-style update of `JDBCDriverParams`. Returns 200 with empty body. Passwords are write-only — never echoed on subsequent GETs.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JDBCDriverParams'
+            example:
+              driverName: org.apache.derby.jdbc.EmbeddedDriver
+              URL: jdbc:derby:memory:myTestDB;create=true
+              useXaDataSourceInterface: false
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+
+  /edit/JDBCSystemResources/{name}/JDBCResource/JDBCConnectionPoolParams:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getJDBCConnectionPoolParams
+      tags: [editDatasources]
+      summary: Get the connection-pool parameters.
+      description: Connection pool tuning. 37 fields on 14.1.2; 36 on 12.2.1.4.
+      responses:
+        '200':
+          description: 37 fields on 14.1.2; 36 on 12.2.1.4 (no `invokeBeginEndRequest`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JDBCConnectionPoolParams'
+    post:
+      operationId: updateJDBCConnectionPoolParams
+      tags: [editDatasources]
+      summary: Update pool sizing and probing.
+      description: Patch-style update of `JDBCConnectionPoolParams`. Returns 200 with empty body.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JDBCConnectionPoolParams'
+            example:
+              initialCapacity: 0
+              minCapacity: 0
+              maxCapacity: 1
+              testTableName: SQL SELECT 1 FROM SYS.SYSTABLES
+      responses:
+        '200':
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    XRequestedByHeader:
+      name: X-Requested-By
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      example: openapi-spec-client
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    JDBCSystemResource:
+      type: object
+      description: |
+        Top-level shell. 15 fields on both versions, identical
+        shape. The `resource` property is a path tuple pointing at
+        the nested `JDBCResource`; the actual datasource
+        configuration lives at the sub-paths.
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+        targets:
+          type: array
+          description: |
+            Cluster / server targets. Each entry is a tuple
+            `["servers"|"clusters", "<name>"]`. Empty array means
+            the datasource is undeployed.
+          items:
+            type: array
+            items:
+              type: string
+        descriptorFileName:
+          type: string
+          description: Auto-generated `jdbc/<name>-NNNN-jdbc.xml`.
+        sourcePath:
+          type: string
+          description: Filesystem path of the descriptor under the domain.
+        deploymentOrder:
+          type: integer
+          format: int32
+        deploymentPrincipalName:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        moduleType:
+          type: string
+          nullable: true
+        compatibilityName:
+          type: string
+          nullable: true
+        dynamicallyCreated:
+          type: boolean
+        id:
+          type: integer
+          format: int32
+        type:
+          type: string
+          example: JDBCSystemResource
+        tags:
+          type: array
+          items:
+            type: string
+        resource:
+          type: array
+          items:
+            type: string
+          example: [JDBCSystemResources, myTestDS, JDBCResource]
+
+    JDBCResource:
+      type: object
+      description: |
+        5-field bean. Set `name` after the parent shell is created
+        — that is what the partial-create error is asking for.
+      properties:
+        name:
+          type: string
+          description: Must equal the parent system-resource name to clear validation.
+        datasourceType:
+          type: string
+          nullable: true
+          description: |
+            Pre-set datasource type, when the datasource was
+            created from a template. Null on plain creates.
+        id:
+          type: integer
+          format: int32
+        version:
+          type: string
+          nullable: true
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+
+    JDBCDataSourceParams:
+      type: object
+      description: |
+        11 fields, identical shape on both versions. Carries the
+        JNDI bindings, transaction protocol, scope, and failover
+        configuration.
+      additionalProperties: true
+      properties:
+        JNDINames:
+          type: array
+          description: One or more JNDI names the datasource is bound under.
+          items:
+            type: string
+        globalTransactionsProtocol:
+          type: string
+          description: |
+            Verified values include `OnePhaseCommit`,
+            `TwoPhaseCommit`, `LoggingLastResource`,
+            `EmulateTwoPhaseCommit`, `None`.
+          example: OnePhaseCommit
+        scope:
+          type: string
+          description: Scope. Common value `Global`.
+          example: Global
+        algorithmType:
+          type: string
+          description: |
+            Multi-DS load distribution. Verified values include
+            `Failover`, `Load-Balancing`.
+          example: Failover
+        failoverRequestIfBusy:
+          type: boolean
+        connectionPoolFailoverCallbackHandler:
+          type: string
+          nullable: true
+        proxySwitchingCallback:
+          type: string
+          nullable: true
+
+    JDBCDriverParams:
+      type: object
+      description: |
+        6 fields, identical shape on both versions. Setting
+        `useXaDataSourceInterface` chooses between the regular and
+        XA driver classes.
+      additionalProperties: true
+      properties:
+        driverName:
+          type: string
+          description: Fully-qualified driver class.
+          example: org.apache.derby.jdbc.EmbeddedDriver
+        url:
+          type: string
+          description: |
+            JDBC URL. **Note the casing** — sample responses use
+            lowercase `url` even though POST request bodies
+            commonly use `URL`. WebLogic accepts both at write
+            time but standardises to `url` in GET responses.
+          example: jdbc:derby:memory:myTestDB;create=true
+        useXaDataSourceInterface:
+          type: boolean
+        usePasswordIndirection:
+          type: boolean
+        password:
+          type: string
+          nullable: true
+          description: |
+            Plaintext at write time. Always returned `null` on GET
+            (passwords are never echoed). Use `passwordEncrypted`
+            with the WebLogic encryption tool for production.
+
+    JDBCConnectionPoolParams:
+      type: object
+      description: |
+        Connection pool tuning. **37 fields on 14.1.2; 36 on
+        12.2.1.4.** The 14.1.2-only field is
+        `invokeBeginEndRequest`, a hook that lets the pool wrap
+        each reservation in begin/end callbacks. All other fields
+        are identical between versions.
+      additionalProperties: true
+      properties:
+        initialCapacity:
+          type: integer
+          format: int32
+        minCapacity:
+          type: integer
+          format: int32
+        maxCapacity:
+          type: integer
+          format: int32
+        capacityIncrement:
+          type: integer
+          format: int32
+        shrinkFrequencySeconds:
+          type: integer
+          format: int32
+        connectionCreationRetryFrequencySeconds:
+          type: integer
+          format: int32
+        connectionReserveTimeoutSeconds:
+          type: integer
+          format: int32
+        inactiveConnectionTimeoutSeconds:
+          type: integer
+          format: int32
+        testFrequencySeconds:
+          type: integer
+          format: int32
+        secondsToTrustAnIdlePoolConnection:
+          type: integer
+          format: int32
+        testTableName:
+          type: string
+          nullable: true
+          description: |
+            SQL fragment used by the pool to test reserved
+            connections. WLS recognises `SQL <statement>` for
+            free-form SQL and `<table>` for a table-existence
+            test.
+          example: SQL SELECT 1 FROM SYS.SYSTABLES
+        testConnectionsOnReserve:
+          type: boolean
+        wrapTypes:
+          type: boolean
+        pinnedToThread:
+          type: boolean
+        statementTimeout:
+          type: integer
+          format: int32
+        statementCacheSize:
+          type: integer
+          format: int32
+        statementCacheType:
+          type: string
+        highestNumWaiters:
+          type: integer
+          format: int32
+        loginDelaySeconds:
+          type: integer
+          format: int32
+        invokeBeginEndRequest:
+          type: boolean
+          description: |
+            **14.1.2 only.** Wraps each connection reservation in
+            begin/end callbacks. Absent on 12.2.1.4 responses;
+            sending it on 12.2.1.4 returns 400.
+        fatalErrorCodes:
+          type: string
+          nullable: true
+
+    JDBCSystemResourceCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JDBCSystemResource'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'

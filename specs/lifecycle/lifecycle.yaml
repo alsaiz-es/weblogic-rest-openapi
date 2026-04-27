@@ -1,0 +1,620 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Server Lifecycle Operations
+  description: |
+    Async-job-style operations to start, stop, suspend, resume,
+    and force-shutdown managed servers. Lifecycle ops live under
+    `domainRuntime/serverLifeCycleRuntimes`, **not** under
+    `/edit` — they are actions, not configuration changes, and do
+    not require an edit session.
+
+    ## Response shape — task descriptor, always
+
+    Every lifecycle action returns a `ServerLifeCycleTaskRuntime`
+    object describing the (possibly already-completed) job, even
+    when the operation finishes synchronously in milliseconds.
+    Clients should treat this uniformly:
+
+    1. Inspect `taskStatus` and `progress` on the response. If
+       `taskStatus == "TASK COMPLETED"` and `progress == "success"`,
+       the operation is done.
+    2. Otherwise poll the task using the URL in `links.rel=job` (or
+       reconstruct it from the `tasks` collection on the parent
+       lifecycle runtime).
+    3. `taskError` is non-null on failure.
+
+    Verified across both 12.2.1.4 and 14.1.2: same shape, same set
+    of action rels, same task semantics.
+
+    ## Reaching NodeManager
+
+    `start`, `startInAdmin`, `startInStandby`, and graceful
+    `shutdown` all delegate to NodeManager. If NodeManager is not
+    running, the action returns a task whose `taskError` carries
+    the underlying NodeManager-unreachable exception. Suspend and
+    resume do not require NodeManager because they target a
+    server that is already up.
+
+    ## Action availability
+
+    `GET /domainRuntime/serverLifeCycleRuntimes/{name}` exposes the
+    full action set as HATEOAS rels (`action: suspend`, etc.).
+    Eight actions verified during v0.3.0 capture:
+
+    - `suspend`, `forceSuspend`, `resume`
+    - `shutdown`, `forceShutdown`
+    - `start`, `startInAdmin`, `startInStandby`
+
+    Plus two helper actions for reading the server URL:
+    `getIPv4URL`, `getIPv6URL`.
+  version: 0.3.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: serverLifecycle
+    description: Lifecycle actions on managed servers.
+
+paths:
+  /domainRuntime/serverLifeCycleRuntimes:
+    get:
+      operationId: listServerLifeCycleRuntimes
+      tags: [serverLifecycle]
+      summary: List per-server lifecycle runtimes.
+      description: Returns every `ServerLifeCycleRuntime` registered in the domain — one per configured server.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: One entry per configured server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLifeCycleRuntimeCollection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+    get:
+      operationId: getServerLifeCycleRuntime
+      tags: [serverLifecycle]
+      summary: Get one server's lifecycle runtime.
+      description: |
+        Returns server identity plus environment metadata
+        (`weblogicHome`, `middlewareHome`,
+        `nodeManagerRestartCount`) and `state`. The HATEOAS
+        `links` array exposes the action rels.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Lifecycle runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLifeCycleRuntime'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/suspend:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+    post:
+      operationId: suspendServer
+      tags: [serverLifecycle]
+      summary: Suspend a RUNNING server (drops to ADMIN).
+      description: |
+        Initiates a graceful suspend. The server reaches `ADMIN`
+        state and stops accepting non-admin requests. Body fields
+        `timeout` (seconds) and `ignoreSessions` (boolean) are
+        accepted but optional. Internally the operation is
+        recorded as `suspendWithTimeout` regardless of whether
+        you supplied a timeout.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuspendRequestBody'
+            examples:
+              empty:
+                summary: Use server defaults.
+                value: {}
+              timed:
+                summary: 30 s timeout, ignore active HTTP sessions.
+                value:
+                  timeout: 30
+                  ignoreSessions: true
+      responses:
+        '200':
+          description: Task descriptor (may already be completed).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/forceSuspend:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: forceSuspendServer
+      tags: [serverLifecycle]
+      summary: Force-suspend (no graceful drain).
+      description: Stops accepting application traffic immediately. Returns the same task descriptor shape as `suspend`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/resume:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: resumeServer
+      tags: [serverLifecycle]
+      summary: Resume a server from ADMIN to RUNNING.
+      description: Re-opens the server for non-admin traffic. Returns a task descriptor.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/shutdown:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: shutdownServer
+      tags: [serverLifecycle]
+      summary: Graceful shutdown (delegates to NodeManager).
+      description: |
+        Drains the server, then asks NodeManager to stop the JVM.
+        Body fields `timeout`, `ignoreSessions`,
+        `waitForAllSessions` are optional. **Requires
+        NodeManager** to be reachable; otherwise the task fails
+        with a wrapped `NodeManagerException` in `taskError`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShutdownRequestBody'
+            examples:
+              empty:
+                value: {}
+              gentle:
+                value:
+                  timeout: 60
+                  ignoreSessions: false
+                  waitForAllSessions: true
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/forceShutdown:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: forceShutdownServer
+      tags: [serverLifecycle]
+      summary: Force shutdown (no drain). Delegates to NodeManager.
+      description: Stops the JVM without draining sessions. Requires NodeManager reachable.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/start:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: startServer
+      tags: [serverLifecycle]
+      summary: Start a server (delegates to NodeManager).
+      description: |
+        Asks NodeManager on the targeted machine to boot the
+        server. Returns a task descriptor; the actual server may
+        take 30-120 seconds to reach RUNNING — poll
+        `domainRuntime/serverRuntimes/{serverName}.state` to
+        track. Requires NodeManager reachable; otherwise the
+        task fails with a wrapped `NodeManagerException`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/startInAdmin:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: startServerInAdmin
+      tags: [serverLifecycle]
+      summary: Start the server, halting in ADMIN state.
+      description: Boots the server through NodeManager but stops it in ADMIN state (admin-only traffic).
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/startInStandby:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: startServerInStandby
+      tags: [serverLifecycle]
+      summary: Start the server, halting in STANDBY state.
+      description: Boots the server through NodeManager but stops it in STANDBY (listen channels closed).
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Task descriptor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskResponse'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/tasks:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: listLifecycleTasks
+      tags: [serverLifecycle]
+      summary: List historical lifecycle tasks for a server.
+      description: |
+        Returns every `ServerLifeCycleTaskRuntime` recorded since
+        the AdminServer started. Names follow `_<n>_<operation>`
+        ordering (e.g. `_0_suspendWithTimeout`, `_1_resume`).
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Task history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LifecycleTaskCollection'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    XRequestedByHeader:
+      name: X-Requested-By
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      example: openapi-spec-client
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Server not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    ServerLifeCycleRuntime:
+      type: object
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          example: ServerLifeCycleRuntime
+        name:
+          type: string
+          example: myManagedServer
+        state:
+          type: string
+          description: |
+            Same enum as `ServerRuntime.state`. UPPERCASE tokens
+            (`RUNNING`, `ADMIN`, `STANDBY`, `SHUTDOWN`, ...).
+        weblogicHome:
+          type: string
+        middlewareHome:
+          type: string
+        nodeManagerRestartCount:
+          type: integer
+          format: int32
+
+    ServerLifeCycleRuntimeCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerLifeCycleRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+    SuspendRequestBody:
+      type: object
+      description: Optional fields. Send `{}` to use server defaults.
+      properties:
+        timeout:
+          type: integer
+          format: int32
+          description: Seconds to wait for in-flight work to finish.
+          example: 30
+        ignoreSessions:
+          type: boolean
+          description: |
+            When true, do not wait for active HTTP sessions to
+            drain.
+
+    ShutdownRequestBody:
+      type: object
+      description: Optional fields for the graceful shutdown.
+      properties:
+        timeout:
+          type: integer
+          format: int32
+          example: 60
+        ignoreSessions:
+          type: boolean
+        waitForAllSessions:
+          type: boolean
+          description: |
+            When true, wait until every active HTTP session has
+            terminated before stopping the JVM.
+
+    LifecycleTaskResponse:
+      type: object
+      description: |
+        `ServerLifeCycleTaskRuntime` projection. Returned
+        synchronously from every lifecycle POST; may already be
+        completed (`taskStatus == "TASK COMPLETED"`,
+        `completed == true`) by the time the response lands. When
+        not yet complete, follow the `links.rel=job` URL to poll
+        the same descriptor.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          example: ServerLifeCycleTaskRuntime
+        name:
+          type: string
+          description: |
+            Generated task name `_<seq>_<operation>` (e.g.
+            `_0_suspendWithTimeout`, `_1_resume`).
+        operation:
+          type: string
+          description: |
+            Internal operation label. **Note**: `suspend` requests
+            map to `suspendWithTimeout` even when no timeout was
+            sent.
+          example: suspendWithTimeout
+        serverName:
+          type: string
+        description:
+          type: string
+          description: Human-readable description, e.g. `suspending myManagedServer server ...`.
+        progress:
+          type: string
+          description: Verified value `success` on completed tasks. Other values not captured.
+          example: success
+        taskStatus:
+          type: string
+          description: |
+            Lifecycle of the task itself. Verified value
+            `TASK COMPLETED`. Other documented values (e.g.
+            `TASK IN PROGRESS`) are reachable when the operation
+            takes longer than the response round-trip.
+          example: TASK COMPLETED
+        running:
+          type: boolean
+        completed:
+          type: boolean
+        systemTask:
+          type: boolean
+        taskError:
+          type: object
+          nullable: true
+          description: |
+            Non-null on failure. Structure mirrors the standard
+            error envelope but with WLS-specific extensions; treat
+            as opaque if you do not own the consumer.
+          additionalProperties: true
+        parentTask:
+          type: object
+          nullable: true
+          additionalProperties: true
+        intervalToPoll:
+          type: integer
+          format: int32
+          description: Recommended polling interval in milliseconds when the task is still running.
+          example: 1000
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        startTimeAsLong:
+          type: integer
+          format: int64
+        endTimeAsLong:
+          type: integer
+          format: int64
+
+    LifecycleTaskCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LifecycleTaskResponse'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'

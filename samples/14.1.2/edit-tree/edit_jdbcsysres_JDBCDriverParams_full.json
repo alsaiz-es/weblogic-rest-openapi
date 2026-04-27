@@ -1,0 +1,13 @@
+{
+    "identity": [
+        "JDBCSystemResources",
+        "OpenAPISpecTestDS",
+        "JDBCResource",
+        "JDBCDriverParams"
+    ],
+    "password": null,
+    "driverName": "org.apache.derby.jdbc.EmbeddedDriver",
+    "usePasswordIndirection": false,
+    "url": null,
+    "useXaDataSourceInterface": true
+}

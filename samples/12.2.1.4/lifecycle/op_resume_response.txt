@@ -1,0 +1,29 @@
+{
+    "links": [{
+        "rel": "job",
+        "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverLifeCycleRuntimes\/osb_server1\/tasks\/_1_resume"
+    }],
+    "identity": [
+        "serverLifeCycleRuntimes",
+        "osb_server1",
+        "tasks",
+        "_1_resume"
+    ],
+    "running": false,
+    "systemTask": false,
+    "endTimeAsLong": 1777309337115,
+    "name": "_1_resume",
+    "progress": "success",
+    "description": "Resuming osb_server1 server ...",
+    "serverName": "osb_server1",
+    "taskError": null,
+    "startTimeAsLong": 1777309335052,
+    "type": "ServerLifeCycleTaskRuntime",
+    "operation": "resume",
+    "taskStatus": "TASK COMPLETED",
+    "parentTask": null,
+    "completed": true,
+    "intervalToPoll": 1000,
+    "startTime": "2026-04-27T19:02:15.052+02:00",
+    "endTime": "2026-04-27T19:02:17.115+02:00"
+}

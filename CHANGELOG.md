@@ -1,5 +1,125 @@
 # Changelog
 
+## 0.3.0 — 2026-04-27
+
+Phase 2 — domain administration. Adds the entire edit-tree CRUD
+surface (change manager, server, cluster, JDBC system resource) plus
+server-lifecycle actions, verified end-to-end against both lab
+versions on real WebLogic instances. Both lab domains were returned
+to their pre-test state; cleanup verification confirms zero
+`OpenAPISpec*` resources remain.
+
+### New specs
+
+- `specs/edit/change-manager.yaml` — six change-session endpoints
+  (`GET`, `startEdit`, `activate`, `cancelEdit`, `safeResolve`,
+  `forceResolve`). Documents the
+  `EditErrorResponse` shape (the `wls:errorsDetails` array) used
+  by edit-tree validation failures.
+- `specs/edit/servers.yaml` — server CRUD. 136-field
+  `Server` schema with `additionalProperties: true`; documents the
+  5+5 cross-version delta (14.1.2-only:
+  `virtualThreadEnableOption`, `selfTuningThreadPoolSizeMax/Min`,
+  `synchronizedSessionTimeoutEnabled`,
+  `logCriticalRemoteExceptionsEnabled`; 12.2.1.4-only:
+  `buzz{Address,Port,Enabled}`, `administrationProtocol`,
+  `isolatePartitionThreadLocals`).
+- `specs/edit/clusters.yaml` — cluster CRUD. 73/69 field counts
+  with 4 14.1.2-additive fields documented
+  (`replicationTimeoutMillis`, `rebalanceDelayPeriods`,
+  `autoMigrationTableCreationDDLFile`,
+  `autoMigrationTableCreationPolicy`).
+- `specs/edit/datasources.yaml` — JDBC system resource CRUD.
+  Documents the **staged creation workflow** required because the
+  single-shot full-tree POST does not propagate nested fields and
+  always returns 400 with a partial parent shell registered.
+  Sub-resource schemas: `JDBCSystemResource` (15 fields),
+  `JDBCResource` (5), `JDBCDataSourceParams` (11),
+  `JDBCDriverParams` (6), `JDBCConnectionPoolParams` (37 on
+  14.1.2; 36 on 12.2.1.4 — `invokeBeginEndRequest` is
+  14.1.2-only).
+- `specs/lifecycle/lifecycle.yaml` — eight lifecycle actions
+  (`suspend`, `forceSuspend`, `resume`, `shutdown`,
+  `forceShutdown`, `start`, `startInAdmin`, `startInStandby`)
+  plus the `tasks` collection. Models the `LifecycleTaskResponse`
+  shape returned by every action.
+
+### New documentation
+
+- `docs/EDIT_TREE_WORKFLOW.md` — sequence diagram (mermaid) of
+  the change-session lifecycle, header requirements, error
+  envelope shape, recovery hints.
+
+### Discoveries
+
+- **Edit-side errors use a different envelope.** The
+  `wls:errorsDetails` array is the new shape; standard
+  `ErrorResponse` does not apply. Cross-version: 12.2.1.4 keeps
+  the fully-qualified Java exception class name in each `detail`
+  (e.g. `weblogic.management.provider.EditNotEditorException: ...`),
+  14.1.2 strips the FQCN and keeps the message only. Same
+  pattern applies to JDBC validation errors.
+- **`startEdit` is idempotent** when called by the same user who
+  already holds the lock. Useful for clients that recover from
+  intermittent failures by re-acquiring rather than tracking
+  state externally.
+- **`POST /edit/JDBCSystemResources {"name": "..."}` always
+  returns 400** on both versions ("JDBCDataSource: Name cannot be
+  null") because WLS auto-creates an empty `JDBCResource` child
+  with `name=null` whose own validation fails. **The parent shell
+  is registered anyway**; the staged workflow continues from
+  there. This is documented as a partial-create quirk in
+  `datasources.yaml`.
+- **Lifecycle ops are async-task-shaped, not void.** Every action
+  returns a `ServerLifeCycleTaskRuntime` with `taskStatus`,
+  `progress`, `taskError`, and a `links.rel=job` URL even when
+  the operation finished synchronously in milliseconds. Suspend
+  internally maps to `suspendWithTimeout` regardless of whether
+  a timeout was supplied.
+- **NodeManager dependency made explicit.** `start*` actions and
+  graceful `shutdown` go through NodeManager; `suspend`/`resume`
+  do not. Lab observation: NodeManager unreachable returns a
+  task whose `taskError` carries the wrapped exception, not an
+  HTTP error.
+
+### Cross-version field-set deltas summary
+
+| Resource | 14.1.2 | 12.2.1.4 | Notes |
+|---|---|---|---|
+| `Server` | 136 | 136 | 5/5 different fields each side; full list in spec |
+| `Cluster` | 73 | 69 | 14.1.2 strict superset (4 added) |
+| `JDBCSystemResource` shell | 15 | 15 | identical |
+| `JDBCResource` | 5 | 5 | identical |
+| `JDBCDataSourceParams` | 11 | 11 | identical |
+| `JDBCDriverParams` | 6 | 6 | identical |
+| `JDBCConnectionPoolParams` | 37 | 36 | 14.1.2 adds `invokeBeginEndRequest` |
+| `ServerLifeCycleRuntime` | 6 | 6 | identical |
+| `LifecycleTaskResponse` | 18 | 18 | identical |
+
+### Samples added
+
+`samples/12.2.1.4/edit-tree/` and `samples/14.1.2/edit-tree/` —
+change manager idle/active/cancel/safe+forceResolve-error,
+server bean (full + minimal), cluster bean, JDBC sub-resource
+defaults, JDBC populated tree, JDBC create errors verbatim
+(both shell-only and full-tree variants).
+
+`samples/12.2.1.4/lifecycle/` and `samples/14.1.2/lifecycle/` —
+serverLifeCycleRuntime bean (with and without HATEOAS links),
+suspend/resume/suspend-with-args responses, tasks collection.
+
+### Cleanup verification
+
+After the full test suite, both VMs were verified to contain:
+- No edit session held (`locked: false`).
+- No server, cluster, or JDBC resource named `OpenAPISpec*` or
+  `Test*`.
+- All managed servers back in `RUNNING` state.
+
+The probes at `samples/{version}/edit-tree/changeManager_*` and
+the cleanup confirmation at `serverRuntimes` collection all show
+the pre-v0.3.0 state.
+
 ## 0.2.1 — 2026-04-27
 
 Closes the `componentRuntimes` child of `applicationRuntimes` —

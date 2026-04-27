@@ -1,0 +1,54 @@
+{
+    "items": [
+        {
+            "identity": [
+                "serverLifeCycleRuntimes",
+                "server1",
+                "tasks",
+                "_1_resume"
+            ],
+            "running": false,
+            "systemTask": false,
+            "endTimeAsLong": 1777309298754,
+            "name": "_1_resume",
+            "progress": "success",
+            "description": "Resuming server1 server ...",
+            "serverName": "server1",
+            "taskError": null,
+            "startTimeAsLong": 1777309298718,
+            "type": "ServerLifeCycleTaskRuntime",
+            "operation": "resume",
+            "taskStatus": "TASK COMPLETED",
+            "parentTask": null,
+            "completed": true,
+            "intervalToPoll": 1000,
+            "startTime": "2026-04-27T19:01:38.718+02:00",
+            "endTime": "2026-04-27T19:01:38.754+02:00"
+        },
+        {
+            "identity": [
+                "serverLifeCycleRuntimes",
+                "server1",
+                "tasks",
+                "_0_suspendWithTimeout"
+            ],
+            "running": false,
+            "systemTask": false,
+            "endTimeAsLong": 1777309293553,
+            "name": "_0_suspendWithTimeout",
+            "progress": "success",
+            "description": "suspending server1 server ...",
+            "serverName": "server1",
+            "taskError": null,
+            "startTimeAsLong": 1777309293518,
+            "type": "ServerLifeCycleTaskRuntime",
+            "operation": "suspendWithTimeout",
+            "taskStatus": "TASK COMPLETED",
+            "parentTask": null,
+            "completed": true,
+            "intervalToPoll": 1000,
+            "startTime": "2026-04-27T19:01:33.518+02:00",
+            "endTime": "2026-04-27T19:01:33.553+02:00"
+        }
+    ]
+}

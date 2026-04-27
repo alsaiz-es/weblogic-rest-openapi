@@ -1,0 +1,29 @@
+{
+    "links": [{
+        "rel": "job",
+        "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverLifeCycleRuntimes\/osb_server1\/tasks\/_0_suspendWithTimeout"
+    }],
+    "identity": [
+        "serverLifeCycleRuntimes",
+        "osb_server1",
+        "tasks",
+        "_0_suspendWithTimeout"
+    ],
+    "running": false,
+    "systemTask": false,
+    "endTimeAsLong": 1777309330158,
+    "name": "_0_suspendWithTimeout",
+    "progress": "success",
+    "description": "suspending osb_server1 server ...",
+    "serverName": "osb_server1",
+    "taskError": null,
+    "startTimeAsLong": 1777309325748,
+    "type": "ServerLifeCycleTaskRuntime",
+    "operation": "suspendWithTimeout",
+    "taskStatus": "TASK COMPLETED",
+    "parentTask": null,
+    "completed": true,
+    "intervalToPoll": 1000,
+    "startTime": "2026-04-27T19:02:05.748+02:00",
+    "endTime": "2026-04-27T19:02:10.158+02:00"
+}

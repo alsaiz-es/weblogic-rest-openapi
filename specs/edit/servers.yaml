@@ -1,0 +1,436 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Server CRUD (edit tree)
+  description: |
+    Create, read, update, and delete server configurations in the
+    domain. Every mutating call must run inside an edit session —
+    see `specs/edit/change-manager.yaml` and
+    `docs/EDIT_TREE_WORKFLOW.md`.
+
+    The `ServerMBean` exposes a wide surface (136 properties on
+    14.1.2, 136 on 12.2.1.4 with a 5/5 cross-version delta — see
+    description in `Server` schema). This spec documents the
+    common-monitoring/admin subset explicitly and uses
+    `additionalProperties: true` to permit the rest, since clients
+    commonly want to update single fields by name without the spec
+    having to enumerate every option.
+  version: 0.3.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: editServers
+    description: Server configuration CRUD.
+
+paths:
+  /edit/servers:
+    get:
+      operationId: listEditServers
+      tags: [editServers]
+      summary: List configured servers.
+      description: |
+        Returns every server defined in the domain (AdminServer
+        plus managed servers, regardless of whether they are
+        currently running). Equivalent to a config-side counterpart
+        to `domainRuntime/serverRuntimes`.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Server collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerCollection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createServer
+      tags: [editServers]
+      summary: Create a server.
+      description: |
+        Creates a new server in the active edit session. Minimum
+        body is `{"name": "<unique>"}`; other fields fall back to
+        domain defaults. Returns `201` with empty body. Subsequent
+        `POST` to `/edit/servers/{name}` updates fields.
+
+        After activation the server appears in the domain config
+        but is not started — start it via the lifecycle endpoints
+        in `lifecycle/lifecycle.yaml` or via NodeManager.
+
+        Requires `X-Requested-By` (any non-empty value) and an
+        active edit session.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+            example:
+              name: myManagedServer
+              listenPort: 7099
+              listenAddress: ""
+      responses:
+        '201':
+          description: Server created in the pending session.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/servers/{serverName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+    get:
+      operationId: getEditServer
+      tags: [editServers]
+      summary: Get a server's configuration.
+      description: Returns the full `ServerMBean` projection (~136 fields) for the named server.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Server bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Server'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: updateServer
+      tags: [editServers]
+      summary: Update server fields.
+      description: |
+        Patch-style update — only fields included in the body are
+        modified; everything else is left as-is. Returns `200` with
+        empty body. Some fields require a server **restart** after
+        activation to take effect (most JVM args, listen-address /
+        listen-port changes); the API does not flag them, see
+        Oracle's MBean reference for the per-field restart matrix.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Server'
+            example:
+              listenAddress: 127.0.0.1
+      responses:
+        '200':
+          description: Server updated in the pending session.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteServer
+      tags: [editServers]
+      summary: Delete a server.
+      description: |
+        Removes the server from the domain. Returns `200` with
+        empty body. The deletion is part of the pending session
+        and only takes effect on `activate`.
+
+        Deleting the AdminServer is allowed in the API but
+        catastrophic for the domain — do not.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      responses:
+        '200':
+          description: Server removed in the pending session.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    XRequestedByHeader:
+      name: X-Requested-By
+      in: header
+      required: true
+      description: Mandatory CSRF guard. Any non-empty value works.
+      schema:
+        type: string
+        minLength: 1
+      example: openapi-spec-client
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Server not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    EditError:
+      description: Validation error inside the edit session.
+      content:
+        application/json:
+          schema:
+            $ref: '../edit/change-manager.yaml#/components/schemas/EditErrorResponse'
+
+  schemas:
+    Server:
+      type: object
+      description: |
+        `ServerMBean` projection on the edit tree. The full bean
+        carries 136 properties on both 12.2.1.4 and 14.1.2; this
+        schema documents the 25 most commonly used and accepts the
+        rest via `additionalProperties: true`.
+
+        ### Cross-version property delta (5 + 5)
+
+        Fields **only on 14.1.2** (added with the 14c and JDK 21
+        updates):
+
+        - `virtualThreadEnableOption` — JDK 21 virtual-thread
+          dispatch toggle.
+        - `selfTuningThreadPoolSizeMin`,
+          `selfTuningThreadPoolSizeMax` — bounds for the
+          self-tuning thread pool.
+        - `synchronizedSessionTimeoutEnabled` — coordinated
+          session-timeout flag.
+        - `logCriticalRemoteExceptionsEnabled` — log severity
+          tweak for cross-server exceptions.
+
+        Fields **only on 12.2.1.4** (removed in 14.1.2):
+
+        - `buzzAddress`, `buzzPort`, `buzzEnabled` — "Buzz"
+          cluster transport, removed from the 14.1.x cluster
+          stack.
+        - `administrationProtocol` — replaced by the broader
+          `administrationPort` + listen-channel model in 14.1.x.
+        - `isolatePartitionThreadLocals` — Multi-Tenant artifact,
+          consistent with the rest of the partition removal.
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+          description: |
+            Server name — unique per domain. Required on creation.
+            Cannot be changed once set.
+          example: myManagedServer
+        listenAddress:
+          type: string
+          description: |
+            Bind address for the default listen channel. Empty
+            string means "all interfaces".
+          example: ""
+        listenPort:
+          type: integer
+          format: int32
+          description: TCP port for the default listen channel.
+          example: 7099
+        listenPortEnabled:
+          type: boolean
+          description: Whether the default listen port accepts connections.
+        administrationPort:
+          type: integer
+          format: int32
+          description: |
+            Dedicated administration port (separate listen
+            channel). `9002` by default for AdminServer; can be
+            disabled or reassigned per server.
+          example: 9002
+        cluster:
+          type: array
+          nullable: true
+          description: |
+            Reference to the `cluster` MBean this server is a
+            member of. Two-element array
+            `["clusters", "<clusterName>"]` when set; `null`
+            for standalone servers.
+          items:
+            type: string
+          example: [clusters, cluster1]
+        machine:
+          type: array
+          nullable: true
+          description: |
+            Reference to the machine the server is targeted at,
+            for NodeManager-driven start/stop.
+          items:
+            type: string
+          example: [machines, machine1]
+        startupMode:
+          type: string
+          description: |
+            Initial state to bring the server up in.
+            Verified values include `RUNNING`, `STANDBY`,
+            `ADMIN`.
+          example: RUNNING
+        autoRestart:
+          type: boolean
+          description: |
+            Whether NodeManager restarts the server automatically
+            after a crash.
+        autoMigrationEnabled:
+          type: boolean
+          description: |
+            Whether the server participates in JTA / cluster
+            auto-migration.
+        weblogicPluginEnabled:
+          type: boolean
+          description: |
+            Whether the WebLogic web-server plugin is allowed to
+            override `WL-Proxy-Client-IP` for this server.
+        clientCertProxyEnabled:
+          type: boolean
+          description: |
+            Whether the server accepts client certificates from
+            front-end proxies.
+        tunnelingEnabled:
+          type: boolean
+          description: HTTP tunnelling toggle.
+        stagingMode:
+          type: string
+          description: |
+            Application staging mode for deployments targeted at
+            this server. Common values: `nostage`, `stage`,
+            `external_stage`.
+          example: nostage
+        stagingDirectoryName:
+          type: string
+          description: Filesystem directory used for staged deployments.
+        acceptBacklog:
+          type: integer
+          format: int32
+          description: TCP listen backlog.
+        clusterWeight:
+          type: integer
+          format: int32
+          description: Load-balancing weight when the server is in a cluster.
+        coherenceClusterSystemResource:
+          type: array
+          nullable: true
+          description: Reference to a Coherence cluster system resource, if any.
+          items:
+            type: string
+        candidateMachines:
+          type: array
+          nullable: true
+          description: |
+            Machines this server is allowed to migrate to under
+            JTA / cluster auto-migration.
+          items:
+            type: array
+            items:
+              type: string
+        completeMessageTimeout:
+          type: integer
+          format: int32
+          description: Seconds to wait for a complete protocol message before declaring timeout.
+        connectTimeout:
+          type: integer
+          format: int32
+          description: Outbound connection timeout in milliseconds.
+        IIOPEnabled:
+          type: boolean
+          description: Whether IIOP is enabled on this server.
+        TGIOPEnabled:
+          type: boolean
+          description: Whether the legacy Tuxedo Gateway IIOP variant is enabled.
+        JMSDefaultConnectionFactoriesEnabled:
+          type: boolean
+        XMLEntityCache:
+          type: array
+          nullable: true
+          description: Reference to a domain-level XML entity cache, if configured.
+          items:
+            type: string
+        XMLRegistry:
+          type: array
+          nullable: true
+          description: Reference to a domain-level XML registry, if configured.
+          items:
+            type: string
+        type:
+          type: string
+          description: Bean discriminator. Always `Server` on this resource.
+          example: Server
+
+    ServerCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Server'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'

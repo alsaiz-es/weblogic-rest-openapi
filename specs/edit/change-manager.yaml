@@ -1,0 +1,379 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Change Manager
+  description: |
+    Edit session lifecycle. Every mutation under `/edit/` (server,
+    cluster, datasource, etc.) must happen between a `startEdit`
+    and an `activate` (or `cancelEdit`). This file documents the
+    six change-manager operations plus the `GET` that reads the
+    session state.
+
+    See `docs/EDIT_TREE_WORKFLOW.md` for a sequence diagram and
+    operational guidance, including the `X-Requested-By` header
+    requirement on every mutating call (CSRF guard) and the
+    `wls:errorsDetails` error envelope used by edit-side
+    validation failures.
+  version: 0.3.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: changeManager
+    description: Edit-session lifecycle operations.
+
+paths:
+  /edit/changeManager:
+    get:
+      operationId: getChangeManagerState
+      tags: [changeManager]
+      summary: Read current edit session state.
+      description: |
+        Returns the lock state for the configured `editSession`
+        (always `"default"` in non-Multi-Tenant domains). Does not
+        require `X-Requested-By`.
+      responses:
+        '200':
+          description: Session state envelope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeManagerState'
+              examples:
+                idle:
+                  $ref: '#/components/examples/ChangeManagerStateIdleExample'
+                active:
+                  $ref: '#/components/examples/ChangeManagerStateActiveExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/startEdit:
+    post:
+      operationId: startEdit
+      tags: [changeManager]
+      summary: Acquire the edit lock.
+      description: |
+        Acquires (or refreshes) the edit lock for the calling user.
+        Idempotent: calling it again while you already hold the lock
+        returns `200` with empty body. The body is `{}`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Lock acquired (or already held by you).
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/activate:
+    post:
+      operationId: activateChanges
+      tags: [changeManager]
+      summary: Apply pending changes and release the lock.
+      description: |
+        Activates every change made in the current session and
+        releases the edit lock. Body is `{}`. On success the
+        response is empty `{}` and a subsequent
+        `GET /edit/changeManager` reports `locked=false`.
+
+        Activation can fail if any pending change does not
+        validate against the global descriptor — for example,
+        a datasource missing required properties. Error bodies
+        use the `wls:errorsDetails` envelope (see
+        `EditErrorResponse` schema).
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Changes activated.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/cancelEdit:
+    post:
+      operationId: cancelEdit
+      tags: [changeManager]
+      summary: Discard pending changes and release the lock.
+      description: |
+        Reverts every pending change in the current session and
+        releases the lock. Always safe to call as a finally clause
+        in client code.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Pending changes discarded.
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/safeResolve:
+    post:
+      operationId: safeResolve
+      tags: [changeManager]
+      summary: Reconcile against concurrent activations (no conflict allowed).
+      description: |
+        Required when `mergeNeeded` is `true` — i.e. another user
+        activated changes while your session was open. `safeResolve`
+        succeeds if your pending changes do not conflict with the
+        new global config; if they conflict it returns an error
+        and you must `cancelEdit` or `forceResolve`.
+
+        Calling this when you are not the lock owner returns 400
+        with two-element `wls:errorsDetails` array.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Reconciliation succeeded.
+        '400':
+          $ref: '#/components/responses/EditError'
+
+  /edit/changeManager/forceResolve:
+    post:
+      operationId: forceResolve
+      tags: [changeManager]
+      summary: Force-reconcile, overwriting concurrent changes.
+      description: |
+        Like `safeResolve` but accepts conflicts — your session's
+        pending values overwrite whatever the concurrent activation
+        produced. Use only with administrative authority.
+
+        Calling this when you are not the lock owner returns 400
+        with two-element `wls:errorsDetails` array.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Reconciliation succeeded; conflicts overwritten.
+        '400':
+          $ref: '#/components/responses/EditError'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    XRequestedByHeader:
+      name: X-Requested-By
+      in: header
+      required: true
+      description: |
+        CSRF guard. Any non-empty value is accepted; clients
+        commonly send their product name. Without it the request
+        returns `400 Bad Request` (plain text).
+      schema:
+        type: string
+        minLength: 1
+      example: openapi-spec-client
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    EditError:
+      description: |
+        Edit-session validation error. Body uses the
+        `wls:errorsDetails` envelope rather than the standard
+        `ErrorResponse` shape.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EditErrorResponse'
+
+  schemas:
+    ChangeManagerState:
+      type: object
+      description: |
+        Edit session state. Two shapes are returned depending on
+        whether the lock is held; `lockOwner` and `hasChanges` are
+        absent when `locked` is false.
+      required:
+        - locked
+        - editSession
+      properties:
+        locked:
+          type: boolean
+          description: True when an edit session is currently held.
+          example: false
+        lockOwner:
+          type: string
+          description: |
+            Username currently holding the edit lock. Present only
+            when `locked` is true.
+          example: weblogic
+        hasChanges:
+          type: boolean
+          description: |
+            True when the holder has made at least one mutating
+            call in this session. Present only when `locked` is
+            true.
+          example: false
+        mergeNeeded:
+          type: boolean
+          description: |
+            True when the global configuration has advanced under
+            your session and `safeResolve` is required before
+            activation.
+        editSession:
+          type: string
+          description: |
+            Edit session identifier. Always `"default"` in
+            non-Multi-Tenant domains; the field is a Multi-Tenant
+            artifact retained on both 12.2.1.4 and 14.1.2.
+          example: default
+
+    EditErrorDetail:
+      type: object
+      description: |
+        Single nested error inside an `EditErrorResponse`. The
+        `detail` text on **12.2.1.4** includes the fully-qualified
+        Java exception class name (e.g.
+        `weblogic.management.provider.EditNotEditorException: ...`);
+        on **14.1.2** the FQCN is stripped and only the message
+        remains. Clients comparing strings across versions should
+        normalize.
+      required:
+        - type
+        - title
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+          example: FAILURE
+        detail:
+          type: string
+          example: Not edit lock owner
+
+    EditErrorResponse:
+      type: object
+      description: |
+        Error envelope used by edit-tree validation failures.
+        Distinct from the standard `ErrorResponse`: it carries a
+        `wls:errorsDetails` array with one or more nested errors.
+      required:
+        - status
+        - title
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 400
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+          example: ERRORS
+        "wls:errorsDetails":
+          type: array
+          description: List of contributing errors that caused the request to fail.
+          items:
+            $ref: '#/components/schemas/EditErrorDetail'
+
+  examples:
+    ChangeManagerStateIdleExample:
+      summary: No edit session held.
+      value:
+        locked: false
+        mergeNeeded: false
+        editSession: default
+
+    ChangeManagerStateActiveExample:
+      summary: Lock held by `weblogic`, no changes yet.
+      value:
+        locked: true
+        lockOwner: weblogic
+        hasChanges: false
+        mergeNeeded: false
+        editSession: default

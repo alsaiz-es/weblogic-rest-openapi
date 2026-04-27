@@ -1,0 +1,12 @@
+{
+    "items": [
+        {
+            "name": "AdminServer",
+            "listenPort": 7001
+        },
+        {
+            "name": "server1",
+            "listenPort": 7003
+        }
+    ]
+}

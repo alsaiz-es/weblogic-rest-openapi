@@ -1,0 +1,92 @@
+{
+    "identity": [
+        "clusters",
+        "cluster1"
+    ],
+    "sessionStateQueryRequestTimeout": 30,
+    "notes": null,
+    "sessionFlushInterval": 180,
+    "txnAffinityEnabled": false,
+    "fencingGracePeriodMillis": 30000,
+    "serviceActivationRequestResponseTimeout": 0,
+    "replicationTimeoutMillis": 30000,
+    "type": "Cluster",
+    "autoMigrationTableCreationDDLFile": null,
+    "databaseLeasingBasisConnectionRetryCount": 1,
+    "rebalanceDelayPeriods": 2,
+    "autoMigrationTableCreationPolicy": "Disabled",
+    "millisToSleepBetweenAutoMigrationAttempts": 180000,
+    "migrationBasis": "database",
+    "oneWayRmiForReplicationEnabled": false,
+    "id": 0,
+    "secureReplicationEnabled": false,
+    "WANSessionPersistenceTableName": "WLS_WAN_PERSISTENCE_TABLE",
+    "asyncSessionQueueTimeout": 30,
+    "clusterType": "none",
+    "databaseLeasingBasisConnectionRetryDelay": 1000,
+    "defaultLoadAlgorithm": "round-robin",
+    "frontendHTTPPort": 0,
+    "singletonServiceRequestTimeout": 30000,
+    "sessionFlushThreshold": 10000,
+    "httpTraceSupportEnabled": false,
+    "tags": [],
+    "replicationTimeoutEnabled": true,
+    "maxSecondarySelectionAttempts": 0,
+    "serviceAgeThresholdSeconds": 180,
+    "additionalAutoMigrationAttempts": 3,
+    "name": "cluster1",
+    "sessionLazyDeserializationEnabled": false,
+    "multicastBufferSize": 64,
+    "weblogicPluginEnabled": false,
+    "healthCheckIntervalMillis": 10000,
+    "jobSchedulerTableName": "WEBLOGIC_TIMERS",
+    "concurrentSingletonActivationEnabled": false,
+    "memberDeathDetectorEnabled": false,
+    "multicastTTL": 1,
+    "siteName": null,
+    "frontendHost": null,
+    "clusterAddress": null,
+    "interClusterCommLinkHealthCheckInterval": 30000,
+    "remoteClusterAddress": null,
+    "greedySessionFlushInterval": 3,
+    "memberWarmupTimeoutSeconds": 0,
+    "replicationChannel": "ReplicationChannel",
+    "multicastAddress": "239.192.0.0",
+    "dynamicallyCreated": false,
+    "numberOfServersInClusterAddress": 3,
+    "persistSessionsOnShutdown": false,
+    "healthCheckPeriodsUntilFencing": 6,
+    "sessionStateQueryProtocolEnabled": false,
+    "clusterBroadcastChannel": null,
+    "multicastSendDelay": 3,
+    "multicastDataEncryption": false,
+    "messageOrderingEnabled": true,
+    "autoMigrationTableName": "ACTIVE",
+    "idlePeriodsUntilTimeout": 3,
+    "clientCertProxyEnabled": false,
+    "multicastPort": 7001,
+    "clusterMessagingMode": "unicast",
+    "unicastReadTimeout": 15000,
+    "frontendHTTPSPort": 0,
+    "dataSourceForSessionPersistence": null,
+    "dataSourceForJobScheduler": null,
+    "dataSourceForAutomaticMigration": null,
+    "coherenceClusterSystemResource": null,
+    "servers": [
+        {
+            "identity": [
+                "servers",
+                "server1"
+            ]
+        }
+    ],
+    "migratableTargets": [
+        {
+            "identity": [
+                "migratableTargets",
+                "server1 (migratable)"
+            ]
+        }
+    ],
+    "candidateMachinesForMigratableServers": []
+}
