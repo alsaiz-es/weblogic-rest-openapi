@@ -115,8 +115,10 @@ paths:
       description: |
         Returns the `ApplicationRuntimeMBean` for one deployed
         application. The HATEOAS `links` array (when not suppressed)
-        points to `componentRuntimes` for per-module drill-down; that
-        sub-tree is **not** modelled by this spec yet — see roadmap.
+        points to `componentRuntimes` for per-module drill-down — see
+        [`components.yaml`](./components.yaml) for the polymorphic
+        schema (web, EJB, application client, and JCA connector
+        subtypes).
       parameters:
         - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
         - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'

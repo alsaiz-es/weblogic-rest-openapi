@@ -1,0 +1,58 @@
+{
+    "items": [
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Routing",
+                "componentRuntimes",
+                "osb_server1_Service Bus Routing_appmarker.jar"
+            ],
+            "deploymentState": 2,
+            "name": "osb_server1_Service Bus Routing_appmarker.jar",
+            "moduleId": "appmarker.jar",
+            "type": "AppClientComponentRuntime"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Routing",
+                "componentRuntimes",
+                "osb_server1_/xbusrouting"
+            ],
+            "filterDispatchedRequestsEnabled": true,
+            "sessionInvalidationIntervalSecs": 60,
+            "logFilename": null,
+            "JSPDebug": false,
+            "type": "WebAppComponentRuntime",
+            "sourceInfo": "stage-routing.war",
+            "indexDirectoryEnabled": false,
+            "sessionMonitoringEnabled": false,
+            "singleThreadedServletPoolSize": 5,
+            "componentName": "/xbusrouting",
+            "moduleId": "/xbusrouting",
+            "moduleURI": "stage-routing.war",
+            "servletReloadCheckSecs": -1,
+            "JSPKeepGenerated": false,
+            "sessionCookieComment": null,
+            "sessionTimeoutSecs": 3600,
+            "sessionCookiePath": "/",
+            "JSPCompileCommand": null,
+            "contextRoot": "/xbusrouting",
+            "applicationIdentifier": "Service Bus Routing",
+            "openSessionsCurrentCount": 0,
+            "servletSessionsMonitoringIds": [],
+            "sessionIDLength": 52,
+            "deploymentState": 2,
+            "sessionsOpenedTotalCount": 0,
+            "JSPVerbose": false,
+            "name": "osb_server1_/xbusrouting",
+            "sessionCookieDomain": null,
+            "JSPPageCheckSecs": -1,
+            "sessionCookieMaxAgeSecs": -1,
+            "sessionCookieName": "JSESSIONID",
+            "configuredContextRoot": "/xbusrouting",
+            "status": "DEPLOYED",
+            "openSessionsHighCount": 0
+        }
+    ]
+}

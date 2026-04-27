@@ -1,0 +1,761 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Component Runtimes
+  description: |
+    Per-application drill-down. Each `ApplicationRuntime` exposes a
+    `componentRuntimes` collection that lists the modules packaged
+    inside the deployment — web modules, EJB jars, application
+    clients, JCA resource adapters, and (in some FMW domains) JDBC
+    datasource bundles. The `type` field on each item is a
+    **discriminator** keyed off the underlying MBean name; this
+    spec models the four types verified against live captures:
+
+    | `type` | Description | Verified |
+    |---|---|---|
+    | `WebAppComponentRuntime` | Web module (servlet/JSP container, sessions). | 12.2.1.4 + 14.1.2 |
+    | `EJBComponentRuntime` | EJB jar wrapper. Detail lives under the `EJBRuntimes` child rel. | 12.2.1.4 |
+    | `AppClientComponentRuntime` | Application client jar (EAR sub-module). | 12.2.1.4 |
+    | `ConnectorComponentRuntime` | JCA resource adapter (RAR). | 12.2.1.4 + 14.1.2 |
+
+    `JDBCDataSourceRuntime` instances also appear in this collection
+    when a datasource is bundled inside an EAR (rare; observed on
+    `WLSSchemaDataSource` in the FMW domain). Its schema is **not**
+    redefined here — see `specs/domain-runtime/jdbc.yaml`.
+
+    Sub-resources reachable via `links` from each component (and
+    intentionally **not** modelled in v0.2.x):
+    `EJBRuntimes`, `kodoPersistenceUnitRuntimes`, `wseeV2Runtimes`,
+    `workManagerRuntimes`, `managedThreadFactoryRuntimes`,
+    `managedExecutorServiceRuntimes`, `wseeClientRuntimes`,
+    `wseeClientConfigurationRuntimes`,
+    `managedScheduledExecutorServiceRuntimes`. Targeting any of
+    these is roadmap.
+  version: 0.2.1
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: componentRuntimes
+    description: Per-application module-level monitoring.
+
+paths:
+  /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}/componentRuntimes:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+      - name: applicationName
+        in: path
+        required: true
+        description: |
+          Application name as deployed. Names containing spaces or
+          punctuation must be percent-encoded as path segments.
+        schema:
+          type: string
+        example: myApp
+    get:
+      operationId: listComponentRuntimes
+      tags: [componentRuntimes]
+      summary: List the components packaged inside one application.
+      description: |
+        Returns the collection of modules in the named application.
+        Each item carries a `type` discriminator that determines the
+        applicable schema. A typical multi-module application
+        returns one or more `WebAppComponentRuntime` items plus an
+        optional `EJBComponentRuntime` and/or
+        `AppClientComponentRuntime`; a JCA RAR application returns a
+        single `ConnectorComponentRuntime`.
+
+        The collection-default field set varies by component type:
+        `WebAppComponentRuntime` and `ConnectorComponentRuntime`
+        return their full property set (35 and 28 fields
+        respectively); `EJBComponentRuntime` and
+        `AppClientComponentRuntime` return only 5 minimal fields
+        because their detail-bearing properties live one level
+        deeper, under the `EJBRuntimes` child rel for example.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Component runtime collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentRuntimeCollection'
+              examples:
+                mixedWebAndEjb:
+                  $ref: '#/components/examples/ComponentRuntimeCollectionMixedExample'
+                connectorOnly:
+                  $ref: '#/components/examples/ComponentRuntimeCollectionConnectorExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}/componentRuntimes/{componentName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+      - name: applicationName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myApp
+      - name: componentName
+        in: path
+        required: true
+        description: |
+          Component name as returned in the collection. For web
+          modules this is a server-prefixed context root such as
+          `myServer_/myContext`; for jars it is the archive file
+          name (e.g. `myEjb.jar`, `myAppClient.jar`); for resource
+          adapters it is the application name. Percent-encode
+          slashes (`%2F`) when the name contains them.
+        schema:
+          type: string
+        example: myManagedServer_%2FmyContext
+    get:
+      operationId: getComponentRuntime
+      tags: [componentRuntimes]
+      summary: Get a single component runtime by name.
+      description: |
+        Returns one `ComponentRuntime` projected by its `type`
+        discriminator. `WebAppComponentRuntime` and
+        `ConnectorComponentRuntime` carry their full property set
+        in the response; `EJBComponentRuntime` and
+        `AppClientComponentRuntime` carry only the 5 base fields
+        because their detail-bearing properties live one level
+        deeper, under sub-resources reachable via the response's
+        `links` array (see file-level description).
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Component runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentRuntime'
+              examples:
+                webApp:
+                  $ref: '#/components/examples/WebAppComponentRuntimeExample'
+                ejb:
+                  $ref: '#/components/examples/EJBComponentRuntimeExample'
+                appClient:
+                  $ref: '#/components/examples/AppClientComponentRuntimeExample'
+                connector:
+                  $ref: '#/components/examples/ConnectorComponentRuntimeExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The application or component does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    DeploymentState:
+      type: integer
+      format: int32
+      description: |
+        Numeric module deployment state. Observed value `2` is the
+        common ACTIVE state on a healthy deployment. Other values
+        documented in the underlying
+        `weblogic.application.ApplicationConstants` Java API
+        include `0` UNPREPARED, `1` PREPARED, `3` NEW,
+        `4` UPDATE_PENDING, `5` ADMIN, `6` RETIRED. Treat as
+        opaque and prefer `healthState` (when present) for runtime
+        decisions.
+      example: 2
+
+    ComponentRuntimeBase:
+      type: object
+      description: |
+        Common envelope for every entry in the `componentRuntimes`
+        collection. The `type` field is the discriminator that
+        selects one of the concrete subtypes (`WebAppComponentRuntime`,
+        `EJBComponentRuntime`, `AppClientComponentRuntime`,
+        `ConnectorComponentRuntime`).
+      required:
+        - type
+        - name
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: |
+            Bean class name discriminator. Values observed in
+            v0.2.1 captures: `WebAppComponentRuntime`,
+            `EJBComponentRuntime`, `AppClientComponentRuntime`,
+            `ConnectorComponentRuntime`. Other values may appear
+            on FMW-rich domains and should be treated as opaque
+            extensions of this base schema.
+          example: WebAppComponentRuntime
+        name:
+          type: string
+          description: |
+            Component runtime name. Web modules use a
+            `<serverName>_<contextRoot>` pattern; jars use the
+            archive file name; resource adapters use the
+            application name. Equal to `componentName` on
+            connectors and EJBs; **distinct** on web apps (web
+            apps put just the context-root in `componentName`).
+          example: myManagedServer_/myContext
+        moduleId:
+          type: string
+          description: |
+            Module identifier as registered at deployment. Web
+            modules use the context root (e.g. `/myContext`);
+            jars use the archive file name; resource adapters
+            use the RAR archive name (e.g. `myAdapter.rar`).
+        deploymentState:
+          $ref: '#/components/schemas/DeploymentState'
+
+    ComponentRuntime:
+      description: |
+        Polymorphic component runtime. `type` discriminates the
+        concrete subtype.
+      oneOf:
+        - $ref: '#/components/schemas/WebAppComponentRuntime'
+        - $ref: '#/components/schemas/EJBComponentRuntime'
+        - $ref: '#/components/schemas/AppClientComponentRuntime'
+        - $ref: '#/components/schemas/ConnectorComponentRuntime'
+      discriminator:
+        propertyName: type
+        mapping:
+          WebAppComponentRuntime: '#/components/schemas/WebAppComponentRuntime'
+          EJBComponentRuntime: '#/components/schemas/EJBComponentRuntime'
+          AppClientComponentRuntime: '#/components/schemas/AppClientComponentRuntime'
+          ConnectorComponentRuntime: '#/components/schemas/ConnectorComponentRuntime'
+
+    ComponentRuntimeCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+    WebAppComponentRuntime:
+      allOf:
+        - $ref: '#/components/schemas/ComponentRuntimeBase'
+        - type: object
+          description: |
+            Web module runtime. Verified field set (35 properties)
+            identical between WLS 12.2.1.4 and 14.1.2.
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [WebAppComponentRuntime]
+            componentName:
+              type: string
+              description: |
+                Web module short name — typically the context root
+                without a leading slash adjustment.
+              example: /myContext
+            applicationIdentifier:
+              type: string
+              description: Owning application name (matches `applicationName` in the path).
+              example: myApp
+            moduleURI:
+              type: string
+              description: Web module archive name as packaged in the EAR/WAR.
+              example: myWebModule.war
+            sourceInfo:
+              type: string
+              description: |
+                Source info reported by the deployer. Often the
+                same as `moduleURI`; useful when modules are
+                deployed exploded.
+            contextRoot:
+              type: string
+              description: Effective context root the application is bound to.
+              example: /myContext
+            configuredContextRoot:
+              type: string
+              description: |
+                Context root as configured (may differ from
+                `contextRoot` when the runtime applied a default
+                or domain-level override).
+            status:
+              type: string
+              description: Deployment status string. Observed `DEPLOYED` on healthy modules.
+              example: DEPLOYED
+            openSessionsCurrentCount:
+              type: integer
+              format: int64
+              description: Active HTTP sessions on this web module right now.
+              example: 0
+            openSessionsHighCount:
+              type: integer
+              format: int64
+              description: Highest concurrent session count seen since module start.
+              example: 0
+            sessionsOpenedTotalCount:
+              type: integer
+              format: int64
+              description: Cumulative sessions opened on this module since startup.
+              example: 0
+            sessionTimeoutSecs:
+              type: integer
+              format: int32
+              description: Inactive-session timeout in seconds.
+            sessionIDLength:
+              type: integer
+              format: int32
+              description: Length (chars) of the generated session ID.
+            sessionInvalidationIntervalSecs:
+              type: integer
+              format: int32
+              description: Interval at which expired sessions are reaped.
+            sessionMonitoringEnabled:
+              type: boolean
+              description: |
+                When true, the runtime maintains the
+                `servletSessionsMonitoringIds` array of active
+                session IDs (typically false in production for
+                privacy/perf).
+            servletSessionsMonitoringIds:
+              type: array
+              description: |
+                Active session IDs when `sessionMonitoringEnabled`
+                is true. Empty otherwise.
+              items:
+                type: string
+            sessionCookieComment:
+              type: string
+              nullable: true
+            sessionCookieDomain:
+              type: string
+              nullable: true
+            sessionCookieMaxAgeSecs:
+              type: integer
+              format: int32
+              description: Max-Age attribute on the session cookie. `-1` means session-only.
+            sessionCookieName:
+              type: string
+              description: Session cookie name (default `JSESSIONID`).
+              example: JSESSIONID
+            sessionCookiePath:
+              type: string
+              description: Session cookie path attribute.
+              example: /
+            servletReloadCheckSecs:
+              type: integer
+              format: int32
+              description: Servlet reload check interval. `-1` disables reloads.
+            singleThreadedServletPoolSize:
+              type: integer
+              format: int32
+              description: Pool size for legacy `SingleThreadModel` servlets.
+            JSPCompileCommand:
+              type: string
+              nullable: true
+              description: Override compiler command for JSP compilation.
+            JSPDebug:
+              type: boolean
+            JSPKeepGenerated:
+              type: boolean
+              description: Keep the generated `.java` files after JSP compilation.
+            JSPPageCheckSecs:
+              type: integer
+              format: int32
+              description: Interval for the runtime to recompile changed JSPs. `-1` disables.
+            JSPVerbose:
+              type: boolean
+            filterDispatchedRequestsEnabled:
+              type: boolean
+            indexDirectoryEnabled:
+              type: boolean
+            logFilename:
+              type: string
+              nullable: true
+
+    EJBComponentRuntime:
+      allOf:
+        - $ref: '#/components/schemas/ComponentRuntimeBase'
+        - type: object
+          description: |
+            EJB jar wrapper. Carries no instance-level data of its
+            own — only the 5 base fields. The interesting metrics
+            (instance pool sizes, invocation counts, transaction
+            counts) live one level deeper, under the `EJBRuntimes`
+            child collection. Modeling that subtree is roadmap for
+            v0.3.x. Verified on 12.2.1.4; not present in the
+            14.1.2 lab domain (vanilla `base_domain` has no EJB
+            deployments).
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [EJBComponentRuntime]
+
+    AppClientComponentRuntime:
+      allOf:
+        - $ref: '#/components/schemas/ComponentRuntimeBase'
+        - type: object
+          description: |
+            Application client module wrapper. Same minimal field
+            set as `EJBComponentRuntime` (the 5 base fields,
+            nothing component-specific in the REST projection).
+            Observed on EAR deployments that include client jars
+            (e.g. OSB-style packaging on 12.2.1.4).
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [AppClientComponentRuntime]
+
+    ConnectorComponentRuntime:
+      allOf:
+        - $ref: '#/components/schemas/ComponentRuntimeBase'
+        - type: object
+          description: |
+            JCA resource adapter (RAR) component. Verified field
+            set (28 properties) identical between WLS 12.2.1.4 and
+            14.1.2 (tested on `jms-internal-xa-adp` — a JCA
+            adapter shipped by every WebLogic install).
+
+            `schema` and `configuration` are large embedded XML
+            strings (the ra.xml-style schema definition and the
+            adapter's configured properties tree). The
+            `configuredProperties` object is the parsed view of
+            those properties.
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ConnectorComponentRuntime]
+            componentName:
+              type: string
+              description: |
+                Component short name. On connectors equal to
+                `name` and `moduleId` minus the `.rar` suffix.
+            healthState:
+              $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+            state:
+              type: string
+              description: |
+                Adapter activation state. Observed `Activated`;
+                other values documented but not captured.
+              example: Activated
+            suspendedState:
+              type: integer
+              format: int32
+              description: Numeric flag for suspension state. Observed `0` on active adapters.
+            jndiName:
+              type: string
+              nullable: true
+              description: Top-level JNDI name (often null; per-connection JNDI lives inside `configuration`).
+            linkref:
+              type: string
+              nullable: true
+              description: Linked-RAR reference for shared deployments.
+            description:
+              type: string
+              nullable: true
+            descriptions:
+              type: array
+              items:
+                type: string
+            EISType:
+              type: string
+              description: Enterprise Information System type advertised by the adapter (e.g. `JMS Service`).
+              example: JMS Service
+            EISResourceId:
+              type: string
+              description: |
+                Composite resource identifier in
+                `type=<eis>, application=..., module=..., eis=...`
+                format. Used by JCA security/audit logs.
+            vendorName:
+              type: string
+              example: Oracle Corporation
+            version:
+              type: string
+              description: Adapter version per ra.xml.
+              example: 1.0.2
+            specVersion:
+              type: string
+              description: JCA specification version supported by the adapter.
+              example: "1.5"
+            versioned:
+              type: boolean
+              description: Whether the deployment uses WebLogic versioned applications.
+            activeVersion:
+              type: boolean
+            activeVersionId:
+              type: string
+              nullable: true
+            versionId:
+              type: string
+              nullable: true
+            configurationVersion:
+              type: string
+              description: Adapter configuration metadata version.
+            connectionPoolCount:
+              type: integer
+              format: int32
+              description: Number of outbound connection pools provisioned by this adapter.
+            inboundConnectionsCount:
+              type: integer
+              format: int32
+              description: Active inbound connections (message-driven listeners).
+            schema:
+              type: string
+              description: |
+                Embedded XSD describing the adapter's configuration
+                shape. Long string; pass `excludeFields=schema` if
+                you don't need it.
+            configuration:
+              type: string
+              description: |
+                Embedded XML configuration tree of the adapter as
+                parsed from `weblogic-ra.xml`. Long string; pass
+                `excludeFields=configuration` if you don't need it.
+            configuredProperties:
+              type: object
+              description: |
+                Parsed view of selected adapter properties (vendor
+                name, MCF class name, JNDI bindings, etc.). Keys
+                vary by adapter; treat as a free-form map.
+              additionalProperties:
+                type: string
+
+  examples:
+    ComponentRuntimeCollectionMixedExample:
+      summary: A multi-module application with one EJB and several web modules.
+      value:
+        items:
+          - type: EJBComponentRuntime
+            name: myEjb.jar
+            moduleId: myEjb.jar
+            deploymentState: 2
+            identity:
+              - applicationRuntimes
+              - myApp
+              - componentRuntimes
+              - myEjb.jar
+          - type: WebAppComponentRuntime
+            name: myManagedServer_/myContext
+            componentName: /myContext
+            moduleId: /myContext
+            moduleURI: myWebModule.war
+            contextRoot: /myContext
+            configuredContextRoot: /myContext
+            applicationIdentifier: myApp
+            status: DEPLOYED
+            deploymentState: 2
+            openSessionsCurrentCount: 0
+            openSessionsHighCount: 0
+            sessionsOpenedTotalCount: 0
+
+    ComponentRuntimeCollectionConnectorExample:
+      summary: A JCA RAR application with a single connector component.
+      value:
+        items:
+          - type: ConnectorComponentRuntime
+            name: myAdapter
+            componentName: myAdapter
+            moduleId: myAdapter.rar
+            deploymentState: 2
+            state: Activated
+            EISType: JMS Service
+            vendorName: Oracle Corporation
+            specVersion: "1.5"
+            connectionPoolCount: 1
+            inboundConnectionsCount: 0
+            healthState:
+              state: ok
+              subsystemName: null
+              symptoms: []
+
+    WebAppComponentRuntimeExample:
+      summary: WebApp module on a managed server.
+      value:
+        identity:
+          - applicationRuntimes
+          - myApp
+          - componentRuntimes
+          - myManagedServer_/myContext
+        type: WebAppComponentRuntime
+        name: myManagedServer_/myContext
+        componentName: /myContext
+        applicationIdentifier: myApp
+        moduleURI: myWebModule.war
+        sourceInfo: myWebModule.war
+        moduleId: /myContext
+        contextRoot: /myContext
+        configuredContextRoot: /myContext
+        status: DEPLOYED
+        deploymentState: 2
+        openSessionsCurrentCount: 0
+        openSessionsHighCount: 0
+        sessionsOpenedTotalCount: 0
+        sessionTimeoutSecs: 3600
+        sessionIDLength: 52
+        sessionInvalidationIntervalSecs: 60
+        sessionMonitoringEnabled: false
+        servletSessionsMonitoringIds: []
+        sessionCookieComment: null
+        sessionCookieDomain: null
+        sessionCookieMaxAgeSecs: -1
+        sessionCookieName: JSESSIONID
+        sessionCookiePath: /
+        servletReloadCheckSecs: -1
+        singleThreadedServletPoolSize: 5
+        JSPCompileCommand: null
+        JSPDebug: false
+        JSPKeepGenerated: false
+        JSPPageCheckSecs: -1
+        JSPVerbose: false
+        filterDispatchedRequestsEnabled: false
+        indexDirectoryEnabled: false
+        logFilename: null
+
+    EJBComponentRuntimeExample:
+      summary: EJB jar wrapper (minimal direct fields).
+      value:
+        identity:
+          - applicationRuntimes
+          - myApp
+          - componentRuntimes
+          - myEjb.jar
+        type: EJBComponentRuntime
+        name: myEjb.jar
+        moduleId: myEjb.jar
+        deploymentState: 2
+
+    AppClientComponentRuntimeExample:
+      summary: Application client module.
+      value:
+        identity:
+          - applicationRuntimes
+          - myApp
+          - componentRuntimes
+          - myAppClient.jar
+        type: AppClientComponentRuntime
+        name: myAppClient.jar
+        moduleId: myAppClient.jar
+        deploymentState: 2
+
+    ConnectorComponentRuntimeExample:
+      summary: JCA resource adapter (JMS bridge XA adapter shipped with every WLS install).
+      value:
+        identity:
+          - applicationRuntimes
+          - jms-internal-xa-adp
+          - componentRuntimes
+          - jms-internal-xa-adp
+        type: ConnectorComponentRuntime
+        name: jms-internal-xa-adp
+        componentName: jms-internal-xa-adp
+        moduleId: jms-internal-xa-adp.rar
+        deploymentState: 2
+        state: Activated
+        suspendedState: 0
+        EISType: JMS Service
+        EISResourceId: "type=<eis>, application=jms-internal-xa-adp, module=jms-internal-xa-adp, eis=JMS Service"
+        vendorName: Oracle Corporation
+        version: 1.0.2
+        specVersion: "1.5"
+        versioned: false
+        activeVersion: true
+        activeVersionId: null
+        versionId: null
+        configurationVersion: "1.0"
+        connectionPoolCount: 1
+        inboundConnectionsCount: 0
+        jndiName: null
+        linkref: null
+        description: null
+        descriptions: []
+        configuredProperties:
+          VendorName: Oracle Corporation
+          EisType: JMS Service
+          SpecVersion: "1.5"
+          Version: 1.0.2
+          OutboundJndiNames: eis/jms/internal/WLSConnectionFactoryJNDIXA
+          MCFClassNames: weblogic.jms.adapter.JMSManagedConnectionFactory
+          TransactionSupports: XATransaction
+        healthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        schema: |
+          <?xml version="1.0" encoding="UTF-8"?>
+          <xsd:schema xmlns="http://www.bea.com/connector/monitoring1dot0" ...
+          (truncated — verbatim copy of the JCA monitoring schema)
+        configuration: |
+          <connector xmlns="http://www.bea.com/connector/monitoring1dot0" ...
+          (truncated — verbatim weblogic-ra.xml-derived config tree)

@@ -1,0 +1,12 @@
+{
+    "identity": [
+        "applicationRuntimes",
+        "wsm-pm",
+        "componentRuntimes",
+        "wsm-pmserver-wls.jar"
+    ],
+    "deploymentState": 2,
+    "name": "wsm-pmserver-wls.jar",
+    "moduleId": "wsm-pmserver-wls.jar",
+    "type": "EJBComponentRuntime"
+}

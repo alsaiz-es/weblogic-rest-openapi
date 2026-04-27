@@ -51,6 +51,7 @@ specs/
 | domainRuntime | Thread pool runtime | ✅ Verified (12.2.1.4, 14.1.2) |
 | domainRuntime | JVM runtime | ✅ Verified (12.2.1.4, 14.1.2) |
 | domainRuntime | Application runtime | ✅ Verified (12.2.1.4, 14.1.2) — 12.2.1.4 has extra `partitionName` |
+| domainRuntime | Component runtime (web/EJB/appclient/connector) | ✅ Verified (12.2.1.4, 14.1.2) — 4 subtypes via `type` discriminator |
 | domainRuntime | Server channel runtime | ✅ Verified (12.2.1.4, 14.1.2) — identical 12-field set |
 | domainRuntime | Bulk search (`POST /search`) | ✅ Verified (12.2.1.4, 14.1.2) — DSL identical, CSRF header required on both |
 | domainRuntime | JMS runtime (container + per-`JMSServer`) | ✅ Container verified both versions; `JMSServer` detail (37 fields) verified on 12.2.1.4 OSB; per-destination drill-down deferred to v0.3.0 |

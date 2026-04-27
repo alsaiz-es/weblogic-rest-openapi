@@ -1,5 +1,74 @@
 # Changelog
 
+## 0.2.1 — 2026-04-27
+
+Closes the `componentRuntimes` child of `applicationRuntimes` —
+per-application module drill-down for web, EJB, application client,
+and JCA connector modules. New endpoints:
+
+- `GET /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}/componentRuntimes`
+- `GET /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}/componentRuntimes/{componentName}`
+
+### New spec
+
+- `specs/domain-runtime/components.yaml` — polymorphic
+  `ComponentRuntime` schema with a `type` discriminator and four
+  concrete subtypes built from real captures:
+
+  | `type` | Fields | Verified |
+  |---|---|---|
+  | `WebAppComponentRuntime` | 35 | 12.2.1.4 + 14.1.2, identical |
+  | `EJBComponentRuntime` | 5 (collection-default; rich data via `EJBRuntimes` child rel) | 12.2.1.4 |
+  | `AppClientComponentRuntime` | 5 (same shape as EJB) | 12.2.1.4 |
+  | `ConnectorComponentRuntime` | 28 | 12.2.1.4 + 14.1.2, identical |
+
+  `JDBCDataSourceRuntime` instances also surface in this collection
+  on EAR-bundled datasources (FMW domain quirk); the spec does not
+  redefine that schema and points to `jdbc.yaml`. Per-EJB and
+  per-destination drill-down (children of EJB and Connector
+  components) are deferred to v0.3.x.
+
+### Cross-version notes
+
+- `WebAppComponentRuntime` 35-field set: identical between
+  12.2.1.4 (`wsm-pm` web modules on the FMW domain) and 14.1.2
+  (`wls-management-services` web module on the vanilla domain).
+- `ConnectorComponentRuntime` 28-field set: identical between both
+  versions, captured on the same shipped adapter
+  (`jms-internal-xa-adp`).
+- EJB and AppClient component types only observed on 12.2.1.4
+  (no EJB or app-client deployments in the 14.1.2 lab domain). The
+  5-field shape is too minimal to vary cross-version; the
+  detail-bearing subtree (`EJBRuntimes`) is what would actually
+  matter for cross-version verification, and it is roadmap.
+
+### Samples added
+
+`samples/12.2.1.4/`:
+`componentRuntimes_collection_wsm-pm.json` (mixed EJB + 5 web
+modules),
+`componentRuntimes_collection_service-bus-routing.json` (AppClient
++ web),
+`componentRuntime_individual_wsm-pm_webapp.json` (full WebApp
+field set),
+`componentRuntime_individual_wsm-pm_ejb.json`,
+`componentRuntime_individual_service-bus-routing_appclient.json`,
+`componentRuntime_individual_jmsadp_connector.json` (full
+Connector field set on the shipped JMS XA adapter).
+
+`samples/14.1.2/`:
+`componentRuntimes_collection_wls-management-services.json`,
+`componentRuntime_individual_wls-management-services_webapp.json`
+(cross-version baseline for WebApp),
+`componentRuntimes_collection_jms-internal-xa-adp.json`,
+`componentRuntime_individual_jmsadp_connector.json`
+(cross-version baseline for Connector).
+
+### Documentation
+
+- `README.md` Coverage Status — `componentRuntimes` row added,
+  marked verified on both versions.
+
 ## 0.2.0 — 2026-04-27
 
 Domain-runtime monitoring coverage extended. Four new spec files and a

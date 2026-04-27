@@ -1,0 +1,12 @@
+{
+    "identity": [
+        "applicationRuntimes",
+        "Service Bus Routing",
+        "componentRuntimes",
+        "osb_server1_Service Bus Routing_appmarker.jar"
+    ],
+    "deploymentState": 2,
+    "name": "osb_server1_Service Bus Routing_appmarker.jar",
+    "moduleId": "appmarker.jar",
+    "type": "AppClientComponentRuntime"
+}
