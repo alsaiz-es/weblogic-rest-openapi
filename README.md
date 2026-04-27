@@ -72,6 +72,12 @@ in the Oracle reference and regularly surprise implementers. These were
 uncovered while verifying v0.1.0 against a live WLS 12.2.1.4 server and
 are modelled explicitly in the specs.
 
+> **Consolidated reference.** Every quirk discovered across v0.1.x
+> through v0.3.0 — with version-of-observation, expected vs actual
+> behaviour, operational implication, and the spec file modelling each
+> one — is collected in [`docs/QUIRKS.md`](docs/QUIRKS.md). The list
+> below is a short summary; the consolidated doc is the reference.
+
 1. **`state` casing varies by subsystem.** `ServerRuntime.state` is
    **UPPERCASE** (`RUNNING`, `SHUTDOWN`, ...), while
    `JDBCDataSourceRuntime.state` is **Title Case** (`Running`,
