@@ -1,0 +1,39 @@
+# Additional probe axes on 14.1.2 (wls-admin.example.com, AdminServer + server1 RUNNING)
+# All probes target http://wls-admin.example.com:7001/management/weblogic/latest/...
+# Status code only (no=without X-Requested-By, with=with X-Requested-By: probe)
+
+## /domainRuntime root collections (does the 400 affect other siblings?)
+no=400  with=200  /domainRuntime/serverRuntimes
+no=200  with=200  /domainRuntime/migrationDataRuntimes
+no=200  with=200  /domainRuntime/nodeManagerRuntimes
+no=200  with=200  /domainRuntime/serviceMigrationDataRuntimes
+no=200  with=200  /domainRuntime/serverLifeCycleRuntimes
+no=200  with=200  /domainRuntime/systemComponentLifeCycleRuntimes
+
+## Root and singleton children
+no=200  with=200  /domainRuntime
+no=200  with=200  /domainRuntime/JNDI
+no=200  with=200  /serverRuntime              (per-server URL prefix root)
+
+## Alternate namespaces
+no=404  with=404  /management/wls/latest/domainRuntime/serverRuntimes
+
+## X-Requested-By value variations on /domainRuntime/serverRuntimes
+empty value ("X-Requested-By: ")        -> 400
+"MyClient"                                -> 200
+"x"                                       -> 200
+"1"                                       -> 200
+"openapi-spec"                            -> 200
+"weblogic-rest"                           -> 200
+
+## Header name case variations on /domainRuntime/serverRuntimes
+"X-Requested-By: probe"   -> 200
+"x-requested-by: probe"   -> 200
+"X-REQUESTED-BY: probe"   -> 200
+"X-Requested-by: probe"   -> 200
+
+## Alternative CSRF-style headers (does any other header satisfy the gate?)
+"Requested-By: probe"     -> 400
+"X-CSRF-Token: probe"     -> 400
+"X-XSRF-TOKEN: probe"     -> 400
+"X-Custom-Header: probe"  -> 400

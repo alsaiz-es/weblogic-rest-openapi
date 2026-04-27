@@ -195,13 +195,44 @@ components:
       type: object
       description: |
         Subset of `ServerRuntimeMBean` properties most commonly used for
-        monitoring. Field set and types verified against a live WLS
-        12.2.1.4 OSB domain.
+        monitoring. Field set and types verified against live WLS
+        12.2.1.4 and 14.1.2 domains.
 
         JVM details (`javaVersion`, heap, uptime) and listen-channel
-        details (`listenAddress`, `listenPort`) are **not** on this bean —
-        they live under the `JVMRuntime` and `serverChannelRuntimes`
-        children respectively, reachable via the `links` array.
+        details are **not** on this bean — they live under the
+        `JVMRuntime` and `serverChannelRuntimes` children respectively,
+        reachable via the `links` array. See
+        [`channels.yaml`](./channels.yaml) for the channel runtime
+        schema; note that the REST projection of channel runtimes
+        does **not** expose `listenAddress`/`listenPort` either —
+        only the concatenated `publicURL`.
+
+        ⚠️ **`GET /serverRuntimes` (collection) requires the
+        `X-Requested-By` request header when at least one managed
+        server is RUNNING.** Without it the endpoint returns
+        `HTTP 400 Bad Request` (JSON envelope, no useful detail). Any
+        non-empty header value works (`X-Requested-By: openapi-client`,
+        `X-Requested-By: 1`, etc.), and the header name is
+        case-insensitive (HTTP standard). When only the AdminServer
+        is running and no managed server is up, the header is not
+        required.
+
+        This behavior is selective and not documented in any Oracle
+        reference we have found. Of the eight `/domainRuntime/*`
+        endpoints we probed (`serverRuntimes`, `migrationDataRuntimes`,
+        `nodeManagerRuntimes`, `serviceMigrationDataRuntimes`,
+        `serverLifeCycleRuntimes`,
+        `systemComponentLifeCycleRuntimes`, plus the
+        `/domainRuntime` root and the `JNDI` singleton), **only**
+        `serverRuntimes` enforces this header — the other seven
+        accept anonymous GETs even with managed servers up.
+        Reproduced identically on WLS 12.2.1.4 and 14.1.2; see
+        `CHANGELOG.md` v0.2.0 "Corrections from v0.1.x" for the
+        retraction history (this was previously misattributed as an
+        OSB-specific 12.2.1.4 serialization bug). Fallback options if
+        the header cannot be set: fetch each server by name, or use
+        `POST /domainRuntime/search` (which always requires
+        `X-Requested-By` per the standard CSRF guard).
       properties:
         identity:
           $ref: '../common/schemas.yaml#/components/schemas/Identity'

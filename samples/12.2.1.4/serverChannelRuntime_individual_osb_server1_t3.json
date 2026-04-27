@@ -1,0 +1,17 @@
+{
+    "identity": [
+        "serverChannelRuntimes",
+        "Default[t3]"
+    ],
+    "messagesReceivedCount": 0,
+    "bytesReceivedCount": 0,
+    "associatedVirtualTargetName": null,
+    "name": "Default[t3]",
+    "publicURL": "t3://127.0.0.1:7003",
+    "channelName": "Default[t3]",
+    "acceptCount": 9,
+    "bytesSentCount": 0,
+    "type": "ServerChannelRuntime",
+    "connectionsCount": 0,
+    "messagesSentCount": 0
+}

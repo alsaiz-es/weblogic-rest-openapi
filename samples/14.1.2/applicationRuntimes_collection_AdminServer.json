@@ -1,0 +1,136 @@
+{
+    "items": [
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jms-internal-xa-adp"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "jms-internal-xa-adp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jms-internal-xa-adp"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "bea_wls_internal"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "bea_wls_internal",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "bea_wls_internal"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "wls-management-services"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "wls-management-services",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "wls-management-services"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jamagent"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "jamagent",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jamagent"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jms-internal-notran-adp"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "jms-internal-notran-adp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jms-internal-notran-adp"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "mejb"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "symptoms": []
+            },
+            "name": "mejb",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "mejb"
+        }
+    ]
+}

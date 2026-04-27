@@ -1,0 +1,195 @@
+=== test=empty body={} ===
+HTTP=400
+--- response ---
+Bad Request
+
+=== test=servers_basic body={"fields":[],"links":[],"children":{"serverRuntimes":{"fields":["name","state"],"links":[]}}} ===
+HTTP=400
+--- response ---
+Bad Request
+
+=== test=servers_threadpool body={"fields":[],"links":[],"children":{"serverRuntimes":{"fields":["name","state"],"links":[],"children":{"threadPoolRuntime":{"fields":["executeThreadTotalCount","hoggingThreadCount","stuckThreadCount"],"links":[]}}}}} ===
+HTTP=400
+--- response ---
+Bad Request
+
+=== test=servers_filtered body={"fields":[],"links":[],"children":{"serverRuntimes":{"name":["AdminServer"],"fields":["name","state","activationTime"],"links":[]}}} ===
+HTTP=400
+--- response ---
+Bad Request
+
+=== test=no_body (POST without body) ===
+HTTP=400
+Bad Request
+
+=== test=form_encoded (Content-Type form) ===
+HTTP=415
+Unsupported Media Type
+
+=== test=GET_search (wrong method) ===
+HTTP=405
+{
+    "status": 405,
+    "type": "http:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec10.html#sec10.4.1",
+    "title": "FAILURE",
+    "detail": "Method not allowed."
+}
+
+=== test=alt_namespace_wls (POST /management/wls/latest/.../search) ===
+HTTP=404
+Not Found
+
+=== test=domainConfig_search (config tree, not runtime) ===
+HTTP=400
+Bad Request
+
+=== test=oracle_specific_accept (vnd.oracle.adf.action+json) ===
+HTTP=406
+Not Acceptable
+
+=== test=action_search_query (X-Requested-By + ADF) ===
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+  
+
+=== test=just_fields_array (no children) ===
+HTTP=400
+Bad Request
+
+=== test=just_links_string ===
+HTTP=400
+Bad Request
+
+=== test=invalid_json (verify if 400 is parser or DSL) ===
+HTTP=400
+Bad Request
+
+=== noheader_csrf_400 ===
+body={}
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\
+
+=== missing_csrf_repro ===
+body={}
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\
+
+=== unknown_field ===
+body={"foo":"bar","fields":["name"]}
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\
+
+=== nonexistent_property ===
+body={"fields":["definitelyNotARealProperty"]}
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\
+
+=== deep_nesting_3_levels ===
+body={"children":{"serverRuntimes":{"fields":["name"],"children":{"applicationRuntimes":{"fields":["name","internal"],"children":{"componentRuntimes":{"fields":["name","type"]}}}}}}}
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\
+
+=== links_passed_string ===
+body={"fields":["name"],"links":"none"}
+HTTP=400
+{
+    "status": 400,
+    "type": "http:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec10.html#sec10.4.1",
+    "title": "FAILURE",
+    "detail": "The property 'links' must be an array."
+}
+
+=== links_passed_empty_array ===
+body={"fields":["name"],"links":[]}
+HTTP=200
+{
+    "name": "base_domain"
+}
+
+=== links_omitted ===
+body={"fields":["name"]}
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\
+

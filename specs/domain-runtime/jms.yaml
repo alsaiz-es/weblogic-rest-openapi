@@ -1,0 +1,533 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — JMS Runtime
+  description: |
+    Read-only monitoring of the JMS subsystem under each
+    `serverRuntime`. The `JMSRuntime` singleton is the per-server
+    container that aggregates connection counts and the JMS server
+    instances targeted at that server. Each `JMSServer` exposes
+    message/byte counters, paging buffer state, and three independent
+    pause modes (insertion, consumption, production).
+
+    **Coverage scope (v0.2.0).**
+    - `JMSRuntime` container — verified on both 12.2.1.4 and 14.1.2.
+    - `JMSServers` collection envelope — verified on both versions.
+    - Per-`JMSServer` detail (`JMSServerRuntimeMBean` projection) —
+      37 properties, verified on both versions.
+    - Per-destination drill-down (`destinations` collection on each
+      JMS server, queue/topic level metrics) — **deferred to v0.3.0**.
+      Reachable via the `destinations` rel from each `JMSServer`
+      response when `links` are not suppressed.
+  version: 0.2.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: jmsRuntime
+    description: Per-server JMS subsystem monitoring.
+
+paths:
+  /domainRuntime/serverRuntimes/{serverName}/JMSRuntime:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+    get:
+      operationId: getJMSRuntime
+      tags: [jmsRuntime]
+      summary: Get the JMS subsystem container for a server.
+      description: |
+        Returns the per-server `JMSRuntimeMBean`. The shape is the
+        same whether or not any `<jms-server>` is targeted at this
+        server — counters simply read zero in the empty case.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: JMS runtime container.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JMSRuntime'
+              examples:
+                empty:
+                  $ref: '#/components/examples/JMSRuntimeEmptyExample'
+                populated:
+                  $ref: '#/components/examples/JMSRuntimePopulatedExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/JMSRuntime/JMSServers:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+    get:
+      operationId: listJMSServers
+      tags: [jmsRuntime]
+      summary: List JMS server runtimes targeted at this server.
+      description: |
+        Collection envelope around `JMSServerRuntimeMBean` instances.
+        On a server with no JMS resources targeted, returns
+        `{"items": []}`.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Collection of JMS server runtimes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JMSServerCollection'
+              examples:
+                empty:
+                  $ref: '#/components/examples/JMSServerCollectionEmptyExample'
+                populated:
+                  $ref: '#/components/examples/JMSServerCollectionPopulatedExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/JMSRuntime/JMSServers/{jmsServerName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: myManagedServer
+      - name: jmsServerName
+        in: path
+        required: true
+        description: |
+          JMS server runtime name as configured in the domain.
+          Case-sensitive.
+        schema:
+          type: string
+        example: myJMSServer
+    get:
+      operationId: getJMSServerRuntime
+      tags: [jmsRuntime]
+      summary: Get a single JMS server runtime by name.
+      description: |
+        Returns the `JMSServerRuntimeMBean` projection for one JMS
+        server. The `destinations` rel (when `links` are not
+        suppressed) points to the per-queue/topic metric tree
+        which is **not** modelled in this spec yet (deferred to
+        v0.3.0).
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: JMS server runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JMSServerRuntime'
+              examples:
+                running:
+                  $ref: '#/components/examples/JMSServerRuntimeExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The server, JMS runtime, or JMS server does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    JMSRuntime:
+      type: object
+      description: |
+        Container summary for the JMS subsystem on one server.
+        Verified field set (9 properties) on both 12.2.1.4 and
+        14.1.2. Counter types are int32 — promote to int64
+        client-side if you expect long-running domains with high
+        churn.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `JMSRuntime`.
+          example: JMSRuntime
+        name:
+          type: string
+          description: |
+            Container name following the convention
+            `<serverName>.jms`. Not configurable.
+          example: myManagedServer.jms
+        healthState:
+          $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+        JMSServersCurrentCount:
+          type: integer
+          format: int32
+          description: Number of JMS server runtimes currently active on this server.
+          example: 0
+        JMSServersHighCount:
+          type: integer
+          format: int32
+          description: Highest number of concurrently active JMS server runtimes since this server started.
+          example: 0
+        JMSServersTotalCount:
+          type: integer
+          format: int32
+          description: Cumulative count of JMS server runtimes activated since this server started.
+          example: 0
+        connectionsCurrentCount:
+          type: integer
+          format: int32
+          description: Active JMS client connections.
+          example: 0
+        connectionsHighCount:
+          type: integer
+          format: int32
+          description: Highest concurrent JMS client connection count seen since startup.
+          example: 0
+        connectionsTotalCount:
+          type: integer
+          format: int32
+          description: Cumulative JMS client connections since startup.
+          example: 0
+
+    JMSServerCollection:
+      type: object
+      description: Envelope for the JMS server runtime list.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JMSServerRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+    JMSPausedState:
+      type: string
+      description: |
+        Tri-state pause indicator returned by the JMS server for
+        each of its three control modes (insertion, consumption,
+        production). Despite being conceptually a boolean toggle,
+        the REST API returns these as descriptive strings — the
+        boolean form is offered separately as `insertionPaused` /
+        `consumptionPaused` / `productionPaused`.
+      enum:
+        - Insertion-Enabled
+        - Insertion-Paused
+        - Consumption-Enabled
+        - Consumption-Paused
+        - Production-Enabled
+        - Production-Paused
+
+    JMSServerRuntime:
+      type: object
+      description: |
+        `JMSServerRuntimeMBean` projection. 37 properties, verified
+        against live WLS 12.2.1.4 and 14.1.2.
+
+        Counters fall into four families:
+        - `messages*` / `bytes*` — message and byte volume,
+          current/high/pending/threshold/pageable.
+        - `destinations*` — counts of destinations targeted at
+          this server.
+        - `sessionPools*` — application-managed session pool
+          counts.
+        - `paging*` — disk-paging buffer utilisation.
+
+        Three pause modes (`insertion`, `consumption`,
+        `production`) are reported both as booleans and as
+        descriptive strings on `*PausedState`. Use the boolean
+        form for programmatic checks.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `JMSServerRuntime`.
+          example: JMSServerRuntime
+        name:
+          type: string
+          description: JMS server runtime name as configured.
+          example: myJMSServer
+        healthState:
+          $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+        destinationsCurrentCount:
+          type: integer
+          format: int32
+        destinationsHighCount:
+          type: integer
+          format: int32
+        destinationsTotalCount:
+          type: integer
+          format: int32
+        messagesCurrentCount:
+          type: integer
+          format: int64
+        messagesHighCount:
+          type: integer
+          format: int64
+        messagesPendingCount:
+          type: integer
+          format: int64
+        messagesReceivedCount:
+          type: integer
+          format: int64
+        messagesThresholdTime:
+          type: integer
+          format: int64
+          description: Cumulative milliseconds the server spent above its message threshold.
+        messagesPageableCurrentCount:
+          type: integer
+          format: int64
+        messagesPagedInTotalCount:
+          type: integer
+          format: int64
+        messagesPagedOutTotalCount:
+          type: integer
+          format: int64
+        bytesCurrentCount:
+          type: integer
+          format: int64
+        bytesHighCount:
+          type: integer
+          format: int64
+        bytesPendingCount:
+          type: integer
+          format: int64
+        bytesReceivedCount:
+          type: integer
+          format: int64
+        bytesThresholdTime:
+          type: integer
+          format: int64
+          description: Cumulative milliseconds the server spent above its byte threshold.
+        bytesPageableCurrentCount:
+          type: integer
+          format: int64
+        bytesPagedInTotalCount:
+          type: integer
+          format: int64
+        bytesPagedOutTotalCount:
+          type: integer
+          format: int64
+        sessionPoolsCurrentCount:
+          type: integer
+          format: int32
+        sessionPoolsHighCount:
+          type: integer
+          format: int32
+        sessionPoolsTotalCount:
+          type: integer
+          format: int32
+        pagingPhysicalWriteCount:
+          type: integer
+          format: int64
+          description: Cumulative paging operations actually flushed to disk.
+        pagingAllocatedIoBufferBytes:
+          type: integer
+          format: int64
+          description: Bytes allocated to the paging I/O buffer pool.
+        pagingAllocatedWindowBufferBytes:
+          type: integer
+          format: int64
+          description: Bytes allocated to the paging window buffer pool.
+        insertionPaused:
+          type: boolean
+          description: True if the server is currently rejecting new messages from producers.
+        insertionPausedState:
+          $ref: '#/components/schemas/JMSPausedState'
+        consumptionPaused:
+          type: boolean
+          description: True if the server is currently rejecting consumer reads.
+        consumptionPausedState:
+          $ref: '#/components/schemas/JMSPausedState'
+        productionPaused:
+          type: boolean
+          description: True if the server is currently rejecting message production.
+        productionPausedState:
+          $ref: '#/components/schemas/JMSPausedState'
+        pendingTransactions:
+          type: array
+          nullable: true
+          description: |
+            List of pending transactions on the server. Observed
+            null on idle servers; structure not modelled because no
+            pending-transaction sample is available. Treat as
+            opaque for now.
+          items:
+            type: object
+            additionalProperties: true
+        transactions:
+          type: array
+          nullable: true
+          description: |
+            Active transactions snapshot. Same observation note as
+            `pendingTransactions`.
+          items:
+            type: object
+            additionalProperties: true
+
+  examples:
+    JMSRuntimeEmptyExample:
+      summary: JMSRuntime on a server with no JMS resources targeted.
+      value:
+        identity:
+          - JMSRuntime
+        type: JMSRuntime
+        name: myManagedServer.jms
+        healthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        JMSServersCurrentCount: 0
+        JMSServersHighCount: 0
+        JMSServersTotalCount: 0
+        connectionsCurrentCount: 0
+        connectionsHighCount: 0
+        connectionsTotalCount: 0
+
+    JMSRuntimePopulatedExample:
+      summary: JMSRuntime on a server with several JMS servers and active client connections.
+      value:
+        identity:
+          - JMSRuntime
+        type: JMSRuntime
+        name: myManagedServer.jms
+        healthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        JMSServersCurrentCount: 3
+        JMSServersHighCount: 3
+        JMSServersTotalCount: 3
+        connectionsCurrentCount: 25
+        connectionsHighCount: 25
+        connectionsTotalCount: 25
+
+    JMSServerCollectionEmptyExample:
+      summary: Empty JMS server collection.
+      value:
+        items: []
+
+    JMSServerCollectionPopulatedExample:
+      summary: Server with three JMS servers targeted (truncated fields).
+      value:
+        items:
+          - name: myJMSServer1
+            type: JMSServerRuntime
+            destinationsCurrentCount: 1
+          - name: myJMSServer2
+            type: JMSServerRuntime
+            destinationsCurrentCount: 9
+          - name: myJMSServer3
+            type: JMSServerRuntime
+            destinationsCurrentCount: 14
+
+    JMSServerRuntimeExample:
+      summary: JMS server runtime with active counters and 9 destinations.
+      value:
+        identity:
+          - JMSRuntime
+          - JMSServers
+          - myJMSServer
+        type: JMSServerRuntime
+        name: myJMSServer
+        healthState:
+          state: ok
+          subsystemName: JMSServer.myJMSServer
+          symptoms: []
+        destinationsCurrentCount: 9
+        destinationsHighCount: 9
+        destinationsTotalCount: 9
+        messagesCurrentCount: 0
+        messagesHighCount: 393
+        messagesPendingCount: 0
+        messagesReceivedCount: 402
+        messagesThresholdTime: 0
+        messagesPageableCurrentCount: 0
+        messagesPagedInTotalCount: 0
+        messagesPagedOutTotalCount: 0
+        bytesCurrentCount: 0
+        bytesHighCount: 764706
+        bytesPendingCount: 0
+        bytesReceivedCount: 782211
+        bytesThresholdTime: 0
+        bytesPageableCurrentCount: 0
+        bytesPagedInTotalCount: 0
+        bytesPagedOutTotalCount: 0
+        sessionPoolsCurrentCount: 0
+        sessionPoolsHighCount: 0
+        sessionPoolsTotalCount: 0
+        pagingPhysicalWriteCount: 0
+        pagingAllocatedIoBufferBytes: 0
+        pagingAllocatedWindowBufferBytes: 1147146240
+        insertionPaused: false
+        insertionPausedState: Insertion-Enabled
+        consumptionPaused: false
+        consumptionPausedState: Consumption-Enabled
+        productionPaused: false
+        productionPausedState: Production-Enabled
+        pendingTransactions: null
+        transactions: null

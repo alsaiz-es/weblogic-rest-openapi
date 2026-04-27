@@ -1,0 +1,69 @@
+=== test: no_csrf_header ===
+HTTP=400
+Bad Request
+
+=== test: with_csrf empty ===
+HTTP=200
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest"
+        },
+        {
+            "rel": "self",
+            "href
+
+=== test: with_csrf servers_basic ===
+HTTP=200
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "name": "osb_server1"
+            },
+            {
+                "state": "RUNNING",
+                "name": "AdminServer"
+            }
+        ]
+    }
+}
+
+=== test: with_csrf threadpool nested ===
+HTTP=200
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "name": "osb_server1",
+                "threadPoolRuntime": {
+                    "executeThreadTotalCount": 44,
+                    "stuckThreadCount": 0,
+                    "hoggingThreadCount": 0
+                }
+            },
+            {
+                "state": "RUNNING",
+                "name": "AdminServer",
+                "threadPoolRuntime": {
+                    "executeThreadTotalCount": 68,
+                    "stuckThreadCount": 0,
+                    "hoggingThreadCount": 0
+                }
+            }
+        ]
+    }
+}
+
+=== test: with_csrf links_string_400 ===
+HTTP=400
+{
+    "status": 400,
+    "type": "http:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec10.html#sec10.4.1",
+    "title": "FAILURE",
+    "detail": "The property 'links' must be an array."
+}
+

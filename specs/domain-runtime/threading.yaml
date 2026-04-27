@@ -7,7 +7,7 @@ info:
     throughput, stuck/hogging thread detection, and queue depth — the
     primary signals for diagnosing server load and thread starvation.
 
-    Field set and types verified against a live WLS 12.2.1.4 OSB domain.
+    Field set and types verified against live WLS 12.2.1.4 and 14.1.2 domains.
   version: 0.1.1
   contact:
     name: weblogic-rest-openapi (unofficial)
@@ -62,7 +62,7 @@ paths:
         description: Name of the managed server (case-sensitive).
         schema:
           type: string
-        example: osb_server1
+        example: myManagedServer
     get:
       operationId: getThreadPoolRuntime
       tags: [threadPoolRuntime]
@@ -243,7 +243,7 @@ components:
 
   examples:
     ThreadPoolRuntimeExample:
-      summary: osb_server1 ThreadPoolRuntime (verbatim from WLS 12.2.1.4)
+      summary: ThreadPoolRuntime sample (verbatim from a WLS 12.2.1.4 managed server)
       value:
         identity: [threadPoolRuntime]
         type: ThreadPoolRuntime

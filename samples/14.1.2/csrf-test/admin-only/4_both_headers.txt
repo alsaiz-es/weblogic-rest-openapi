@@ -1,0 +1,88 @@
+## test=4_both_headers  args=-H Accept: application/json -H X-Requested-By: MyClient http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes
+
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Date: Mon, 27 Apr 2026 15:14:22 GMT
+Content-Length: 3327
+Content-Type: application/json
+X-ORACLE-DMS-ECID: f9f48504-cde0-4fcd-9ff8-0cfb5f9145b4-00000034
+X-ORACLE-DMS-RID: 0
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Vary: Accept-Encoding
+
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes"
+        }
+    ],
+    "items": [{
+        "links": [
+            {
+                "rel": "self",
+                "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes\/AdminServer"
+            },
+            {
+                "rel": "canonical",
+                "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes\/AdminServer"
+            }
+        ],
+        "identity": [],
+        "stateVal": 2,
+        "type": "ServerRuntime",
+        "weblogicVersion": "WebLogic Server 14.1.2.0.0  Thu Sep 11 09:33:31 GMT 2025 local",
+        "adminServerHost": "127.0.0.1",
+        "restartRequired": false,
+        "overallHealthState": {
+            "state": "ok",
+            "subsystemName": null,
+            "symptoms": []
+        },
+        "middlewareHome": "\/oracle\/fmw",
+        "listenPortEnabled": true,
+        "weblogicHome": "\/oracle\/fmw\/wlserver",
+        "adminServer": true,
+        "SSLListenPortEnabled": false,
+        "state": "RUNNING",
+        "activationTime": 1777302705589,
+        "defaultURL": "t3:\/\/127.0.0.1:7001",
+        "adminServerListenPort": 7001,
+        "currentMachine": "machine1",
+        "patchList": [
+            "38527714;28144797;Tue Dec 16 18:20:49 CET 2025;WLS STACK PATCH BUNDLE 14.1.2.0.251010 (Patch 38527687)",
+            "38417899;27966793;Tue Dec 16 18:20:47 CET 2025;WLS PATCH SET UPDATE 14.1.2.0.250911",
+            "38409191;27970771;Tue Dec 16 18:19:21 CET 2025;Coherence Cumulative Patch 14.1.2.0.4",
+            "38397132;27928235;Tue Dec 16 18:19:13 CET 2025;FMW Thirdparty Bundle Patch 14.1.2.0.250905",
+            "38199212;27642884;Tue Dec 16 18:19:10 CET 2025;RDA release 25.4-20251021 for OFM 14.1.2 SPB",
+            "37925693;27466908;Tue Dec 16 18:18:30 CET 2025;JDBC23.8 BUNDLE PATCH 14.1.2.0.250521",
+            "37669471;27296438;Tue Dec 16 18:18:26 CET 2025;DATABASE RELEASE UPDATE 23.8.0.0.0 FOR FMW DBCLIENT"
+        ],
+        "openSocketsCurrentCount": 1,
+        "administrationPortEnabled": false,
+        "administrationURL": "t3:\/\/127.0.0.1:7001",
+        "adminServerListenPortSecure": false,
+        "healthState": {
+            "state": "ok",
+            "subsystemName": null,
+            "symptoms": []
+        },
+        "currentDirectory": "\/domains\/base_domain\/.",
+        "name": "AdminServer",
+        "inSitConfigState": false,
+        "serverClasspath": "\/oracle\/jvm\/jdk\/lib\/jrt-fs.jar:\/oracle\/fmw\/wlserver\/server\/lib\/weblogic.jar:\/oracle\/fmw\/wlserver\/modules\/features\/oracle.wls.common.nodemanager.jar:\/oracle\/fmw\/wlserver\/common\/derby\/lib\/derbytools.jar:\/oracle\/fmw\/wlserver\/common\/derby\/lib\/derbyclient.jar:\/oracle\/fmw\/wlserver\/common\/derby\/lib\/derby.jar:\/oracle\/fmw\/wlserver\/common\/derby\/lib\/derbyshared.jar"
+    }]
+}
+----- summary -----
+http_code=200
+size_download=3327
+content_type=application/json

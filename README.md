@@ -50,7 +50,10 @@ specs/
 | domainRuntime | JDBC runtime metrics | ✅ Verified (12.2.1.4, 14.1.2) |
 | domainRuntime | Thread pool runtime | ✅ Verified (12.2.1.4, 14.1.2) |
 | domainRuntime | JVM runtime | ✅ Verified (12.2.1.4, 14.1.2) |
-| domainRuntime | Application runtime | 🔲 Planned (v0.2.0) |
+| domainRuntime | Application runtime | ✅ Verified (12.2.1.4, 14.1.2) — 12.2.1.4 has extra `partitionName` |
+| domainRuntime | Server channel runtime | ✅ Verified (12.2.1.4, 14.1.2) — identical 12-field set |
+| domainRuntime | Bulk search (`POST /search`) | ✅ Verified (12.2.1.4, 14.1.2) — DSL identical, CSRF header required on both |
+| domainRuntime | JMS runtime (container + per-`JMSServer`) | ✅ Container verified both versions; `JMSServer` detail (37 fields) verified on 12.2.1.4 OSB; per-destination drill-down deferred to v0.3.0 |
 | edit | Server CRUD | 🔲 Planned |
 | edit | Cluster CRUD | 🔲 Planned |
 | edit | JDBC resource CRUD | 🔲 Planned |
@@ -99,6 +102,49 @@ are modelled explicitly in the specs.
    `null` even when the server is healthy. Do not rely on it being
    present.
 
+6. **`POST` requires `X-Requested-By` (CSRF guard).** Every state-changing
+   request — including `POST /domainRuntime/search` — is rejected with a
+   plain-text `HTTP 400 Bad Request` (no JSON body) when the
+   `X-Requested-By` header is missing. Any non-empty value is accepted.
+   The Oracle REST docs do not call this out, and the symptom is
+   indistinguishable from a malformed body. Verified on WLS 14.1.2;
+   `v0.1.1` of this repo originally documented `POST /search` as
+   universally broken — it wasn't, the CSRF header was missing.
+
+7. **`ServerChannelRuntime` does not expose `listenAddress`/`listenPort`.**
+   Oracle's `ServerChannelRuntimeMBean` reference lists `listenAddress`,
+   `listenPort`, `protocol`, `publicAddress`, `publicPort` as readable
+   properties. The REST serialization returns none of them — even when
+   asked explicitly via `?fields=listenAddress,...`. The only network
+   address surfaced is the concatenated `publicURL`
+   (`<protocol>://<host>:<port>`). Parse it client-side if you need the
+   components separately.
+
+8. **`GET /domainRuntime/serverRuntimes` requires `X-Requested-By`
+   when managed servers are RUNNING.** This is the second endpoint
+   (alongside the POST /search of quirk 6) where Oracle's CSRF guard
+   shows up — but on a plain `GET`, contradicting Oracle's
+   documentation that limits the header to mutating methods. Without
+   the header the collection returns `HTTP 400 Bad Request` (JSON
+   envelope, no detail). With any non-empty value (`-H 'X-Requested-By:
+   anything'`) it returns 200. **The check is conditional on domain
+   state**: with only the AdminServer up and no managed servers
+   RUNNING, the same anonymous GET succeeds. **The check is also
+   selective**: of the eight `/domainRuntime/*` endpoints we probed,
+   only `serverRuntimes` enforces it; the seven siblings
+   (`migrationDataRuntimes`, `nodeManagerRuntimes`,
+   `serviceMigrationDataRuntimes`, `serverLifeCycleRuntimes`,
+   `systemComponentLifeCycleRuntimes`, plus the `/domainRuntime` root
+   and `JNDI` singleton) all accept anonymous GETs. Reproduced
+   identically on WLS 12.2.1.4 and 14.1.2. Earlier `v0.1.1` notes
+   attributed the symptom to an OSB-specific 12.2.1.4 serialization
+   bug; that attribution was wrong on all three counts (not OSB-
+   specific, not 12.2.1.4-specific, not silently fixed in 14.1.2). See
+   `CHANGELOG.md` v0.2.0 "Corrections from v0.1.x" for the full
+   retraction. Workarounds: send the header, fetch each server by
+   name, or use `POST /domainRuntime/search` with a `serverRuntimes`
+   child.
+
 ## Version-specific differences: 12.2.1.4 vs 14.1.2
 
 Verified by capturing the same bean set from both versions and diffing.
@@ -130,17 +176,21 @@ Clients that followed these rels must detect version and degrade.
 - `/domainRuntime/serverRuntimes/{name}/JVMRuntime` → `action: runGC`
   (triggers an explicit `System.gc()` via REST).
 
-**Bug that existed only in 12.2.1.4**
-- `GET /domainRuntime/serverRuntimes` (collection) returned HTTP 400 in
-  12.2.1.4 when a managed server with heavy OSB application deployments
-  was running. Individual `GET .../{name}` worked. The bug does not
-  reproduce on 14.1.2.
+**Selective `X-Requested-By` enforcement on `GET /serverRuntimes`**
+(reclassified in v0.2.0; previously misattributed to an OSB-specific
+12.2.1.4 serialization bug — see Known API Quirk #8 above and the
+CHANGELOG retraction). Reproduces identically on both 12.2.1.4 and
+14.1.2 once at least one managed server is RUNNING; disappears on
+admin-only domains.
 
-**Unresolved in both versions**
-- `POST /domainRuntime/search` returns HTTP 400 on every request body
-  shape we tried (empty, top-level fields, nested children). The query
-  DSL is referenced in Oracle docs but no schema is published. Do not
-  rely on this endpoint.
+**`POST /domainRuntime/search` works in both versions** (reclassified
+in v0.2.0)
+- v0.1.1 reported the search endpoint as broken on every body shape.
+  Re-verification on 14.1.2 traced this to a missing `X-Requested-By`
+  header: WebLogic's CSRF guard rejects POSTs without it and answers
+  with a plain `Bad Request` page. Once the header is supplied, the
+  documented DSL (`fields`, `links`, `children`, `name`) works as
+  Oracle describes. See `specs/domain-runtime/search.yaml`.
 
 **Platform note.** 14.1.2 requires JDK 17+ and commonly runs on JDK 21
 (the stock Oracle install we tested is on HotSpot 21.0.9). 12.2.1.4 is

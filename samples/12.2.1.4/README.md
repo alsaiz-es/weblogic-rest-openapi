@@ -10,6 +10,16 @@ etc.) left as-is (public FMW convention).
 These files are the authoritative reference for what v0.1.0 specs
 model — if the spec disagrees with the JSON here, the spec is wrong.
 
+**v0.2.0 update (2026-04-27).** Additional captures added for the
+endpoints introduced in v0.2.0 (`serverChannelRuntimes`,
+`applicationRuntimes` detail, `JMSRuntime` + `JMSServer` detail,
+bulk `POST /search`). The OSB-deployed JMS servers
+(`wlsbJMSServer_auto_2`, `UMSJMSServer_auto_2`,
+`AgentTestJMSServer`) provided the populated counter samples; an
+additional empty `myJMSServer` was created via WLST next to them
+(named to match the spec's generic example) to confirm the field
+set holds for non-OSB JMS servers, then destroyed.
+
 ## Files
 
 | File | Endpoint | Notes |
@@ -31,6 +41,19 @@ model — if the spec disagrees with the JSON here, the spec is wrong.
 | `error_401_sample.html` | wrong password | **HTML**, not JSON — ErrorResponse schema doesn't apply |
 
 ## 12.2.1.4-specific quirks observed
+
+> **Note (v0.2.0 update).** Items 1 and 2 below are the **original
+> v0.1.0 observations**, both of which were retracted in v0.2.0 after
+> additional verification. Item 1 was misdiagnosed as a serialization
+> bug; the actual cause is a request-side `X-Requested-By` gate that
+> reproduces identically on 14.1.2 (so it is neither 12.2.1.4-specific
+> nor OSB-specific). Item 2 was misdiagnosed as a broken DSL; the
+> actual cause was the same missing `X-Requested-By` header. Both
+> retractions are documented in `CHANGELOG.md` under v0.2.0
+> "Corrections from v0.1.x", and the controlled probe matrix is
+> preserved verbatim under `samples/{version}/csrf-test/`. The
+> historical text is kept here for traceability, not as current
+> guidance.
 
 1. `/serverRuntimes` collection endpoint returns **HTTP 400** when
    `osb_server1` is running. Individual `/serverRuntimes/{name}` works

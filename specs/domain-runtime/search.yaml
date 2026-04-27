@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Bulk Search
+  description: |
+    The bulk-search endpoint takes a JSON description of which beans
+    and properties to return, and answers with the matching tree
+    slice. It allows a single request to harvest many runtime values
+    that would otherwise require N separate REST round-trips.
+
+    **Critical quirk — `X-Requested-By` is mandatory.** Without an
+    `X-Requested-By` request header, every POST to this endpoint
+    returns `HTTP 400 Bad Request` with a plain-text body and no
+    diagnostic. With the header present (any value works) the same
+    body is accepted and a 200 response is returned. This applies to
+    `POST /domainRuntime/search` and `POST /domainConfig/search`
+    alike, and is the most likely cause of "the bulk search DSL
+    doesn't work" reports in the wild. WebLogic's CSRF guard for
+    state-changing methods is the real gatekeeper. Verified on WLS
+    14.1.2; Oracle's REST docs do not call this out.
+  version: 0.2.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: search
+    description: Bulk read across the domainRuntime bean tree.
+
+paths:
+  /domainRuntime/search:
+    post:
+      operationId: searchDomainRuntime
+      tags: [search]
+      summary: Bulk-fetch a tree slice of runtime beans in one request.
+      description: |
+        Accepts a `BulkSearchRequest` body describing the desired
+        tree shape and answers with a JSON document that mirrors the
+        request structure, populated with the requested fields.
+
+        ### Headers
+
+        - `Content-Type: application/json` — required.
+        - `X-Requested-By: <any value>` — **required**. Without it
+          the server returns `400 Bad Request` (plain text) before
+          parsing the body.
+
+        ### Body shape (verified)
+
+        - `fields` — array of property names to read on the current
+          node. Unknown property names are silently ignored.
+        - `links` — array of link relation names to keep in the
+          response. Pass `[]` to suppress the HATEOAS `links` array
+          on this node entirely. **Must be an array** — passing the
+          string `"none"` (which is valid as a query parameter on
+          GET) returns 400 with detail
+          `The property 'links' must be an array.`
+        - `children` — object whose keys are child collection or
+          singleton names (e.g. `serverRuntimes`,
+          `threadPoolRuntime`) and whose values are themselves
+          `BulkSearchRequest` nodes. Recursive to arbitrary depth.
+        - `name` — when used inside a `children.<collection>` node,
+          restricts the collection to the listed instance names.
+          Verified for `serverRuntimes` on 14.1.2 with
+          `{"name":["AdminServer"]}`.
+
+        Top-level keys not listed above (e.g. `foo`) are silently
+        ignored.
+
+        ### Response shape
+
+        Mirrors the request: each requested child appears as either
+        a single object (when targeting a singleton MBean such as
+        `threadPoolRuntime`) or an `{"items": [...]}` envelope
+        (when targeting a collection such as `serverRuntimes`).
+        The fields listed in `fields` populate each node, and any
+        `links` array requested is appended at the same level.
+
+        ### Failure modes (verified, WLS 14.1.2)
+
+        | Condition | HTTP | Body |
+        |---|---|---|
+        | No `X-Requested-By` header | 400 | `Bad Request` (text/html) |
+        | Wrong content type | 415 | `Unsupported Media Type` |
+        | GET instead of POST | 405 | RFC-7807-style JSON error |
+        | `/management/wls/latest/...` namespace | 404 | `Not Found` |
+        | Invalid JSON body | 400 | `Bad Request` (text/html) |
+        | `"links": "none"` (string) | 400 | RFC-7807 JSON: `must be an array` |
+
+        The asymmetry between the plain-text 400 (CSRF / parser) and
+        the JSON-bodied 400 (DSL validation) is itself a useful
+        diagnostic: if you got HTML back, you never reached the
+        request validator.
+      parameters:
+        - name: X-Requested-By
+          in: header
+          required: true
+          description: |
+            Mandatory CSRF guard. Any non-empty value is accepted;
+            client tools commonly send their product name (e.g.
+            `MyClient`, `wlst`). Missing this header yields HTTP 400
+            with no diagnostic body.
+          schema:
+            type: string
+            minLength: 1
+          example: openapi-spec-tester
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkSearchRequest'
+            examples:
+              empty:
+                summary: Empty body — returns the full domainRuntime root with HATEOAS links.
+                value: {}
+              serversBasic:
+                summary: Names and states of every running server.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      fields: [name, state]
+                      links: []
+              serversFiltered:
+                summary: Activation time of a single named server.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      name: [AdminServer]
+                      fields: [name, state, activationTime]
+                      links: []
+              serversWithThreadPool:
+                summary: Server state plus thread pool counters in one call.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      fields: [name, state]
+                      links: []
+                      children:
+                        threadPoolRuntime:
+                          fields:
+                            - executeThreadTotalCount
+                            - hoggingThreadCount
+                            - stuckThreadCount
+                          links: []
+      responses:
+        '200':
+          description: Tree slice mirroring the request structure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkSearchResponse'
+              examples:
+                serversBasic:
+                  summary: Result of the `serversBasic` request example.
+                  value:
+                    serverRuntimes:
+                      items:
+                        - name: AdminServer
+                          state: RUNNING
+                serversWithThreadPool:
+                  summary: Result of the nested-children request example.
+                  value:
+                    serverRuntimes:
+                      items:
+                        - name: AdminServer
+                          state: RUNNING
+                          threadPoolRuntime:
+                            executeThreadTotalCount: 12
+                            stuckThreadCount: 0
+                            hoggingThreadCount: 0
+        '400':
+          description: |
+            Returned for two distinct reasons. **If the response
+            body is `text/html` containing `Bad Request`**, the
+            CSRF check or JSON parser rejected the request before
+            it reached the DSL validator — most commonly because
+            the `X-Requested-By` header is missing.
+            **If the response body is RFC-7807-style JSON**, the
+            DSL validator rejected a value (e.g. `links` was not
+            an array).
+          content:
+            application/json:
+              schema:
+                $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+            text/html:
+              schema:
+                type: string
+                description: |
+                  Plain `Bad Request` page. Indicates the request
+                  was rejected before DSL validation.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '405':
+          description: Wrong HTTP method (only POST is accepted).
+          content:
+            application/json:
+              schema:
+                $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+        '415':
+          description: Unsupported `Content-Type` (only `application/json` is accepted).
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    BulkSearchRequest:
+      type: object
+      description: |
+        Recursive description of a tree slice. Every node may carry
+        `fields`, `links`, and `children`. Inside `children.<X>`,
+        when `<X>` is a collection, `name` may filter to a subset.
+      properties:
+        fields:
+          type: array
+          description: Property names to read on this node. Unknown names are silently ignored.
+          items:
+            type: string
+          example: [name, state]
+        links:
+          type: array
+          description: |
+            Link relation names to keep in the `links` array of this
+            node's response. Pass `[]` to suppress all links on this
+            node. **Must be an array** even when empty — the string
+            `"none"` (valid on GET) is rejected here.
+          items:
+            type: string
+          example: []
+        children:
+          type: object
+          description: |
+            Map of child collection or singleton names to nested
+            `BulkSearchRequest` nodes. Recursive to arbitrary depth.
+          additionalProperties:
+            $ref: '#/components/schemas/BulkSearchRequest'
+        name:
+          type: array
+          description: |
+            Restricts a `children.<collection>` node to instances
+            with these names. Has no observed effect at the root
+            node — only inside a child collection.
+          items:
+            type: string
+
+    BulkSearchResponse:
+      type: object
+      description: |
+        Mirror of the request structure populated with values.
+        Each child collection appears as `{ "items": [...] }`;
+        each child singleton appears as a plain object. The shape
+        is structural — no fixed property set is enforced because
+        it depends entirely on which fields and children the
+        request asked for.
+      additionalProperties: true

@@ -1,0 +1,328 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Application Runtimes
+  description: |
+    Read-only monitoring endpoints for `applicationRuntimes` under each
+    `serverRuntime`. Returns one entry per deployed application targeted
+    at the server, including framework-internal applications shipped
+    with the WebLogic install (e.g. `bea_wls_internal`,
+    `wls-management-services`, `mejb`, JMS adapters — these names are
+    stable across WebLogic installs).
+
+    The collection mixes user-deployed and framework-internal
+    applications. Filter on the `internal` boolean (see
+    `ApplicationRuntime.internal`) to isolate user-deployed work —
+    there is no server-side filter.
+  version: 0.2.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: applicationRuntimes
+    description: Per-server view of deployed application runtimes.
+
+paths:
+  /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: AdminServer
+    get:
+      operationId: listApplicationRuntimes
+      tags: [applicationRuntimes]
+      summary: List application runtimes targeted at a server.
+      description: |
+        Returns the collection of `ApplicationRuntimeMBean` instances
+        on the named server. **Internal applications are included by
+        default** — use the `internal` field on each item or a
+        client-side filter to remove them.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Collection of application runtimes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRuntimeCollection'
+              examples:
+                adminServerApps:
+                  $ref: '#/components/examples/ApplicationRuntimeCollectionExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: AdminServer
+      - name: applicationName
+        in: path
+        required: true
+        description: |
+          Application name as deployed (matches `name` and
+          `applicationName` in the bean — they are equal in every
+          response observed). Case-sensitive.
+        schema:
+          type: string
+        example: myApp
+    get:
+      operationId: getApplicationRuntime
+      tags: [applicationRuntimes]
+      summary: Get a single application runtime by name.
+      description: |
+        Returns the `ApplicationRuntimeMBean` for one deployed
+        application. The HATEOAS `links` array (when not suppressed)
+        points to `componentRuntimes` for per-module drill-down; that
+        sub-tree is **not** modelled by this spec yet — see roadmap.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Application runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationRuntime'
+              examples:
+                userApp:
+                  $ref: '#/components/examples/ApplicationRuntimeExample'
+                internalApp:
+                  $ref: '#/components/examples/ApplicationRuntimeInternalExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The server or application does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    ApplicationRuntime:
+      type: object
+      description: |
+        `ApplicationRuntimeMBean` projection as exposed via REST.
+        Verified field set against live WLS 12.2.1.4 (76-application
+        FMW domain) and 14.1.2 (vanilla domain).
+
+        Fields verified present: `identity`, `type`, `name`,
+        `applicationName`, `applicationVersion`, `internal`,
+        `healthState`, `overallHealthState`, `activeVersionState`.
+        In every observed response `name` equals `applicationName` —
+        the spec keeps both, but clients can treat them as a single
+        value.
+
+        **Cross-version delta:** 12.2.1.4 responses include one
+        additional top-level field, `partitionName` (always null in
+        non-partitioned domains). It is the Multi-Tenant artifact
+        that was removed from 14.1.2. The schema includes it as
+        nullable and clients should expect it to disappear when
+        targeting 14.1.2.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `ApplicationRuntime`.
+          example: ApplicationRuntime
+        name:
+          type: string
+          description: Application name as registered in the runtime.
+          example: myApp
+        applicationName:
+          type: string
+          description: |
+            Configured application name. Equal to `name` in every
+            observation — kept separate to match the underlying
+            MBean shape.
+          example: myApp
+        applicationVersion:
+          type: string
+          nullable: true
+          description: |
+            Application version string when the deployment uses
+            WebLogic versioned applications. Null when unversioned —
+            the typical case on `base_domain` and most simple
+            deployments.
+        internal:
+          type: boolean
+          description: |
+            True for framework-shipped applications (e.g.
+            `bea_wls_internal`, `wls-management-services`, JMS
+            adapters). False for user deployments. **Use this to
+            filter the collection** — there is no separate endpoint
+            for user-only apps.
+          example: false
+        healthState:
+          $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+        overallHealthState:
+          allOf:
+            - $ref: '../common/schemas.yaml#/components/schemas/HealthState'
+          description: |
+            Roll-up health state across the application's component
+            runtimes (web modules, EJB modules, ...). Mirrors
+            `healthState` when no component is degraded.
+        activeVersionState:
+          type: integer
+          format: int32
+          description: |
+            Numeric version-activation state. Observed value `2`
+            corresponds to ACTIVE_VERSION_STATE_CURRENT in the
+            `weblogic.application.ApplicationConstants` Java API. Other
+            documented values: `0` UNKNOWN, `1` RETIRED. Casing of any
+            string form is not exposed via REST; treat this field as a
+            flag and prefer `healthState` for runtime decisions.
+          example: 2
+        partitionName:
+          type: string
+          nullable: true
+          description: |
+            Multi-Tenant partition this application is scoped to.
+            **Present only on 12.2.1.4** (always null in
+            non-partitioned domains, which is most of them). The
+            field disappears entirely from 14.1.2 responses
+            following the Multi-Tenant feature removal. Clients
+            consuming both versions should treat the absence and
+            null as equivalent.
+
+    ApplicationRuntimeCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+  examples:
+    ApplicationRuntimeExample:
+      summary: User-deployed application.
+      value:
+        identity:
+          - applicationRuntimes
+          - myApp
+        type: ApplicationRuntime
+        name: myApp
+        applicationName: myApp
+        applicationVersion: null
+        internal: false
+        healthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        overallHealthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        activeVersionState: 2
+
+    ApplicationRuntimeInternalExample:
+      summary: |
+        Framework-internal application. The names below
+        (`bea_wls_internal`, `wls-management-services`, `mejb`,
+        and the JMS internal adapters) are shipped by every
+        WebLogic install and always appear in the collection.
+      value:
+        identity:
+          - applicationRuntimes
+          - bea_wls_internal
+        type: ApplicationRuntime
+        name: bea_wls_internal
+        applicationName: bea_wls_internal
+        applicationVersion: null
+        internal: true
+        healthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        overallHealthState:
+          state: ok
+          subsystemName: null
+          symptoms: []
+        activeVersionState: 2
+
+    ApplicationRuntimeCollectionExample:
+      summary: Mixed collection (framework apps + one user deployment).
+      value:
+        items:
+          - name: jms-internal-xa-adp
+            applicationName: jms-internal-xa-adp
+            internal: true
+          - name: bea_wls_internal
+            applicationName: bea_wls_internal
+            internal: true
+          - name: wls-management-services
+            applicationName: wls-management-services
+            internal: true
+          - name: myApp
+            applicationName: myApp
+            internal: false
+          - name: jms-internal-notran-adp
+            applicationName: jms-internal-notran-adp
+            internal: true
+          - name: mejb
+            applicationName: mejb
+            internal: true

@@ -1,0 +1,25 @@
+{
+    "identity": [
+        "applicationRuntimes",
+        "DbAdapter"
+    ],
+    "applicationVersion": null,
+    "internal": false,
+    "partitionName": null,
+    "overallHealthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "partitionName": null,
+        "symptoms": []
+    },
+    "healthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "partitionName": null,
+        "symptoms": []
+    },
+    "name": "DbAdapter",
+    "type": "ApplicationRuntime",
+    "activeVersionState": 2,
+    "applicationName": "DbAdapter"
+}

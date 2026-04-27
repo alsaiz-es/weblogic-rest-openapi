@@ -1,0 +1,294 @@
+openapi: 3.0.3
+info:
+  title: WebLogic REST Management API — Server Channel Runtimes
+  description: |
+    Read-only monitoring endpoints for `serverChannelRuntimes`, the
+    per-server collection of network channel runtimes (T3, HTTP, IIOP,
+    LDAP, SNMP, ...) under each `serverRuntime`.
+
+    `servers.yaml` deliberately omits `listenAddress` and `listenPort`
+    because those properties are not on `ServerRuntimeMBean`; they live
+    on the channel runtimes documented here. **However, in the REST
+    representation only `publicURL` is exposed** — see the quirk note in
+    the `ServerChannelRuntime` schema.
+  version: 0.2.0
+  contact:
+    name: weblogic-rest-openapi (unofficial)
+    url: https://github.com/alsaiz-es/weblogic-rest-openapi
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTP).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7001"
+      version:
+        default: latest
+        enum:
+          - latest
+          - "14.1.1.0"
+          - "14.1.2.0"
+          - "12.2.1.4.0"
+  - url: https://{host}:{port}/management/weblogic/{version}
+    description: WebLogic Administration Server management endpoint (HTTPS).
+    variables:
+      host:
+        default: localhost
+      port:
+        default: "7002"
+      version:
+        default: latest
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: serverChannelRuntimes
+    description: Network channel monitoring for managed servers.
+
+paths:
+  /domainRuntime/serverRuntimes/{serverName}/serverChannelRuntimes:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        description: Name of the managed server (case-sensitive).
+        schema:
+          type: string
+        example: AdminServer
+    get:
+      operationId: listServerChannelRuntimes
+      tags: [serverChannelRuntimes]
+      summary: List network channel runtimes for a server.
+      description: |
+        Returns every active channel exposed by the server. A typical
+        AdminServer running on plain HTTP exposes ~25 channel entries
+        across the protocol family (`t3`, `http`, `iiop`, `ldap`,
+        `snmp`), each in a default and several internal/replica forms
+        (verified on WLS 14.1.2).
+
+        Channel names contain bracket characters (e.g. `Default[t3]`).
+        These must be percent-encoded when used as a path segment in
+        the per-channel endpoint below.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/ExcludeFieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Collection of server channel runtimes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerChannelRuntimeCollection'
+              examples:
+                adminServerChannels:
+                  $ref: '#/components/examples/ServerChannelRuntimeCollectionExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverRuntimes/{serverName}/serverChannelRuntimes/{channelName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: AdminServer
+      - name: channelName
+        in: path
+        required: true
+        description: |
+          Channel name as returned by the collection (e.g. `Default[t3]`,
+          `Default[http]`). The brackets must be percent-encoded
+          (`%5B`, `%5D`) when constructing the URL.
+        schema:
+          type: string
+        example: "Default%5Bt3%5D"
+    get:
+      operationId: getServerChannelRuntime
+      tags: [serverChannelRuntimes]
+      summary: Get a single channel runtime by name.
+      description: |
+        Returns the named channel's `ServerChannelRuntimeMBean`
+        projection. Channel names contain bracket characters and
+        must be percent-encoded in the URL — see the path
+        parameter documentation. The same field set as the
+        collection items is returned (12 properties), without
+        any HATEOAS expansion of `listenAddress`/`listenPort`
+        even when explicitly requested via `?fields=`.
+      parameters:
+        - $ref: '../common/schemas.yaml#/components/parameters/FieldsParam'
+        - $ref: '../common/schemas.yaml#/components/parameters/LinksParam'
+      responses:
+        '200':
+          description: Channel runtime bean.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerChannelRuntime'
+              examples:
+                t3Channel:
+                  $ref: '#/components/examples/ServerChannelRuntimeExample'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The server or channel does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '../common/schemas.yaml#/components/schemas/ErrorResponse'
+
+  schemas:
+    ServerChannelRuntime:
+      type: object
+      description: |
+        `ServerChannelRuntimeMBean` projection as exposed via REST.
+        Verified field set against a live WLS 14.1.2 AdminServer.
+
+        **Quirk — listen address is not exposed.** The Oracle MBean
+        reference for `ServerChannelRuntimeMBean` lists
+        `listenAddress`, `listenPort`, `protocol`, `publicAddress`, and
+        `publicPort` as readable properties. The REST serialization
+        **does not include any of them**: an explicit
+        `?fields=listenAddress,listenPort,protocol,publicAddress,publicPort,channelName`
+        on WLS 14.1.2 returns only `channelName`. Use `publicURL`
+        (which embeds `<protocol>://<host>:<port>`) and parse it
+        client-side if you need the components separately.
+      properties:
+        identity:
+          $ref: '../common/schemas.yaml#/components/schemas/Identity'
+        type:
+          type: string
+          description: Bean discriminator. Always `ServerChannelRuntime`.
+          example: ServerChannelRuntime
+        name:
+          type: string
+          description: |
+            Channel runtime name, equal to `channelName` in every
+            response observed.
+          example: "Default[t3]"
+        channelName:
+          type: string
+          description: |
+            Configured channel name. Names follow the pattern
+            `Default[<protocol>]` for default channels and
+            `Default[<protocol>][<n>]` for protocol replicas
+            (multi-listener configurations).
+          example: "Default[t3]"
+        publicURL:
+          type: string
+          description: |
+            Concatenated public URL `<protocol>://<host>:<port>` for
+            this channel as advertised to remote clients. Source of
+            truth for protocol/host/port — none of those are exposed
+            as separate fields in the REST representation.
+          example: "t3://127.0.0.1:7001"
+        associatedVirtualTargetName:
+          type: string
+          nullable: true
+          description: Virtual target name when the channel is bound to one; null otherwise.
+        acceptCount:
+          type: integer
+          format: int32
+          description: Cumulative count of accepted connections since channel start.
+          example: 2
+        connectionsCount:
+          type: integer
+          format: int32
+          description: Active connections currently open on this channel.
+          example: 0
+        bytesReceivedCount:
+          type: integer
+          format: int64
+          description: Cumulative bytes received on this channel.
+          example: 30740
+        bytesSentCount:
+          type: integer
+          format: int64
+          description: Cumulative bytes sent on this channel.
+          example: 269167
+        messagesReceivedCount:
+          type: integer
+          format: int64
+          description: Cumulative messages received (protocol-level frames).
+          example: 44
+        messagesSentCount:
+          type: integer
+          format: int64
+          description: Cumulative messages sent.
+          example: 42
+
+    ServerChannelRuntimeCollection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerChannelRuntime'
+        links:
+          type: array
+          items:
+            $ref: '../common/schemas.yaml#/components/schemas/Link'
+
+  examples:
+    ServerChannelRuntimeExample:
+      summary: Default[t3] channel on AdminServer (WLS 14.1.2).
+      value:
+        identity:
+          - serverChannelRuntimes
+          - "Default[t3]"
+        type: ServerChannelRuntime
+        name: "Default[t3]"
+        channelName: "Default[t3]"
+        publicURL: "t3://wls-admin.example.com:7001"
+        associatedVirtualTargetName: null
+        acceptCount: 2
+        connectionsCount: 0
+        bytesReceivedCount: 30740
+        bytesSentCount: 269167
+        messagesReceivedCount: 44
+        messagesSentCount: 42
+
+    ServerChannelRuntimeCollectionExample:
+      summary: Default channel set on a plain AdminServer (truncated).
+      value:
+        items:
+          - name: "Default[t3]"
+            channelName: "Default[t3]"
+            publicURL: "t3://wls-admin.example.com:7001"
+            acceptCount: 2
+            connectionsCount: 0
+          - name: "Default[http]"
+            channelName: "Default[http]"
+            publicURL: "http://wls-admin.example.com:7001"
+            acceptCount: 0
+            connectionsCount: 0
+          - name: "Default[iiop]"
+            channelName: "Default[iiop]"
+            publicURL: "iiop://wls-admin.example.com:7001"
+            acceptCount: 0
+            connectionsCount: 0

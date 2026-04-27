@@ -68,7 +68,7 @@ paths:
         description: Name of the managed server (case-sensitive).
         schema:
           type: string
-        example: osb_server1
+        example: myManagedServer
     get:
       operationId: getJVMRuntime
       tags: [jvmRuntime]
@@ -149,7 +149,7 @@ components:
           description: |
             Bean name. Mirrors the server name (not a JVM-specific
             identifier) — same convention as `JDBCServiceRuntime`.
-          example: osb_server1
+          example: myManagedServer
 
         # --- Uptime ---
         uptime:
@@ -254,7 +254,7 @@ components:
       summary: Composite example — 12.2.1.4 body with the 14.1.2 `javaVendorVersion` field
       description: |
         Values for every field except `javaVendorVersion` come verbatim
-        from a WLS 12.2.1.4 osb_server1 response (HotSpot 1.8.0_401).
+        from a WLS 12.2.1.4 managed server response (HotSpot 1.8.0_401).
         `javaVendorVersion` was added in WLS 14.1.2 and is shown here as
         `null`, matching what a 14.1.2 Oracle JDK install returns; on
         12.2.1.4 the field is absent from the response entirely.
@@ -265,7 +265,7 @@ components:
       value:
         identity: [JVMRuntime]
         type: JVMRuntime
-        name: osb_server1
+        name: myManagedServer
         uptime: 489908
         heapSizeCurrent: 2979004416
         heapSizeMax: 3817865216

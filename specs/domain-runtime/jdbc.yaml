@@ -6,8 +6,8 @@ info:
     the parent `JDBCServiceRuntime` and the `JDBCDataSourceRuntimeMBeans`
     collection that exposes per-datasource connection-pool metrics.
 
-    Field set and types verified against a live WLS 12.2.1.4 OSB domain
-    (SOA/OSB datasources connected to Oracle Database 19c).
+    Field set and types verified against a live WLS 12.2.1.4 domain
+    (Oracle Database 19c datasources).
 
     Sibling collections under the same service runtime —
     `JDBCMultiDataSourceRuntimeMBeans` and `JDBCDriverRuntimeMBeans` — are
@@ -183,7 +183,7 @@ components:
       description: Name of the managed server (case-sensitive).
       schema:
         type: string
-      example: osb_server1
+      example: myManagedServer
 
   responses:
     Unauthorized:
@@ -238,7 +238,7 @@ components:
           description: |
             Bean name. In this runtime bean it mirrors the server name
             (not a JDBC-specific identifier).
-          example: osb_server1
+          example: myManagedServer
         healthState:
           $ref: '../common/schemas.yaml#/components/schemas/HealthState'
         links:
@@ -516,11 +516,11 @@ components:
 
   examples:
     JDBCServiceRuntimeExample:
-      summary: JDBCServiceRuntime on osb_server1
+      summary: JDBCServiceRuntime on myManagedServer
       value:
         identity: [JDBCServiceRuntime]
         type: JDBCServiceRuntime
-        name: osb_server1
+        name: myManagedServer
         healthState:
           state: ok
           subsystemName: null
@@ -582,7 +582,7 @@ components:
         lastTask: null
 
     JDBCDataSourceCollectionExample:
-      summary: Typical OSB+SOA domain (FMW internal datasources)
+      summary: Domain with several FMW internal datasources
       value:
         items:
           - name: OraSDPMDataSource

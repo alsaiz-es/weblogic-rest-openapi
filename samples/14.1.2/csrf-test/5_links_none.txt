@@ -1,0 +1,23 @@
+## test=5_links_none  args=-H Accept: application/json http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes?links=none
+
+HTTP/1.1 400 Bad Request
+Cache-Control: no-store
+Date: Mon, 27 Apr 2026 13:54:01 GMT
+Content-Length: 159
+Content-Type: application/json
+X-ORACLE-DMS-ECID: 5460689f-04c4-47b6-8e48-a358bbb66ba7-00000183
+X-ORACLE-DMS-RID: 0
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Vary: Accept-Encoding
+
+{
+    "status": 400,
+    "type": "http:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec10.html#sec10.4.1",
+    "title": "FAILURE",
+    "detail": "Bad Request"
+}
+----- summary -----
+http_code=400
+size_download=159
+content_type=application/json

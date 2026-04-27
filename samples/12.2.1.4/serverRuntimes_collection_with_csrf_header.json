@@ -1,0 +1,14 @@
+{
+    "items": [
+        {
+            "state": "RUNNING",
+            "activationTime": 1776350406141,
+            "name": "osb_server1"
+        },
+        {
+            "state": "RUNNING",
+            "activationTime": 1776289650767,
+            "name": "AdminServer"
+        }
+    ]
+}

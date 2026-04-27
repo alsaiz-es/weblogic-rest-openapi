@@ -1,0 +1,22 @@
+{
+    "identity": [
+        "applicationRuntimes",
+        "jamagent"
+    ],
+    "applicationVersion": null,
+    "internal": false,
+    "overallHealthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "symptoms": []
+    },
+    "healthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "symptoms": []
+    },
+    "name": "jamagent",
+    "type": "ApplicationRuntime",
+    "activeVersionState": 2,
+    "applicationName": "jamagent"
+}

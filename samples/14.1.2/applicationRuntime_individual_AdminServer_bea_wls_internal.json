@@ -1,0 +1,22 @@
+{
+    "identity": [
+        "applicationRuntimes",
+        "bea_wls_internal"
+    ],
+    "applicationVersion": null,
+    "internal": true,
+    "overallHealthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "symptoms": []
+    },
+    "healthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "symptoms": []
+    },
+    "name": "bea_wls_internal",
+    "type": "ApplicationRuntime",
+    "activeVersionState": 2,
+    "applicationName": "bea_wls_internal"
+}

@@ -1,0 +1,10 @@
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "name": "AdminServer"
+            }
+        ]
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "identity": [],
+    "name": "base_domain",
+    "activationTime": "2026-03-09T15:06:13.903+01:00",
+    "type": "DomainRuntime",
+    "serverRuntimes": {
+        "items": [
+            {
+                "weblogicVersion": "WebLogic Server 14.1.2.0.0  Thu Sep 11 09:33:31 GMT 2025 local",
+                "state": "RUNNING",
+                "activationTime": 1773065179884,
+                "name": "AdminServer"
+            },
+            {
+                "weblogicVersion": "WebLogic Server 14.1.2.0.0  Thu Sep 11 09:33:31 GMT 2025 local",
+                "state": "RUNNING",
+                "activationTime": 1777292582326,
+                "name": "server1"
+            }
+        ]
+    }
+}

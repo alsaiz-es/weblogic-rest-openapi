@@ -1,0 +1,167 @@
+## test=3_only_xrequestedby  args=-H X-Requested-By: MyClient http://wls-admin.example.com:7001/management/weblogic/latest/domainRuntime/serverRuntimes
+
+HTTP/1.1 200 OK
+Date: Mon, 27 Apr 2026 13:50:32 GMT
+Transfer-Encoding: chunked
+Content-Type: application/json
+Vary: Accept-Encoding
+X-ORACLE-DMS-RID: 0
+X-ORACLE-DMS-ECID: 6ecc333f-f07d-4b34-92dc-78c6638136ad-00000ba5
+X-Content-Type-Options: nosniff
+
+{
+    "links": [
+        {
+            "rel": "parent",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime"
+        },
+        {
+            "rel": "self",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes"
+        },
+        {
+            "rel": "canonical",
+            "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes"
+        }
+    ],
+    "items": [
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes\/osb_server1"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes\/osb_server1"
+                }
+            ],
+            "identity": [],
+            "stateVal": 2,
+            "type": "ServerRuntime",
+            "weblogicVersion": "WebLogic Server 12.2.1.4.0",
+            "adminServerHost": "127.0.0.1",
+            "restartRequired": false,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": "ServerRuntime",
+                "partitionName": null,
+                "symptoms": []
+            },
+            "middlewareHome": "\/oracle\/fmw_dev",
+            "listenPortEnabled": true,
+            "weblogicHome": "\/oracle\/fmw_dev\/wlserver",
+            "adminServer": false,
+            "SSLListenPortEnabled": false,
+            "state": "RUNNING",
+            "activationTime": 1776350406141,
+            "defaultURL": "t3:\/\/127.0.0.1:7003",
+            "adminServerListenPort": 7001,
+            "currentMachine": "oel7",
+            "patchList": [
+                "36074941;25481791;Wed Feb 21 11:47:39 CET 2024;ADF BUNDLE PATCH 12.2.1.4.231205",
+                "36034300;25459648;Wed Feb 21 11:45:28 CET 2024;WebCenter Core Bundle Patch 12.2.1.4.231120",
+                "35950186;25434324;Wed Feb 21 11:44:46 CET 2024;OSB Bundle Patch 12.2.1.4.231026",
+                "35868571;25407132;Wed Feb 21 11:43:00 CET 2024;OWSM BUNDLE PATCH 12.2.1.4.231003",
+                "34809489;25012949;Wed Feb 21 11:41:59 CET 2024;One-off",
+                "34542329;24919025;Wed Feb 21 11:39:47 CET 2024;One-off",
+                "34065178;24731214;Wed Feb 21 11:38:42 CET 2024;One-off",
+                "33950717;24677093;Wed Feb 21 11:37:42 CET 2024;OPSS Bundle Patch 12.2.1.4.220311",
+                "36178550;25524691;Wed Feb 21 11:31:01 CET 2024;WLS STACK PATCH BUNDLE 12.2.1.4.240111 (Patch 36178496)",
+                "36155700;25515608;Wed Feb 21 11:30:56 CET 2024;WLS PATCH SET UPDATE 12.2.1.4.240104",
+                "36086980;25485176;Wed Feb 21 11:29:24 CET 2024;FMW Thirdparty Bundle Patch 12.2.1.4.231207",
+                "35965629;25445064;Wed Feb 21 11:28:32 CET 2024;ADR FOR WEBLOGIC SERVER 12.2.1.4.0 CPU JAN 2024",
+                "35922290;25425080;Wed Feb 21 11:28:22 CET 2024;RDA release 24.1-2024116 for OFM 12.2.1.4 SPB",
+                "32720458;24558359;Wed Feb 21 11:28:07 CET 2024;JDBC 19.3.0.0 FOR CPUJAN2022 (WLS 12.2.1.4, WLS 14.1.1)",
+                "1221420;25499738;Wed Feb 21 11:27:55 CET 2024;Coherence Cumulative Patch 12.2.1.4.20",
+                "30658875;23917622;Thu Nov 11 10:33:36 CET 2021;One-off",
+                "33093748;24325771;Thu Nov 11 10:27:25 CET 2021;One-off"
+            ],
+            "openSocketsCurrentCount": 5,
+            "administrationPortEnabled": false,
+            "administrationURL": "t3:\/\/127.0.0.1:7003",
+            "adminServerListenPortSecure": false,
+            "healthState": {
+                "state": "ok",
+                "subsystemName": "ServerRuntime",
+                "partitionName": null,
+                "symptoms": []
+            },
+            "currentDirectory": "\/oracle\/domains\/dev\/.",
+            "name": "osb_server1",
+            "inSitConfigState": false,
+            "serverClasspath": "\/oracle\/jdk\/jre\/lib\/resources.jar:\/oracle\/jdk\/jre\/lib\/rt.jar:\/oracle\/jdk\/jre\/lib\/jsse.jar:\/oracle\/jdk\/jre\/lib\/jce.jar:\/oracle\/jdk\/jre\/lib\/charsets.jar:\/oracle\/jdk\/jre\/lib\/jfr.jar:\/oracle\/jdk\/jre\/classes:\/oracle\/domains\/dev\/agent\/jfr-extended-agent.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/features\/com.oracle.db.jdbc7-dms.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/odsi_xquery2004_12.1.3\/odsi.xquery.modules_12.1.3.0.jar:\/oracle\/jdk\/lib\/tools.jar:\/oracle\/fmw_dev\/wlserver\/server\/lib\/weblogic.jar:\/oracle\/fmw_dev\/wlserver\/..\/oracle_common\/modules\/thirdparty\/ant-contrib-1.0b3.jar:\/oracle\/fmw_dev\/wlserver\/modules\/features\/oracle.wls.common.nodemanager.jar:\/oracle\/fmw_dev\/oracle_common\/communications\/modules\/config.jar:\/oracle\/fmw_dev\/oracle_common\/communications\/modules\/userprefs-config.jar:\/oracle\/fmw_dev\/soa\/soa\/modules\/oracle.soa.common.adapters_11.1.1\/oracle.soa.common.adapters.jar:\/oracle\/fmw_dev\/soa\/soa\/modules\/oracle.cloud.adapter_12.1.3\/oracle.cloud.adapter.jar:\/oracle\/fmw_dev\/osb\/lib\/servicebus-common.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/oracle.jps\/jps-manifest.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/internal\/features\/jrf_wlsFmw_oracle.jrf.wls.classpath.jar:\/oracle\/fmw_dev\/osb\/lib\/version.jar:\/oracle\/fmw_dev\/osb\/lib\/servicebus.jar:\/oracle\/domains\/dev\/config\/osb\/:\/oracle\/fmw_dev\/wlserver\/common\/derby\/lib\/derbyclient.jar:\/oracle\/fmw_dev\/wlserver\/common\/derby\/lib\/derby.jar:\/oracle\/jdk\/lib\/tools.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/oracle.jps\/jps-manifest.jar"
+        },
+        {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes\/AdminServer"
+                },
+                {
+                    "rel": "canonical",
+                    "href": "http:\/\/wls-admin.example.com:7001\/management\/weblogic\/latest\/domainRuntime\/serverRuntimes\/AdminServer"
+                }
+            ],
+            "identity": [],
+            "stateVal": 2,
+            "type": "ServerRuntime",
+            "weblogicVersion": "WebLogic Server 12.2.1.4.0",
+            "adminServerHost": "127.0.0.1",
+            "restartRequired": false,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": "ServerRuntime",
+                "partitionName": null,
+                "symptoms": []
+            },
+            "middlewareHome": "\/oracle\/fmw_dev",
+            "listenPortEnabled": true,
+            "weblogicHome": "\/oracle\/fmw_dev\/wlserver",
+            "adminServer": true,
+            "SSLListenPortEnabled": false,
+            "state": "RUNNING",
+            "activationTime": 1776289650767,
+            "defaultURL": "t3:\/\/127.0.0.1:7001",
+            "adminServerListenPort": 7001,
+            "currentMachine": "oel7",
+            "patchList": [
+                "36074941;25481791;Wed Feb 21 11:47:39 CET 2024;ADF BUNDLE PATCH 12.2.1.4.231205",
+                "36034300;25459648;Wed Feb 21 11:45:28 CET 2024;WebCenter Core Bundle Patch 12.2.1.4.231120",
+                "35950186;25434324;Wed Feb 21 11:44:46 CET 2024;OSB Bundle Patch 12.2.1.4.231026",
+                "35868571;25407132;Wed Feb 21 11:43:00 CET 2024;OWSM BUNDLE PATCH 12.2.1.4.231003",
+                "34809489;25012949;Wed Feb 21 11:41:59 CET 2024;One-off",
+                "34542329;24919025;Wed Feb 21 11:39:47 CET 2024;One-off",
+                "34065178;24731214;Wed Feb 21 11:38:42 CET 2024;One-off",
+                "33950717;24677093;Wed Feb 21 11:37:42 CET 2024;OPSS Bundle Patch 12.2.1.4.220311",
+                "36178550;25524691;Wed Feb 21 11:31:01 CET 2024;WLS STACK PATCH BUNDLE 12.2.1.4.240111 (Patch 36178496)",
+                "36155700;25515608;Wed Feb 21 11:30:56 CET 2024;WLS PATCH SET UPDATE 12.2.1.4.240104",
+                "36086980;25485176;Wed Feb 21 11:29:24 CET 2024;FMW Thirdparty Bundle Patch 12.2.1.4.231207",
+                "35965629;25445064;Wed Feb 21 11:28:32 CET 2024;ADR FOR WEBLOGIC SERVER 12.2.1.4.0 CPU JAN 2024",
+                "35922290;25425080;Wed Feb 21 11:28:22 CET 2024;RDA release 24.1-2024116 for OFM 12.2.1.4 SPB",
+                "32720458;24558359;Wed Feb 21 11:28:07 CET 2024;JDBC 19.3.0.0 FOR CPUJAN2022 (WLS 12.2.1.4, WLS 14.1.1)",
+                "1221420;25499738;Wed Feb 21 11:27:55 CET 2024;Coherence Cumulative Patch 12.2.1.4.20",
+                "30658875;23917622;Thu Nov 11 10:33:36 CET 2021;One-off",
+                "33093748;24325771;Thu Nov 11 10:27:25 CET 2021;One-off"
+            ],
+            "openSocketsCurrentCount": 6,
+            "administrationPortEnabled": false,
+            "administrationURL": "t3:\/\/127.0.0.1:7001",
+            "adminServerListenPortSecure": false,
+            "healthState": {
+                "state": "ok",
+                "subsystemName": "ServerRuntime",
+                "partitionName": null,
+                "symptoms": []
+            },
+            "currentDirectory": "\/oracle\/domains\/dev\/.",
+            "name": "AdminServer",
+            "inSitConfigState": false,
+            "serverClasspath": "\/oracle\/jdk\/jre\/lib\/resources.jar:\/oracle\/jdk\/jre\/lib\/rt.jar:\/oracle\/jdk\/jre\/lib\/jsse.jar:\/oracle\/jdk\/jre\/lib\/jce.jar:\/oracle\/jdk\/jre\/lib\/charsets.jar:\/oracle\/jdk\/jre\/lib\/jfr.jar:\/oracle\/jdk\/jre\/classes:\/oracle\/fmw_dev\/oracle_common\/modules\/features\/com.oracle.db.jdbc7-dms.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/odsi_xquery2004_12.1.3\/odsi.xquery.modules_12.1.3.0.jar:\/oracle\/jdk\/lib\/tools.jar:\/oracle\/fmw_dev\/wlserver\/server\/lib\/weblogic.jar:\/oracle\/fmw_dev\/wlserver\/..\/oracle_common\/modules\/thirdparty\/ant-contrib-1.0b3.jar:\/oracle\/fmw_dev\/wlserver\/modules\/features\/oracle.wls.common.nodemanager.jar:\/oracle\/fmw_dev\/oracle_common\/communications\/modules\/config.jar:\/oracle\/fmw_dev\/oracle_common\/communications\/modules\/userprefs-config.jar:\/oracle\/fmw_dev\/soa\/soa\/modules\/oracle.soa.common.adapters_11.1.1\/oracle.soa.common.adapters.jar:\/oracle\/fmw_dev\/soa\/soa\/modules\/oracle.cloud.adapter_12.1.3\/oracle.cloud.adapter.jar:\/oracle\/fmw_dev\/osb\/lib\/servicebus-common.jar:\/oracle\/fmw_dev\/oracle_common\/modules\/internal\/features\/jrf_wlsFmw_oracle.jrf.wls.classpath.jar:\/oracle\/fmw_dev\/osb\/lib\/version.jar:\/oracle\/fmw_dev\/osb\/lib\/servicebus.jar:\/oracle\/domains\/dev\/config\/osb\/:\/oracle\/fmw_dev\/wlserver\/common\/derby\/lib\/derbyclient.jar:\/oracle\/fmw_dev\/wlserver\/common\/derby\/lib\/derby.jar"
+        }
+    ]
+}
+----- summary -----
+http_code=200
+size_download=10798
+content_type=application/json

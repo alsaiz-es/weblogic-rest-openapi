@@ -1,0 +1,19 @@
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Date: Mon, 27 Apr 2026 15:21:45 GMT
+Content-Length: 178
+Content-Type: application/json
+X-ORACLE-DMS-ECID: fb578dae-27ce-49f3-8153-bc93d04595f0-00000016
+X-ORACLE-DMS-RID: 0
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Vary: Accept-Encoding
+
+{
+    "status": 404,
+    "type": "http:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec10.html#sec10.4.1",
+    "title": "FAILURE",
+    "detail": "'domainRuntime' was not found."
+}
+----- summary -----
+http_code=404

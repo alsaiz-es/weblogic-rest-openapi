@@ -1,12 +1,39 @@
 # WLS 14.1.2 Baseline Captures
 
-Real JSON responses captured on 2026-04-15 from a live WebLogic Server
-14.1.2.0.0 install (banner: `Thu Sep 11 09:33:31 GMT 2025 local`).
-Plain `base_domain` — AdminServer only, no managed servers, no OSB/SOA
-applications. JVM: **HotSpot 21.0.9** (notable jump from 1.8.0_401 in
-the 12.2.1.4 baseline).
+Real JSON responses captured on 2026-04-15 (initial baseline) and
+extended on 2026-04-27 (v0.2.0 capture cycle) from a live WebLogic
+Server 14.1.2.0.0 install (banner:
+`Thu Sep 11 09:33:31 GMT 2025 local`).
+Plain `base_domain` — AdminServer plus `server1` (managed, in
+`cluster1`) for the v0.2.0 captures. JVM: **HotSpot 21.0.9**.
 
-Host/IP sanitized to `wls-admin.example.com` / `wls-host`.
+Host/IP sanitized to `wls-admin.example.com` / `wls-host`. Loopback
+references (`127.0.0.1`) are left as-is per project convention.
+
+## v0.2.0 additions
+
+- `serverChannelRuntimes_collection_AdminServer.json`,
+  `serverChannelRuntime_individual_AdminServer_t3.json`,
+  `serverChannelRuntimes_collection_server1.json` — channel runtime
+  shapes; field set is identical between AdminServer and `server1`.
+- `applicationRuntimes_collection_AdminServer.json`,
+  `applicationRuntime_individual_AdminServer_jamagent.json`,
+  `applicationRuntime_individual_AdminServer_bea_wls_internal.json`,
+  `applicationRuntimes_collection_server1.json` — application runtime
+  shapes; same caveat (field-set identical across servers).
+- `jmsRuntime_AdminServer.json`,
+  `jmsRuntime_server1.json`,
+  `jmsServers_collection_AdminServer.json`,
+  `jmsServers_collection_server1.json` — JMS container shapes; both
+  servers report empty (no JMS resources targeted in this domain).
+- `search_empty.json`, `search_servers_basic.json`,
+  `search_servers_threadpool.json`, `search_servers_filtered.json`,
+  `search_workaround_for_400_collection.json` — successful POST
+  `/search` responses (with `X-Requested-By` header).
+- `serverRuntimes_collection_with_server1_400.json` — verbatim 400
+  body confirming the collection bug reproduces on 14.1.2.
+- `search_post_tests_v0.2.0.log` — full progressive probe transcript
+  including the CSRF discovery and edge-case behavior table.
 
 ## Files
 
@@ -75,8 +102,8 @@ rel must detect the WLS version and degrade gracefully.
 
 | Case | 12.2.1.4 | 14.1.2 | Notes |
 |---|---|---|---|
-| `GET /serverRuntimes` collection | **HTTP 400** with osb_server1 up | **HTTP 200** | Was OSB-specific serialization bug, gone here |
-| `POST /domainRuntime/search` | 400 on every body shape tried | 400 on every body shape tried | Undocumented in both — requires further reverse-engineering |
+| `GET /serverRuntimes` collection (managed server up) | **HTTP 400** | **HTTP 400** (revised in v0.2.0) | v0.1.1 reported the bug as 12.2.1.4-only and silently fixed in 14.1.2; v0.2.0 reproduced it identically on a vanilla 14.1.2 `base_domain`. Root cause is the `X-Requested-By` request header being required on this specific endpoint when managed servers are RUNNING — see CHANGELOG v0.2.0 Corrections and `samples/{version}/csrf-test/`. Disappears on admin-only domains. |
+| `POST /domainRuntime/search` | 400 on every body shape tried (no CSRF header sent) | **Works** with `X-Requested-By` header (revised in v0.2.0) | The 400 in v0.1.1 was the CSRF guard, not the DSL. With the header supplied, the documented DSL works on both versions (12.2.1.4 cross-check pending). |
 | 401 response body | HTML | HTML | `ErrorResponse` JSON schema does not apply to 401 |
 | 404 response body | JSON envelope | JSON envelope | Identical shape and `detail` format |
 

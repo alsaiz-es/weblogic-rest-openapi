@@ -1,0 +1,24 @@
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "name": "osb_server1",
+                "threadPoolRuntime": {
+                    "executeThreadTotalCount": 44,
+                    "stuckThreadCount": 0,
+                    "hoggingThreadCount": 0
+                }
+            },
+            {
+                "state": "RUNNING",
+                "name": "AdminServer",
+                "threadPoolRuntime": {
+                    "executeThreadTotalCount": 68,
+                    "stuckThreadCount": 0,
+                    "hoggingThreadCount": 0
+                }
+            }
+        ]
+    }
+}

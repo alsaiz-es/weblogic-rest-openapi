@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Date: Mon, 27 Apr 2026 15:21:45 GMT
+Content-Length: 53
+Content-Type: application/json
+X-ORACLE-DMS-ECID: ed07e704-e7ed-4e4f-afe4-4edb59c67b16-000000e6
+X-ORACLE-DMS-RID: 0
+Vary: Accept-Encoding
+
+{
+    "state": "RUNNING",
+    "name": "osb_server1"
+}
+----- summary -----
+http_code=200

@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Date: Mon, 27 Apr 2026 15:21:45 GMT
+Content-Length: 49
+Content-Type: application/json
+X-ORACLE-DMS-ECID: fb578dae-27ce-49f3-8153-bc93d04595f0-00000017
+X-ORACLE-DMS-RID: 0
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Vary: Accept-Encoding
+
+{
+    "state": "RUNNING",
+    "name": "server1"
+}
+----- summary -----
+http_code=200

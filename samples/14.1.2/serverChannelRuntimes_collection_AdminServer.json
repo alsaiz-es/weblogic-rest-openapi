@@ -1,0 +1,429 @@
+{
+    "items": [
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[iiop]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[iiop]",
+            "publicURL": "iiop://127.0.0.1:7001",
+            "channelName": "Default[iiop]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[ldap][2]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[ldap][2]",
+            "publicURL": "ldap://wls-admin.example.com:7001",
+            "channelName": "Default[ldap][2]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[t3][2]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[t3][2]",
+            "publicURL": "t3://wls-admin.example.com:7001",
+            "channelName": "Default[t3][2]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[http][4]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[http][4]",
+            "publicURL": "http://[0:0:0:0:0:0:0:1%lo]:7001",
+            "channelName": "Default[http][4]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[iiop][3]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[iiop][3]",
+            "publicURL": "iiop://wls-admin.example.com:7001",
+            "channelName": "Default[iiop][3]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[t3]"
+            ],
+            "messagesReceivedCount": 44,
+            "bytesReceivedCount": 30740,
+            "associatedVirtualTargetName": null,
+            "name": "Default[t3]",
+            "publicURL": "t3://127.0.0.1:7001",
+            "channelName": "Default[t3]",
+            "acceptCount": 2,
+            "bytesSentCount": 269167,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 42
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[http]"
+            ],
+            "messagesReceivedCount": 16,
+            "bytesReceivedCount": 10160,
+            "associatedVirtualTargetName": null,
+            "name": "Default[http]",
+            "publicURL": "http://127.0.0.1:7001",
+            "channelName": "Default[http]",
+            "acceptCount": 11,
+            "bytesSentCount": 102501,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 1,
+            "messagesSentCount": 15
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[http][2]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[http][2]",
+            "publicURL": "http://wls-admin.example.com:7001",
+            "channelName": "Default[http][2]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[http][3]"
+            ],
+            "messagesReceivedCount": 25,
+            "bytesReceivedCount": 5760,
+            "associatedVirtualTargetName": null,
+            "name": "Default[http][3]",
+            "publicURL": "http://wls-admin.example.com:7001",
+            "channelName": "Default[http][3]",
+            "acceptCount": 25,
+            "bytesSentCount": 119817,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 1,
+            "messagesSentCount": 30
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[snmp]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[snmp]",
+            "publicURL": "snmp://127.0.0.1:7001",
+            "channelName": "Default[snmp]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[snmp][4]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[snmp][4]",
+            "publicURL": "snmp://[0:0:0:0:0:0:0:1%lo]:7001",
+            "channelName": "Default[snmp][4]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[iiop][4]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[iiop][4]",
+            "publicURL": "iiop://[0:0:0:0:0:0:0:1%lo]:7001",
+            "channelName": "Default[iiop][4]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[iiop][2]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[iiop][2]",
+            "publicURL": "iiop://wls-admin.example.com:7001",
+            "channelName": "Default[iiop][2]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[iiop][1]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[iiop][1]",
+            "publicURL": "iiop://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001",
+            "channelName": "Default[iiop][1]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[ldap][1]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[ldap][1]",
+            "publicURL": "ldap://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001",
+            "channelName": "Default[ldap][1]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[t3][4]"
+            ],
+            "messagesReceivedCount": 161,
+            "bytesReceivedCount": 98824,
+            "associatedVirtualTargetName": null,
+            "name": "Default[t3][4]",
+            "publicURL": "t3://[0:0:0:0:0:0:0:1%lo]:7001",
+            "channelName": "Default[t3][4]",
+            "acceptCount": 2,
+            "bytesSentCount": 1007344,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 157
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[t3][3]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[t3][3]",
+            "publicURL": "t3://wls-admin.example.com:7001",
+            "channelName": "Default[t3][3]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[ldap]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[ldap]",
+            "publicURL": "ldap://127.0.0.1:7001",
+            "channelName": "Default[ldap]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[snmp][2]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[snmp][2]",
+            "publicURL": "snmp://wls-admin.example.com:7001",
+            "channelName": "Default[snmp][2]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[ldap][4]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[ldap][4]",
+            "publicURL": "ldap://[0:0:0:0:0:0:0:1%lo]:7001",
+            "channelName": "Default[ldap][4]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[ldap][3]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[ldap][3]",
+            "publicURL": "ldap://wls-admin.example.com:7001",
+            "channelName": "Default[ldap][3]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[snmp][3]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[snmp][3]",
+            "publicURL": "snmp://wls-admin.example.com:7001",
+            "channelName": "Default[snmp][3]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[t3][1]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[t3][1]",
+            "publicURL": "t3://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001",
+            "channelName": "Default[t3][1]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[http][1]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[http][1]",
+            "publicURL": "http://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001",
+            "channelName": "Default[http][1]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        },
+        {
+            "identity": [
+                "serverChannelRuntimes",
+                "Default[snmp][1]"
+            ],
+            "messagesReceivedCount": 0,
+            "bytesReceivedCount": 0,
+            "associatedVirtualTargetName": null,
+            "name": "Default[snmp][1]",
+            "publicURL": "snmp://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001",
+            "channelName": "Default[snmp][1]",
+            "acceptCount": 0,
+            "bytesSentCount": 0,
+            "type": "ServerChannelRuntime",
+            "connectionsCount": 0,
+            "messagesSentCount": 0
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "activationTime": 1773065179884,
+                "name": "AdminServer"
+            }
+        ]
+    }
+}

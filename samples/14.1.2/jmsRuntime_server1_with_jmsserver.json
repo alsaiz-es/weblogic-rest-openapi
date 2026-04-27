@@ -1,0 +1,18 @@
+{
+    "identity": [
+        "JMSRuntime"
+    ],
+    "JMSServersHighCount": 1,
+    "connectionsHighCount": 0,
+    "connectionsTotalCount": 0,
+    "healthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "symptoms": []
+    },
+    "name": "server1.jms",
+    "JMSServersCurrentCount": 1,
+    "type": "JMSRuntime",
+    "JMSServersTotalCount": 1,
+    "connectionsCurrentCount": 0
+}

@@ -1,0 +1,1979 @@
+{
+    "items": [
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Tuxedo Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Tuxedo Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Tuxedo Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Module-FMWDFW"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Module-FMWDFW",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Module-FMWDFW"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Transform"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Transform",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Transform"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus WS Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus WS Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus WS Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "wsm-pm"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "wsm-pm",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "wsm-pm"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus WS Transport Async Response"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus WS Transport Async Response",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus WS Transport Async Response"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "DbAdapter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "DbAdapter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "DbAdapter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "SAPAdapter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "SAPAdapter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "SAPAdapter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-smpp"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-smpp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-smpp"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus OWSM Initializer"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus OWSM Initializer",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus OWSM Initializer"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Test Framework"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Test Framework",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Test Framework"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Logging"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Logging",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Logging"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "AgentTestJMSModule"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "AgentTestJMSModule",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "AgentTestJMSModule"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "DMS Application_12.2.1.1.0"
+            ],
+            "applicationVersion": "12.2.1.1.0",
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "DMS Application_12.2.1.1.0",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "DMS Application"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Message Reporting Purger"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "Service Bus Message Reporting Purger",
+                        "info": "MDB application Service Bus Message Reporting Purger is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Message Reporting Purger",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Message Reporting Purger"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "com.oracle.webservices.wls.bea-wls9-async-response"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "com.oracle.webservices.wls.bea-wls9-async-response",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "com.oracle.webservices.wls.bea-wls9-async-response"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus SOA-DIRECT Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus SOA-DIRECT Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus SOA-DIRECT Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Publish"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Publish",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Publish"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "WLSSchemaDataSource"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "WLSSchemaDataSource",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "WLSSchemaDataSource"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "FtpAdapter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "FtpAdapter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "FtpAdapter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "bea_wls_internal"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "bea_wls_internal",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "bea_wls_internal"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-apns"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-apns",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-apns"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-xmpp"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-xmpp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-xmpp"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jaxrs-test-client"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "jaxrs-test-client",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jaxrs-test-client"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus JCA Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus JCA Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus JCA Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-gcm"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-gcm",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-gcm"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "OraSDPMDataSource"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "OraSDPMDataSource",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "OraSDPMDataSource"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "AqAdapter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "AqAdapter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "AqAdapter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "defaultCoherenceCluster"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "defaultCoherenceCluster",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "defaultCoherenceCluster"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus WSIL"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus WSIL",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus WSIL"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Framework Starter Application"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Framework Starter Application",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Framework Starter Application"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Subscription Listener"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Subscription Listener",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Subscription Listener"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "state-management-provider-memory-rar"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "state-management-provider-memory-rar",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "state-management-provider-memory-rar"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-extension"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-extension",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-extension"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-email"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-email",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-email"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus File Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "Service Bus File Transport Provider",
+                        "info": "MDB application Service Bus File Transport Provider is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus File Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus File Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jms-internal-xa-adp"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "jms-internal-xa-adp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jms-internal-xa-adp"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "com.oracle.webservices.wls.wsat-endpoints-impl"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "com.oracle.webservices.wls.wsat-endpoints-impl",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "com.oracle.webservices.wls.wsat-endpoints-impl"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Aggregator Singleton Marker Application"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Aggregator Singleton Marker Application",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Aggregator Singleton Marker Application"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus JEJB Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus JEJB Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus JEJB Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Domain Singleton Marker Application"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Domain Singleton Marker Application",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Domain Singleton Marker Application"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus EJB Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus EJB Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus EJB Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "weblogic"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "weblogic",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "weblogic"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "opss-audit-DBDS"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "opss-audit-DBDS",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "opss-audit-DBDS"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Cloudsdk"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Cloudsdk",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Cloudsdk"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "bea_wls_deployment_internal"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "bea_wls_deployment_internal",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "bea_wls_deployment_internal"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Result Cache"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Result Cache",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Result Cache"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "wls-management-services"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "wls-management-services",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "wls-management-services"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "mds-owsm"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "mds-owsm",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "mds-owsm"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus MQ Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus MQ Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus MQ Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "opss-data-source"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "opss-data-source",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "opss-data-source"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus FTP Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "Service Bus FTP Transport Provider",
+                        "info": "MDB application Service Bus FTP Transport Provider is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus FTP Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus FTP Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "bea_wls_cluster_internal"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "bea_wls_cluster_internal",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "bea_wls_cluster_internal"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "wlsbjmsrpDataSource"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "wlsbjmsrpDataSource",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "wlsbjmsrpDataSource"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus SFTP Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "Service Bus SFTP Transport Provider",
+                        "info": "MDB application Service Bus SFTP Transport Provider is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus SFTP Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus SFTP Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingserver"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "usermessagingserver",
+                        "info": "MDB application usermessagingserver is connected to messaging system."
+                    },
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "usermessagingserver",
+                        "info": "MDB application usermessagingserver is connected to messaging system."
+                    },
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "usermessagingserver",
+                        "info": "MDB application usermessagingserver is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingserver",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingserver"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "FileAdapter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "FileAdapter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "FileAdapter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "coherence-transaction-rar"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "coherence-transaction-rar",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "coherence-transaction-rar"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "JmsAdapter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "JmsAdapter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "JmsAdapter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jmsResources"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "jmsResources",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jmsResources"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus SB Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus SB Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus SB Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "SB_JMS_Proxy_7f000001.N706acc32.7.19c7d94e8bd.N8000"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "SB_JMS_Proxy_7f000001.N706acc32.7.19c7d94e8bd.N8000",
+                        "info": "MDB application SB_JMS_Proxy_7f000001.N706acc32.7.19c7d94e8bd.N8000 is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "SB_JMS_Proxy_7f000001.N706acc32.7.19c7d94e8bd.N8000",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "SB_JMS_Proxy_7f000001.N706acc32.7.19c7d94e8bd.N8000"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "UMSJMSSystemResource"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "UMSJMSSystemResource",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "UMSJMSSystemResource"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus JMS Reporting Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "Service Bus JMS Reporting Provider",
+                        "info": "MDB application Service Bus JMS Reporting Provider is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus JMS Reporting Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus JMS Reporting Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "jms-internal-notran-adp"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "jms-internal-notran-adp",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "jms-internal-notran-adp"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "test-war-osb"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "test-war-osb",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "test-war-osb"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "SOADataSource"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "SOADataSource",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "SOADataSource"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "usermessagingdriver-twitter"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "usermessagingdriver-twitter",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "usermessagingdriver-twitter"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Resource"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Resource",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Resource"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Email Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "LOW",
+                        "instanceId": "Service Bus Email Transport Provider",
+                        "info": "MDB application Service Bus Email Transport Provider is connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Email Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Email Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Kernel"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Kernel",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Kernel"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus Routing"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus Routing",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus Routing"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "com.oracle.webservices.fmw.wsil-wls-impl"
+            ],
+            "applicationVersion": null,
+            "internal": true,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "com.oracle.webservices.fmw.wsil-wls-impl",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "com.oracle.webservices.fmw.wsil-wls-impl"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "opss-audit-viewDS"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "opss-audit-viewDS",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "opss-audit-viewDS"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "Service Bus DSP Transport Provider"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "Service Bus DSP Transport Provider",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "Service Bus DSP Transport Provider"
+        },
+        {
+            "identity": [
+                "applicationRuntimes",
+                "SB_JMS_Proxy_7f000001.N552f8823.0.17e93901af5.N8000"
+            ],
+            "applicationVersion": null,
+            "internal": false,
+            "partitionName": null,
+            "overallHealthState": {
+                "state": "warn",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": [
+                    {
+                        "type": "MDB",
+                        "severity": "MEDIUM",
+                        "instanceId": "SB_JMS_Proxy_7f000001.N552f8823.0.17e93901af5.N8000",
+                        "info": "MDB application SB_JMS_Proxy_7f000001.N552f8823.0.17e93901af5.N8000 is NOT connected to messaging system."
+                    }
+                ]
+            },
+            "healthState": {
+                "state": "ok",
+                "subsystemName": null,
+                "partitionName": null,
+                "symptoms": []
+            },
+            "name": "SB_JMS_Proxy_7f000001.N552f8823.0.17e93901af5.N8000",
+            "type": "ApplicationRuntime",
+            "activeVersionState": 2,
+            "applicationName": "SB_JMS_Proxy_7f000001.N552f8823.0.17e93901af5.N8000"
+        }
+    ]
+}

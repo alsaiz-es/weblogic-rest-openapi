@@ -1,0 +1,15 @@
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "name": "AdminServer",
+                "threadPoolRuntime": {
+                    "executeThreadTotalCount": 12,
+                    "stuckThreadCount": 0,
+                    "hoggingThreadCount": 0
+                }
+            }
+        ]
+    }
+}

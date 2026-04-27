@@ -1,0 +1,14 @@
+{
+    "serverRuntimes": {
+        "items": [
+            {
+                "state": "RUNNING",
+                "name": "osb_server1"
+            },
+            {
+                "state": "RUNNING",
+                "name": "AdminServer"
+            }
+        ]
+    }
+}

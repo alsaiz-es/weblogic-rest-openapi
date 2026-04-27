@@ -1,0 +1,19 @@
+{
+    "identity": [
+        "JMSRuntime"
+    ],
+    "JMSServersHighCount": 4,
+    "connectionsHighCount": 25,
+    "connectionsTotalCount": 25,
+    "healthState": {
+        "state": "ok",
+        "subsystemName": null,
+        "partitionName": null,
+        "symptoms": []
+    },
+    "name": "osb_server1.jms",
+    "JMSServersCurrentCount": 4,
+    "type": "JMSRuntime",
+    "JMSServersTotalCount": 4,
+    "connectionsCurrentCount": 25
+}
