@@ -1,0 +1,218 @@
+JMSServerRuntime:
+  type: object
+  description: This class is used for monitoring a WebLogic JMS server.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    bytesCurrentCount:
+      type: integer
+      format: int64
+      description: "The current number of bytes stored on this JMS server.\n\nThis number does not include the pending bytes."
+      readOnly: true
+    bytesHighCount:
+      type: integer
+      format: int64
+      description: The peak number of bytes stored in the JMS server since the last reset.
+      readOnly: true
+    bytesPageableCurrentCount:
+      type: integer
+      format: int64
+      description: Return the total number of bytes in all the messages that are currently available to be paged out, 
+        but which have not yet been paged out. The JMS server attempts to keep this number smaller than the 
+        "MessageBufferSize" parameter.
+      readOnly: true
+    bytesPagedInTotalCount:
+      type: integer
+      format: int64
+      description: Return the total number of bytes that were read from the paging directory since the JMS server was 
+        started.
+      readOnly: true
+    bytesPagedOutTotalCount:
+      type: integer
+      format: int64
+      description: Return the total number of bytes that were written to the paging directory since the JMS server was 
+        started.
+      readOnly: true
+    bytesPendingCount:
+      type: integer
+      format: int64
+      description: "The current number of bytes pending (unacknowledged or uncommitted) stored on this JMS server.\n\nPending
+        bytes are over and above the current number of bytes."
+      readOnly: true
+    bytesReceivedCount:
+      type: integer
+      format: int64
+      description: The number of bytes received on this JMS server since the last reset.
+      readOnly: true
+    bytesThresholdTime:
+      type: integer
+      format: int64
+      description: The amount of time in the threshold condition since the last reset.
+      readOnly: true
+    consumptionPaused:
+      type: boolean
+      description: Returns the current consumption paused state of the JMSServer as boolean value.
+      readOnly: true
+    consumptionPausedState:
+      type: string
+      enum:
+      - Consumption-Enabled
+      - Consumption-Pausing
+      - Consumption-Paused
+      description: Returns the current consumption paused state of the JMSServer as string value.
+      readOnly: true
+    destinations:
+      type: array
+      items:
+        $ref: '#/components/schemas/JMSDestinationRuntime'
+      description: An array of destinations on this JMS server.
+      readOnly: true
+    destinationsCurrentCount:
+      type: integer
+      format: int64
+      description: The current number of destinations for this JMS server.
+      readOnly: true
+    destinationsHighCount:
+      type: integer
+      format: int64
+      description: The peak number of destinations on this JMS server since the last reset.
+      readOnly: true
+    destinationsTotalCount:
+      type: integer
+      format: int64
+      description: The number of destinations instantiated on this JMS server since the last reset.
+      readOnly: true
+    healthState:
+      $ref: '#/components/schemas/HealthState'
+      description: The health state of this JMS server.
+    insertionPaused:
+      type: boolean
+      description: Returns the current insertion paused state of the JMSServer as boolean value.
+      readOnly: true
+    insertionPausedState:
+      type: string
+      enum:
+      - Insertion-Enabled
+      - Insertion-Pausing
+      - Insertion-Paused
+      description: Returns the current insertion paused state of the JMSServer as string value.
+      readOnly: true
+    logRuntime:
+      $ref: '#/components/schemas/LogRuntime'
+      description: Gets the log runtime instance for this JMSServerRuntime.
+    messagesCurrentCount:
+      type: integer
+      format: int64
+      description: The current number of messages stored on this JMS server. This number does not include the pending 
+        messages.
+      readOnly: true
+    messagesHighCount:
+      type: integer
+      format: int64
+      description: The peak number of messages stored in the JMS server since the last reset.
+      readOnly: true
+    messagesPageableCurrentCount:
+      type: integer
+      format: int32
+      description: Return the number of messages that are currently available for paging in this JMS server but have not
+        yet been paged out. Note that due to internal implementation details, this count may be zero even if 
+        "PageableByteCurrentCount" is zero.
+      readOnly: true
+    messagesPagedInTotalCount:
+      type: integer
+      format: int32
+      description: Return the total number of messages that were read from the paging directory since the JMS server was
+        started.
+      readOnly: true
+    messagesPagedOutTotalCount:
+      type: integer
+      format: int32
+      description: Return the total number of messages that were written to the paging directory since the JMS server 
+        was started.
+      readOnly: true
+    messagesPendingCount:
+      type: integer
+      format: int64
+      description: "The current number of messages pending (unacknowledged or uncommitted) stored on this JMS server.\n\n\
+        Pending messages are over and above the current number of messages."
+      readOnly: true
+    messagesReceivedCount:
+      type: integer
+      format: int64
+      description: The number of messages received on this destination since the last reset.
+      readOnly: true
+    messagesThresholdTime:
+      type: integer
+      format: int64
+      description: The amount of time in the threshold condition since the last reset.
+      readOnly: true
+    pagingAllocatedIoBufferBytes:
+      type: integer
+      format: int64
+      description: See PersistentStoreRuntimeMBean.AllocatedIoBufferBytes
+      readOnly: true
+    pagingAllocatedWindowBufferBytes:
+      type: integer
+      format: int64
+      description: See PersistentStoreRuntimeMBean.AllocatedWindowBufferBytes
+      readOnly: true
+    pagingPhysicalWriteCount:
+      type: integer
+      format: int64
+      description: See PersistentStoreRuntimeMBean.PhysicalWriteCount
+      readOnly: true
+    pendingTransactions:
+      type: array
+      items:
+        type: string
+      description: Returns an array of Xids representing transaction branches that exist onthis JMS server in the 
+        pending state, i.e. branches that have been prepared by the transaction manager but not yet committed or rolled 
+        back.
+      readOnly: true
+    productionPaused:
+      type: boolean
+      description: Returns the current production paused state of the JMSServer as boolean value.
+      readOnly: true
+    productionPausedState:
+      type: string
+      enum:
+      - Production-Enabled
+      - Production-Pausing
+      - Production-Paused
+      description: Returns the current production paused state of the JMSServer as string value.
+      readOnly: true
+    sessionPoolRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/JMSSessionPoolRuntime'
+      description: The session pools running on this JMS server.
+      readOnly: true
+    sessionPoolsCurrentCount:
+      type: integer
+      format: int64
+      description: The current number of session pools instantiated on this JMS server.
+      readOnly: true
+    sessionPoolsHighCount:
+      type: integer
+      format: int64
+      description: The peak number of session pools instantiated on this JMS server since the last reset.
+      readOnly: true
+    sessionPoolsTotalCount:
+      type: integer
+      format: int64
+      description: The number of session pools instantiated on this JMS server since the last reset.
+      readOnly: true
+    transactions:
+      type: array
+      items:
+        type: string
+      description: Returns an array of Xids representing transaction branches that exist on this JMS server in any 
+        state.
+      readOnly: true

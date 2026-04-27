@@ -1,0 +1,93 @@
+JDBCSystemResource:
+  type: object
+  description: This bean defines a system-level JDBC resource. It links a separate descriptor that specifies the 
+    definition.
+  properties:
+    name:
+      type: string
+      default:
+        derivedDefault: true
+      description: "The user-specified name of this MBean instance.\n\nThis name is included as one of the key properties
+        in the MBean's `javax.management.ObjectName`:\n\n`Name=user-specified-name`"
+      x-weblogic-restart-needed: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+    dynamicallyCreated:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Return whether the MBean was created dynamically or is persisted to config.xml
+    id:
+      type: integer
+      format: int64
+      description: Return the unique id of this MBean instance
+    notes:
+      type: string
+      description: "Optional information that you can include to describe this configuration.\n\nWebLogic Server saves this
+        note in the domain's configuration file (`config.xml`) as XML PCDATA. All left angle brackets (<) are converted to
+        the XML entity `&lt;`. Carriage returns/line feeds are preserved.\n\nNote: If you create or edit a note from the Administration
+        Console, the Administration Console does not preserve carriage returns/line feeds."
+    tags:
+      type: array
+      items:
+        type: string
+      description: Return all tags on this Configuration MBean
+    compatibilityName:
+      type: string
+      description: "This is only set for beans created as a result of conversion from an 8.1 application configured using
+        ApplicationMBean and ComponentMBean. \n\nStandalone modules in 8.1 have both an ApplicationMBean name and ComponentMBean
+        name. This attribute stores the name of the latter, to be used when the server creates the transient ComponentMBean
+        for backward compatibility."
+      x-weblogic-restart-needed: true
+    moduleType:
+      type: string
+      description: The type of the module (ear, jar, war, or rar)
+      x-weblogic-restart-needed: true
+    targets:
+      type: array
+      items:
+        type: array
+        items:
+          type: string
+      default:
+        derivedDefault: true
+      description: You must select a target on which an MBean will be deployed from this list of the targets in the 
+        current domain on which this item can be deployed. Targets must be either servers or clusters. The deployment 
+        will only occur once if deployments overlap.
+    deploymentOrder:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 100
+      description: "An integer value that indicates when this unit is deployed, relative to other deployable units on a server,
+        during startup.\n\nUnits with lower values are deployed before those with higher values."
+      x-weblogic-restart-needed: true
+    deploymentPrincipalName:
+      type: string
+      description: A string value that indicates the principal that should be used when deploying the file or archive 
+        during startup and shutdown. This principal will be used to set the current subject when calling out into 
+        application code for interfaces such as ApplicationLifecycleListener. If no principal name is specified, then 
+        the anonymous principal will be used.
+      x-weblogic-restart-needed: true
+    sourcePath:
+      type: string
+      default:
+        derivedDefault: true
+      x-weblogic-restart-needed: true
+    subDeployments:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubDeployment'
+      description: Targeting for subcomponents that differs from targeting for the component.
+    descriptorFileName:
+      type: string
+      default:
+        derivedDefault: true
+      description: "The name of the file containing this configuration. This is a relative name rooted at `DOMAIN_DIR/config`.
+        By default the file resides in the `jdbc` subdirectory and derives its name from the bean name using the following
+        pattern:\n\n`<beanName>.xml`\n\nNote that this is a read-only property that can only be set when the bean is created."
+    JDBCResource:
+      $ref: '#/components/schemas/JDBCDataSourceBean'

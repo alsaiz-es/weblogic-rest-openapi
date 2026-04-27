@@ -1,0 +1,60 @@
+JMSRuntime:
+  type: object
+  description: This class is used for monitoring a WebLogic JMS service.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    connections:
+      type: array
+      items:
+        $ref: '#/components/schemas/JMSConnectionRuntime'
+      description: The connections to this WebLogic server.
+      readOnly: true
+    connectionsCurrentCount:
+      type: integer
+      format: int64
+      description: The current number of connections to WebLogic Server server.
+      readOnly: true
+    connectionsHighCount:
+      type: integer
+      format: int64
+      description: The highest number of connections to this WebLogic Server since the last reset.
+      readOnly: true
+    connectionsTotalCount:
+      type: integer
+      format: int64
+      description: The total number of connections made to this WebLogic Server since the last reset.
+      readOnly: true
+    healthState:
+      $ref: '#/components/schemas/HealthState'
+      description: The health state of this JMS service.
+    JMSServers:
+      type: array
+      items:
+        $ref: '#/components/schemas/JMSServerRuntime'
+      description: The JMS servers that are currently deployed on this WebLogic Server instance.
+      readOnly: true
+    JMSServersCurrentCount:
+      type: integer
+      format: int64
+      description: The current number of JMS servers that are deployed on this WebLogic Server instance.
+      readOnly: true
+    JMSServersHighCount:
+      type: integer
+      format: int64
+      description: The highest number of JMS servers that were deployed on this WebLogic Server instance since this 
+        server was started.
+      readOnly: true
+    JMSServersTotalCount:
+      type: integer
+      format: int64
+      description: The total number of JMS servers that were deployed on this WebLogic Server instance since this server
+        was started.
+      readOnly: true

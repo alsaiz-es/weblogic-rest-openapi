@@ -1,0 +1,34 @@
+JDBCServiceRuntime:
+  type: object
+  description: This class is used for monitoring a WebLogic JDBC service. It maps to a JDBCResource JMO.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    healthState:
+      $ref: '#/components/schemas/HealthState'
+      description: The health state of the JDBC subsystem.
+    JDBCDataSourceRuntimeMBeans:
+      type: array
+      items:
+        $ref: '#/components/schemas/JDBCDataSourceRuntime'
+      description: The list of JDBCDataSourceRuntimeMBeans created in this domain.
+      readOnly: true
+    JDBCDriverRuntimeMBeans:
+      type: array
+      items:
+        $ref: '#/components/schemas/JDBCDriverRuntime'
+      description: The list of JDBCDriverRuntimeMBeans created in this domain.
+      readOnly: true
+    JDBCMultiDataSourceRuntimeMBeans:
+      type: array
+      items:
+        $ref: '#/components/schemas/JDBCMultiDataSourceRuntime'
+      description: The list of JDBCMultiDataSourceRuntimeMBeans created in this domain.
+      readOnly: true

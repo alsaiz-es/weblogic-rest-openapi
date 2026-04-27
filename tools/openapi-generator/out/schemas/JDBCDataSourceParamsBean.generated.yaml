@@ -1,0 +1,120 @@
+JDBCDataSourceParamsBean:
+  type: object
+  description: "Contains the basic usage parameters of a data source. \n\nConfiguration parameters for the basic usage of
+    a data source are specified using a data source parameters bean."
+  properties:
+    algorithmType:
+      type: string
+      enum:
+      - Load-Balancing
+      - Failover
+      default:
+        value:
+          value: Failover
+      description: "The algorithm determines the connection request processing for the multi data source.\n\nYou can specify
+        one of the following algorithm types:\n\n- Failover \n\nConnection requests are sent to the first data source in the
+        list; if the request fails, the request is sent to the next data source in the list, and so forth. The process is
+        repeated until a valid connection is obtained, or until the end of the list is reached, in which case an exception
+        is thrown.\n\n- \n- Load balancing \n\nThe multi data source distributes connection requests evenly to its member
+        data sources. With this algorithm, the multi data source also provides failover processing. That is, if a request
+        fails, the multi data source sends the request to the next data source in the list until a valid connection is obtained,
+        or until the end of the list is reached, in which case an exception is thrown.\n\n-"
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    connectionPoolFailoverCallbackHandler:
+      type: string
+      default:
+        value:
+          value:
+      description: "The name of the application class to handle the callback sent when a multi data source is ready to failover
+        or fail back connection requests to another data source within the multi data source.\n\nThe name must be the absolute
+        name of an application class that implements the `weblogic.jdbc.extensions.ConnectionPoolFailoverCallback` interface."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    dataSourceList:
+      type: string
+      default:
+        value:
+          value:
+      description: The list of data sources to which the multi data source will route connection requests. The order of 
+        data sources in the list determines the failover order.
+    failoverRequestIfBusy:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: For multi data sources with the `failover` algorithm, enables the multi data source to failover 
+        connection requests to the next data source if all connections in the current data source are in use.
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    globalTransactionsProtocol:
+      type: string
+      enum:
+      - TwoPhaseCommit
+      - LoggingLastResource
+      - EmulateTwoPhaseCommit
+      - OnePhaseCommit
+      - None
+      default:
+        value:
+          value: OnePhaseCommit
+      description: "Determines the transaction protocol (global transaction processing behavior) for the data source. Options
+        include:\n\n- \n\nTwoPhaseCommit - Standard XA transaction processing. Requires an XA driver.\n\n- \n- \n\nLoggingLastResource
+        - A performance enhancement for one non-XA resource.\n\n- \n- \n\nEmulateTwoPhaseCommit - Enables one non-XA resource
+        to participate in a global transaction, but has some risk to data.\n\n- \n- \n\nOnePhaseCommit - One-phase XA transaction
+        processing using a non-XA driver. This is the default setting.\n\n- \n- \n\nNone - Support for local transactions
+        only.\n\n-"
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    JNDINames:
+      type: array
+      items:
+        type: string
+      default:
+        derivedDefault: true
+      description: "The JNDI path for this Data Source. By default, the JNDI name is the name of the data source.\n\nApplications
+        that look up the JNDI path get a `javax.sql.DataSource` instance that corresponds to this data source."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    keepConnAfterGlobalTx:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Enables WebLogic Server to keep the physical database connection associated with the logical connection
+        when committing a global transaction instead releasing it and getting another physical connection when needed.\n\n\
+        Setting this option to true may require additional connections to be configured on the database.\n\nUse this setting
+        to work around specific problems with JDBC XA drivers."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    proxySwitchingCallback:
+      type: string
+      default:
+        value:
+          value:
+      description: "The name of the switching callback class for a Proxy data source.\n\nThis class implements the `weblogic.jdbc.extensions.DataSourceSwitchingCallback`
+        interface."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    proxySwitchingProperties:
+      type: string
+      default:
+        value:
+          value:
+      description: Specifies the switching properties passed to the switching callback method for a Proxy data source.
+    scope:
+      type: string
+      enum:
+      - Global
+      - Application
+      default:
+        value:
+          value: Global
+      description: "Specifies the scoping of the data source.\n\nYou can specify one of the following scopes:\n\n- Global\
+        \ \n\nSpecifies that the data source is bound in the cluster-wide JNDI tree with the JNDIName specified so that the
+        data source is available for use to any JDBC client across the cluster.\n\nThis is the default setting.\n\n- \n- Application\
+        \ \n\nSpecifies that the data source is bound in the application's local namespace with the JNDIName specified so
+        that the data source is available for use only by JDBC clients within the application. This can only be used for packaged
+        datasources and is ignored for JDBC System resources.\n\n-"
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true

@@ -1,0 +1,283 @@
+WebAppComponentRuntime:
+  type: object
+  description: Describes a servlet component (servlet context).
+  properties:
+    name:
+      type: string
+      description: Provides the name of this MBean.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    deploymentState:
+      type: integer
+      format: int32
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      description: "The current deployment state of the module.\n\nA module can be in one and only one of the following states.
+        State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this module is
+        neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is prepared, but
+        not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED. State indicating at
+        this module is currently active.\n- \n- NEW. State indicating this module has just been created and is being initialized.\n\
+        -"
+      readOnly: true
+    moduleId:
+      type: string
+      description: "Returns the identifier for this Component. The identifier is unique within the application.\n\nTypical
+        modules will use the URI for their id. Web Modules will return their context-root since the web-uri may not be unique
+        within an EAR."
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Get the runtime mbeans for all work managers defined in this component
+      readOnly: true
+    managedExecutorServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedExecutorServiceRuntime'
+      description: Get the runtime mbeans for all ManagedExecutorServices defined in this component
+      readOnly: true
+    managedScheduledExecutorServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedScheduledExecutorServiceRuntime'
+      description: Get the runtime mbeans for all ManagedScheduledExecutorServices defined in this component
+      readOnly: true
+    managedThreadFactoryRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedThreadFactoryRuntime'
+      description: Get the runtime mbeans for all ManagedThreadFactorys defined in this component
+      readOnly: true
+    applicationIdentifier:
+      type: string
+      description: Provides the identifier of the application that contains the web module.
+      readOnly: true
+    coherenceClusterRuntime:
+      $ref: '#/components/schemas/CoherenceClusterRuntime'
+      description: Returns the Coherence Cluster related runtime MBean for this component.
+    componentName:
+      type: string
+      description: Provides the name of this component.
+      readOnly: true
+    configuredContextRoot:
+      type: string
+      description: "Returns the context root (context path) configured in weblogic-application.xml or web.xml file, or determined
+        by name of the war file. \n\nFor web application deployed in partition scope, this configured context root does not
+        include uriPrefix of the virtual target. The getContextRoot() method returns value which includes the uriPrefix of
+        the virtual target. \n\nFor web application deployed in domain scope, this method returns same value as getContextRoot()
+        method."
+      readOnly: true
+    contextRoot:
+      type: string
+      description: Returns the context root (context path) for the web application.
+      readOnly: true
+    EJBRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/EJBRuntime'
+      description: Provides an array of EJBRuntimeMBean objects for this module. The EJBRuntimeMBean instances can be 
+        cast to their appropriate subclass (EntityEJBRuntimeMBean, StatelessEJBRuntimeMBean, StatefulEJBRuntimeMBean or 
+        MessageDrivenEJBRuntimeMBean) to access additional runtime information for the particular EJB.
+      readOnly: true
+    filterDispatchedRequestsEnabled:
+      type: boolean
+      description: Indicates whether the dispatched requests are filtered as configured in weblogic.xml.
+      readOnly: true
+    indexDirectoryEnabled:
+      type: boolean
+      description: Provides the directory indexing indicator as it is configured in weblogic.xml.
+      readOnly: true
+    JSPCompileCommand:
+      type: string
+      description: Provides the JSP's compileCommand value as it is configured in weblogic.xml.
+      readOnly: true
+    JSPDebug:
+      type: boolean
+      description: Provides the JSP's debug/linenumbers parameter value as it is configured in weblogic.xml.
+      readOnly: true
+    JSPKeepGenerated:
+      type: boolean
+      description: Provides the JSP's KeepGenerated parameter value as it is configured in weblogic.xml.
+      readOnly: true
+    JSPPageCheckSecs:
+      type: integer
+      format: int64
+      description: Provides the JSP's PageCheckSecs value as it is configured in weblogic.xml.
+      readOnly: true
+    JSPVerbose:
+      type: boolean
+      description: Provides the JSP's verbose parameter value as it is configured in weblogic.xml.
+      readOnly: true
+    jaxRsApplications:
+      type: array
+      items:
+        $ref: '#/components/schemas/JaxRsApplicationRuntime'
+      description: Provides an array of JaxRsApplicationMBeans associated with this module.
+      readOnly: true
+    libraryRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/LibraryRuntime'
+      description: Returns the list of library runtime instances for each Java EE library that is contained in this 
+        enterprise application.
+      readOnly: true
+    logFilename:
+      type: string
+      description: Returns the log filename as configured in the "logging/log-filename" element in weblogic.xml.
+      readOnly: true
+    logRuntime:
+      $ref: '#/components/schemas/LogRuntime'
+      description: Returns the log runtime associated with the Java EE web application log.
+    moduleURI:
+      type: string
+      description: Returns the web URI as configured in application.xml for the web application. For a standalone WAR, 
+        it will return the docroot (if exploded) or the name of the WAR file (if archived).
+      readOnly: true
+    openSessionsCurrentCount:
+      type: integer
+      format: int32
+      description: "Provides a count of the current total number of open sessions in this module.\n\nReturns the current total
+        number of open sessions in this component."
+      readOnly: true
+    openSessionsHighCount:
+      type: integer
+      format: int32
+      description: Provides the high water mark of the total number of open sessions in this server. The count starts at
+        zero each time the server is activated. Note that this is an optimization method for a highly useful statistic 
+        that could be implemented less efficiently using change notification.
+      readOnly: true
+    pageFlows:
+      $ref: '#/components/schemas/PageFlowsRuntime'
+      description: Provides a hook for getting Beehive runtime metrics for the current module.
+    persistenceUnitRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/PersistenceUnitRuntime'
+      description: Provides an array of PersistenceUnitRuntimeMBean objects for this web application module.
+      readOnly: true
+    servletReloadCheckSecs:
+      type: integer
+      format: int32
+      description: Provides the servlet reload check seconds as it is configured in weblogic.xml.
+      readOnly: true
+    servletSessionsMonitoringIds:
+      type: array
+      items:
+        type: string
+      description: This method returns an array of monitoring IDs for HTTP sessions. By default, the monitoring ID for a
+        given HTTP session is a random string (not the same as session ID for security reasons). If the value of the 
+        element monitoring-attribute-name in session-descriptor of weblogic.xml is set, the monitoring ID will be the 
+        toString() of the attribute value in the session, using monitoring-attribute-name as the key.
+      readOnly: true
+    servlets:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServletRuntime'
+      description: "Provides an array of ServletRuntimeMBeans associated with this module.\n\nReturns an array of ServletRuntimeMBeans
+        associated with this component."
+      readOnly: true
+    sessionCookieComment:
+      type: string
+      description: By default, all applications on WebLogic Server specify "WebLogic Session Tracking Cookie" as the 
+        cookie comment. To provide a more specific comment, edit your application's `weblogic.xml` deployment 
+        descriptor.
+      readOnly: true
+    sessionCookieDomain:
+      type: string
+      description: "By default, clients can return cookies only to the server that issued the cookie. You can change this
+        default behavior by editing your application's `weblogic.xml` deployment descriptor.\n\nFor more information, see
+        the servlet specification."
+      readOnly: true
+    sessionCookieMaxAgeSecs:
+      type: integer
+      format: int32
+      description: Provides the life span of the session cookie, in seconds, after which it expires on the client. If 
+        the value is 0, the cookie expires immediately. If set to -1, the cookie expires when the user exits the 
+        browser.
+      readOnly: true
+    sessionCookieName:
+      type: string
+      description: By default, all applications on WebLogic Server specify "JSESSIONID" as the cookie name. To provide a
+        more specific name, edit your application's `weblogic.xml` deployment descriptor.
+      readOnly: true
+    sessionCookiePath:
+      type: string
+      description: Provides the path name to which clients send cookies.
+      readOnly: true
+    sessionIDLength:
+      type: integer
+      format: int32
+      description: Provides the session ID length configured for HTTP sessions.
+      readOnly: true
+    sessionInvalidationIntervalSecs:
+      type: integer
+      format: int32
+      description: Provides the invalidation check timer interval configured for HTTP sessions.
+      readOnly: true
+    sessionMonitoringEnabled:
+      type: boolean
+      description: Provides the session monitoring indicator as it is configured in weblogic.xml.
+      readOnly: true
+    sessionTimeoutSecs:
+      type: integer
+      format: int32
+      description: Provides the timeout configured for HTTP sessions.
+      readOnly: true
+    sessionsOpenedTotalCount:
+      type: integer
+      format: int32
+      description: Provides a count of the total number of sessions opened.
+      readOnly: true
+    singleThreadedServletPoolSize:
+      type: integer
+      format: int32
+      description: Provides the single threaded servlet pool size as it is configured in weblogic.xml.
+      readOnly: true
+    sourceInfo:
+      type: string
+      description: "Provides an informative string about the module's source.\n\nReturns an informative string about the component's
+        source."
+      readOnly: true
+    springRuntimeMBean:
+      $ref: '#/components/schemas/SpringRuntime'
+    status:
+      type: string
+      enum:
+      - DEPLOYED
+      - UNDEPLOYED
+      description: Provides the status of the component.
+      readOnly: true
+    webPubSubRuntime:
+      $ref: '#/components/schemas/WebPubSubRuntime'
+      description: Get HTTP pub-sub server runtime of this web application.
+    websocketApplicationRuntimeMBean:
+      $ref: '#/components/schemas/WebsocketApplicationRuntime'
+      description: Provides a WebsocketApplicationRuntimeMBean associated with this module.
+    wseeClientConfigurationRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeClientConfigurationRuntime'
+      description: Returns the list of Web Service client reference configuration runtime instances that are contained 
+        in this web application within an enterprise application.
+      readOnly: true
+    wseeClientRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeClientRuntime'
+      description: Returns the list of Web Service client runtime instances that are contained in this Enterprise 
+        JavaBean component.
+      readOnly: true
+    wseeV2Runtimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeV2Runtime'
+      description: Returns the list of Web Service runtime instances that are contained in this web application within 
+        an enterprise application.
+      readOnly: true

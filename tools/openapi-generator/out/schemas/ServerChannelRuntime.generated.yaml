@@ -1,0 +1,56 @@
+ServerChannelRuntime:
+  type: object
+  description: Runtime information for NetworkAccessPoints or "Channels".
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    acceptCount:
+      type: integer
+      format: int64
+      description: The number of sockets that have been accepted on this channel. This includes sockets both past and 
+        present so gives a good idea of the connection rate to the server.
+      readOnly: true
+    associatedVirtualTargetName:
+      type: string
+      description: Associated virtual-target name with this channel. This may be null.
+      readOnly: true
+    bytesReceivedCount:
+      type: integer
+      format: int64
+      description: The total number of bytes received on this channel.
+      readOnly: true
+    bytesSentCount:
+      type: integer
+      format: int64
+      description: The total number of bytes sent on this channel.
+      readOnly: true
+    channelName:
+      type: string
+      description: The channel name of this channel.
+      readOnly: true
+    connectionsCount:
+      type: integer
+      format: int64
+      description: The number of active connections and sockets associated with this channel.
+      readOnly: true
+    messagesReceivedCount:
+      type: integer
+      format: int64
+      description: The number of messages received on this channel.
+      readOnly: true
+    messagesSentCount:
+      type: integer
+      format: int64
+      description: The number of messages sent on this channel.
+      readOnly: true
+    publicURL:
+      type: string
+      description: The physical URL that this channel is listening on.
+      readOnly: true

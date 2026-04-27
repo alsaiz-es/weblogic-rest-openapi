@@ -1,0 +1,55 @@
+JDBCDataSourceBean:
+  type: object
+  description: "The top of the JDBC data source bean tree. \n\nJDBC data sources all have a JDBCDataSourceBean as their root
+    bean (a bean with no parent). The schema namespace that corresponds to this bean is \"http://xmlns.oracle.com/weblogic/jdbc-data-source\""
+  properties:
+    datasourceType:
+      type: string
+      enum:
+      - GENERIC
+      - MDS
+      - AGL
+      - UCP
+      - PROXY
+      description: "The data source type. Valid types are: \n\n- GENERIC - generic data source\n- \n- MDS - multi data source\n\
+        - \n- AGL - Active GridLink data source\n- \n- UCP - Universal Connection Pool data source\n- \n- PROXY - proxy for
+        multiple tenant data sources\n-"
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    id:
+      type: integer
+      format: int64
+      description: Gets the Id value
+    internalProperties:
+      $ref: '#/components/schemas/JDBCPropertiesBean'
+      description: Internal Use only, applications must not attempt to configure or use this.
+    JDBCConnectionPoolParams:
+      $ref: '#/components/schemas/JDBCConnectionPoolParamsBean'
+      description: "Gets the connection pool parameters of this data source \n\nConfiguration parameters for this data source's
+        connection pool are specified using the connection pool parameters bean."
+    JDBCDataSourceParams:
+      $ref: '#/components/schemas/JDBCDataSourceParamsBean'
+      description: "Gets the basic usage parameters of this data source \n\nConfiguration parameters for the basic usage of
+        this data source are specified using the data source parameters bean."
+    JDBCDriverParams:
+      $ref: '#/components/schemas/JDBCDriverParamsBean'
+      description: "Gets the driver parameters of this data source \n\nConfiguration parameters for the JDBC Driver used by
+        this data source are specified using the driver parameters bean."
+    JDBCOracleParams:
+      $ref: '#/components/schemas/JDBCOracleParamsBean'
+      description: "Gets the Oracle-related parameters of this data source \n\nConfiguration parameters for this data source's
+        Oracle-related behavior are specified using the Oracle parameters bean."
+    JDBCXAParams:
+      $ref: '#/components/schemas/JDBCXAParamsBean'
+      description: "Gets the XA-related parameters of this data source \n\nConfiguration parameters for this data source's
+        XA-related behavior are specified using the XA parameters bean."
+    name:
+      type: string
+      description: A unique name that identifies this data source in the WebLogic domain.
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    version:
+      type: string
+      description: Gets the "version" attribute
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true

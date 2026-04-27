@@ -1,0 +1,304 @@
+JDBCDataSourceRuntime:
+  type: object
+  description: This class is used for monitoring a WebLogic JDBC Data Source and its associated connection pool.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    deploymentState:
+      type: integer
+      format: int32
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      description: "The current deployment state of the module.\n\nA module can be in one and only one of the following states.
+        State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this module is
+        neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is prepared, but
+        not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED. State indicating at
+        this module is currently active.\n- \n- NEW. State indicating this module has just been created and is being initialized.\n\
+        -"
+      readOnly: true
+    moduleId:
+      type: string
+      description: "Returns the identifier for this Component. The identifier is unique within the application.\n\nTypical
+        modules will use the URI for their id. Web Modules will return their context-root since the web-uri may not be unique
+        within an EAR."
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Get the runtime mbeans for all work managers defined in this component
+      readOnly: true
+    activeConnectionsAverageCount:
+      type: integer
+      format: int32
+      description: "Average number of active connections in this instance of the data source.\n\nActive connections are connections
+        in use by an application. This value is only valid if the resource is configured to allow shrinking."
+      readOnly: true
+    activeConnectionsCurrentCount:
+      type: integer
+      format: int32
+      description: The number of connections currently in use by applications.
+      readOnly: true
+    activeConnectionsHighCount:
+      type: integer
+      format: int32
+      description: "Highest number of active database connections in this instance of the data source since the data source
+        was instantiated. \n\nActive connections are connections in use by an application."
+      readOnly: true
+    commitOutcomeRetryTotalCount:
+      type: integer
+      format: int64
+      description: The cumulative total number of commit outcome query retries conducted before resolving the outcome or
+        exceeding the retry seconds in this data source since the data source was deployed.
+      readOnly: true
+    connectionDelayTime:
+      type: integer
+      format: int32
+      description: "The average amount of time, in milliseconds, that it takes to create a physical connection to the database.\n\
+        \nThe value is calculated as summary of all times to connect divided by the total number of connections."
+      readOnly: true
+    connectionsTotalCount:
+      type: integer
+      format: int32
+      description: The cumulative total number of database connections created in this data source since the data source
+        was deployed.
+      readOnly: true
+    currCapacity:
+      type: integer
+      format: int32
+      description: The current count of JDBC connections in the connection pool in the data source.
+      readOnly: true
+    currCapacityHighCount:
+      type: integer
+      format: int32
+      description: Highest number of database connections available or in use (current capacity) in this instance of the
+        data source since the data source was deployed.
+      readOnly: true
+    databaseProductName:
+      type: string
+      description: The product name of the database that this data source is connected to.
+      readOnly: true
+    databaseProductVersion:
+      type: string
+      description: The product version of the database that this data source is connected to.
+      readOnly: true
+    driverName:
+      type: string
+      description: The product name of the JDBC driver that this data source is configured to use.
+      readOnly: true
+    driverVersion:
+      type: string
+      description: The version of the JDBC driver that this data source is configured to use.
+      readOnly: true
+    enabled:
+      type: boolean
+      description: "Indicates whether the data source is enabled or disabled:\n\n- `true` if the data source is enabled.\n\
+        - \n- `false` if the data source is disabled.\n-"
+      readOnly: true
+    failedRepurposeCount:
+      type: integer
+      format: int64
+      description: The number of repurpose errors that have occurred since the datasource was deployed.
+      readOnly: true
+    failedReserveRequestCount:
+      type: integer
+      format: int64
+      description: The cumulative, running count of requests for a connection from this data source that could not be 
+        fulfilled.
+      readOnly: true
+    failuresToReconnectCount:
+      type: integer
+      format: int32
+      description: "The number of times that the data source attempted to refresh a database connection and failed.\n\nFailures
+        may occur when the database is unavailable or when the network connection to the database is interrupted."
+      readOnly: true
+    highestNumAvailable:
+      type: integer
+      format: int32
+      description: Highest number of database connections that were idle and available to be used by an application at 
+        any time in this instance of the data source since the data source was deployed.
+      readOnly: true
+    highestNumUnavailable:
+      type: integer
+      format: int32
+      description: Highest number of database connections that were in use by applications or being tested by the system
+        in this instance of the data source since the data source was deployed.
+      readOnly: true
+    JDBCDriverRuntime:
+      $ref: '#/components/schemas/JDBCDriverRuntime'
+      description: Gets the JDBCDriverRuntimeMBean associated with this data source.
+    JDBCReplayStatisticsRuntimeMBean:
+      $ref: '#/components/schemas/JDBCReplayStatisticsRuntime'
+      description: Get the statistics for replay only if the datasource is using an Oracle replay driver for 12.1.0.2 
+        and later. Otherwise, null is returned. The statistics are a snapshort. To update the snapshot, call 
+        refreshStatistics() on the mbean.
+    lastTask:
+      type: array
+      items:
+        type: string
+      description: Get the last datasource Task
+      readOnly: true
+    leakedConnectionCount:
+      type: integer
+      format: int32
+      description: The number of leaked connections. A leaked connection is a connection that was reserved from the data
+        source but was not returned to the data source by calling `close()`.
+      readOnly: true
+    numAvailable:
+      type: integer
+      format: int32
+      description: The number of database connections that are currently idle and available to be used by applications 
+        in this instance of the data source.
+      readOnly: true
+    numUnavailable:
+      type: integer
+      format: int32
+      description: The number of connections currently in use by applications or being tested in this instance of the 
+        data source.
+      readOnly: true
+    prepStmtCacheAccessCount:
+      type: integer
+      format: int64
+      description: The cumulative, running count of the number of times that the statement cache was accessed.
+      readOnly: true
+    prepStmtCacheAddCount:
+      type: integer
+      format: int64
+      description: "The cumulative, running count of the number of statements added to the statement cache.\n\nEach connection
+        in the connection pool has its own cache of statements. This number is the sum of the number of statements added to
+        the caches for all connections in the connection pool."
+      readOnly: true
+    prepStmtCacheCurrentSize:
+      type: integer
+      format: int32
+      description: "The number of prepared and callable statements currently cached in the statement cache.\n\nEach connection
+        in the connection pool has its own cache of statements. This number is the sum of the number of statements in the
+        caches for all connections in the connection pool."
+      readOnly: true
+    prepStmtCacheDeleteCount:
+      type: integer
+      format: int64
+      description: "The cumulative, running count of statements discarded from the cache.\n\nEach connection in the connection
+        pool has its own cache of statements. This number is the sum of the number of statements that were discarded from
+        the caches for all connections in the connection pool."
+      readOnly: true
+    prepStmtCacheHitCount:
+      type: integer
+      format: int32
+      description: The cumulative, running count of the number of times that statements from the cache were used.
+      readOnly: true
+    prepStmtCacheMissCount:
+      type: integer
+      format: int32
+      description: The number of times that a statement request could not be satisfied with a statement from the cache.
+      readOnly: true
+    properties:
+      type: object
+      description: "The list of properties for a data source that are passed to the JDBC driver when creating database connections.\n\
+        \nThis is a privileged operation that can only be invoked by an authorized user."
+      readOnly: true
+    repurposeCount:
+      type: integer
+      format: int64
+      description: The number of times connections have been repurposed since the datasource was deployed.
+      readOnly: true
+    reserveRequestCount:
+      type: integer
+      format: int64
+      description: The cumulative, running count of requests for a connection from this data source.
+      readOnly: true
+    resolvedAsCommittedTotalCount:
+      type: integer
+      format: int64
+      description: The cumulative total number of commit outcomes successfully resolved as committed in this data source
+        since the data source was deployed. This does not refer to the number of outcome query retries used to resolve 
+        the outcomes.
+      readOnly: true
+    resolvedAsNotCommittedTotalCount:
+      type: integer
+      format: int64
+      description: The cumulative total number of commit outcomes successfully resolved as not committed in this data 
+        source since the data source was deployed. This does not refer to the number of outcome query retries used to 
+        resolve the outcomes.
+      readOnly: true
+    state:
+      type: string
+      enum:
+      - Running
+      - Suspended
+      - Shutdown
+      - Unhealthy
+      - Overloaded
+      - Unknown
+      description: "The current state of the data source.\n\nPossible states are:\n\n- `Running` - the data source is enabled
+        (deployed and not `Suspended`). This is the normal state of the data source. This state includes conditions when the
+        database server is not available and the data source is created (creation retry must be enabled) or when all connections
+        have failed connection tests (on creation, on reserve, or periodic testing).\n- \n- `Suspended` - the data source
+        has been disabled.\n- \n- `Shutdown` - the data source is shutdown and all database connections have been closed.\n\
+        - \n- `Overloaded` - all resources in pool are in use.\n- \n- `Unknown` - the data source state is unknown.\n-"
+      readOnly: true
+    tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/JDBCDataSourceTaskRuntime'
+      description: Get preexisting datasource Tasks
+      readOnly: true
+    unresolvedTotalCount:
+      type: integer
+      format: int64
+      description: The cumulative total number of commit outcomes unsuccessfully resolved in this data source since the 
+        data source was deployed. This does not refer to the number of outcome query retries used to resolve the 
+        outcomes.
+      readOnly: true
+    versionJDBCDriver:
+      type: string
+      description: The driver class name of the JDBC driver used to create database connections.
+      readOnly: true
+    waitSecondsHighCount:
+      type: integer
+      format: int32
+      description: "The highest number of seconds that an application waited for a connection (the longest connection reserve
+        wait time) from this instance of the connection pool since the connection pool was instantiated.\n\nThis value is
+        updated when a completed `getConnection` request takes longer to return a connection than any previous request."
+      readOnly: true
+    waitingForConnectionCurrentCount:
+      type: integer
+      format: int32
+      description: The number of connection requests waiting for a database connection.
+      readOnly: true
+    waitingForConnectionFailureTotal:
+      type: integer
+      format: int64
+      description: "The cumulative, running count of requests for a connection from this data source that had to wait before
+        getting a connection and eventually failed to get a connection.\n\nWaiting connection requests can fail for a variety
+        of reasons, including waiting for longer than the ConnectionReserveTimeoutSeconds."
+      readOnly: true
+    waitingForConnectionHighCount:
+      type: integer
+      format: int32
+      description: Highest number of application requests concurrently waiting for a connection from this instance of 
+        the data source.
+      readOnly: true
+    waitingForConnectionSuccessTotal:
+      type: integer
+      format: int64
+      description: The cumulative, running count of requests for a connection from this data source that had to wait 
+        before getting a connection and eventually succeeded in getting a connection.
+      readOnly: true
+    waitingForConnectionTotal:
+      type: integer
+      format: int64
+      description: The cumulative, running count of requests for a connection from this data source that had to wait 
+        before getting a connection, including those that eventually got a connection and those that did not get a 
+        connection.
+      readOnly: true

@@ -1,0 +1,40 @@
+ComponentRuntime:
+  type: object
+  description: Base class for all runtime mbeans that provide status of running modules.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    deploymentState:
+      type: integer
+      format: int32
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      description: "The current deployment state of the module.\n\nA module can be in one and only one of the following states.
+        State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this module is
+        neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is prepared, but
+        not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED. State indicating at
+        this module is currently active.\n- \n- NEW. State indicating this module has just been created and is being initialized.\n\
+        -"
+      readOnly: true
+    moduleId:
+      type: string
+      description: "Returns the identifier for this Component. The identifier is unique within the application.\n\nTypical
+        modules will use the URI for their id. Web Modules will return their context-root since the web-uri may not be unique
+        within an EAR."
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Get the runtime mbeans for all work managers defined in this component
+      readOnly: true

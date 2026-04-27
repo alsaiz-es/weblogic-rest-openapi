@@ -1,0 +1,1450 @@
+Server:
+  type: object
+  description: This class represents a individual WebLogic Server. A WebLogic Server is a Java process that is a 
+    container for Java EE applications.
+  properties:
+    name:
+      type: string
+      description: "An alphanumeric name for this server instance. (Spaces are not valid.)\n\nThe name must be unique for
+        all configuration objects in the domain. Within a domain, each server, machine, cluster, JDBC connection pool, virtual
+        host, and any other resource type must be named uniquely and must not use the same name as the domain.\n\nFor more
+        information on server naming conventions, see Domain and Server Name Restrictions in Understanding Domain Configuration
+        for Oracle WebLogic Server.\n\nThe server name is not used as part of the URL for applications that are deployed on
+        the server. It is for your identification purposes only. The server name displays in the Administration Console, and
+        if you use WebLogic Server command-line utilities or APIs, you use this name to identify the server.\n\nAfter you
+        have created a server, you cannot change its name. Instead, clone the server and provide a new name for the clone."
+      x-weblogic-restart-needed: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+    dynamicallyCreated:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Return whether the MBean was created dynamically or is persisted to config.xml
+    id:
+      type: integer
+      format: int64
+      description: Return the unique id of this MBean instance
+    notes:
+      type: string
+      description: "Optional information that you can include to describe this configuration.\n\nWebLogic Server saves this
+        note in the domain's configuration file (`config.xml`) as XML PCDATA. All left angle brackets (<) are converted to
+        the XML entity `&lt;`. Carriage returns/line feeds are preserved.\n\nNote: If you create or edit a note from the Administration
+        Console, the Administration Console does not preserve carriage returns/line feeds."
+    tags:
+      type: array
+      items:
+        type: string
+      description: Return all tags on this Configuration MBean
+    addWorkManagerThreadsByCpuCount:
+      type: boolean
+      default:
+        derivedDefault: true
+      description: "Enables increased efficiency of the self-tuning thread pool by aligning it with the Exalogic processor
+        architecture threading capabilities. Use only when configuring a WebLogic domain for Oracle Exalogic. \n\n- Enabling
+        this attribute increases efficiency during I/O in environments with high network throughput.\n- \n- Disabling this
+        attribute allows the thread pool to self-tune to match the demand of the workload at the expense of longer ramp up
+        time.\n-"
+      x-weblogic-restart-needed: true
+    administrationProtocol:
+      type: string
+      enum:
+      - t3s
+      - https
+      - iiops
+      - t3
+      - http
+      - iiop
+      default:
+        derivedDefault: true
+      deprecated: true
+      description: "Returns the protocol to be used for administrative connections when none is specified.\n\n_Deprecated_:
+        14.1.2.0.0"
+      x-weblogic-restart-needed: true
+    allowShrinkingPriorityRequestQueue:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Specifies whether self-tuning should allow shrinking of its priority based queue for pending requests
+        after it has grown in size due to busy workload, and whether it should try to purge work requests that have 
+        already been picked up for processing due to minimum threads constraints before growing the queue. Setting this 
+        to true would help reduce memory footprint after the busy work period has ended, at the expense of the overhead 
+        of growing the request queue again at the next period of busy workload. It would also help to reduce the amount 
+        of memory allocated for the request queue, at the expense of the overhead required in purging already processed 
+        work requests from the queue.
+      x-weblogic-restart-needed: true
+    completeMessageTimeout:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 60
+      description: "The maximum number of seconds that this server waits for a complete message to be received. If you configure
+        network channels for this server, each channel can override this message timeout.\n\nThis timeout helps guard against
+        a denial of service attack in which a caller indicates that it will be sending a message of a certain size which it
+        never finishes sending.\n\nCompleteMessageTimeout affects the HTTP Response, such that if WebLogic Server discovers
+        sockets inactive for longer than the CompleteMessageTimeout, the server will close these sockets."
+    completeWriteTimeout:
+      type: integer
+      format: int32
+      default:
+        derivedDefault: true
+      description: "The maximum number of seconds that this server waits for a complete HTTP response to be sent.\n\nA value
+        of `0` disables the complete write timeout. The default value is derived from the CompleteHTTPMessageTimeout. If it
+        is `-1`, then the CompleteMessageTimeout value is used for the default value."
+      x-weblogic-restart-needed: true
+    connectTimeout:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 0
+      description: The amount of time that this server should wait to establish an outbound socket connection before 
+        timing out. A value of `0` disables server connect timeout.
+    DGCIdlePeriodsUntilTimeout:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 5
+      description: The number of idle periods allowed before the object is collected.
+      x-weblogic-restart-needed: true
+    defaultProtocol:
+      type: string
+      enum:
+      - t3
+      - t3s
+      - http
+      - https
+      - iiop
+      - iiops
+      default:
+        value:
+          value: t3
+      description: The protocol to use for connections when none is specified.
+      x-weblogic-restart-needed: true
+    defaultSecureProtocol:
+      type: string
+      enum:
+      - t3s
+      - https
+      - iiops
+      default:
+        value:
+          value: t3s
+      description: The protocol to use for secure connections when none is specified.
+      x-weblogic-restart-needed: true
+    eagerThreadLocalCleanup:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether to clean up all ThreadLocals storage from self-tuning thread pool threads after 
+        they have finished processing each work request. By default, the self-tuning thread pool only cleans up 
+        ThreadLocal storage in its threads after an application is undeployed to avoid ClassLoader memory leak.
+      x-weblogic-restart-needed: true
+    executeQueues:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExecuteQueue'
+      description: Returns the execute queues configured for this server.
+    gatheredWritesEnabled:
+      type: boolean
+      default:
+        derivedDefault: true
+      description: Enables gathered writes over NIO socket channels. Enabling this attribute increases efficiency during
+        I/O in environments with high network throughput and should be used only when configuring a WebLogic domain for 
+        Oracle Exalogic.
+      x-weblogic-restart-needed: true
+    IIOP:
+      $ref: '#/components/schemas/IIOP'
+      description: Returns the kernel's IIOP configuration. An IIOP MBean is always linked to a particular kernel and 
+        cannot be changed. Individual attributes on the IIOP MBean may be changed, as documented, but the MBean itself 
+        may not.
+    idleConnectionTimeout:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 65
+      description: "The maximum number of seconds that a connection is allowed to be idle before it is closed by the server.
+        The T3 and T3S protocols ignore this attribute. If you configure network channels for this server, each channel can
+        override this idle connection message timeout.\n\nThis timeout helps guard against server deadlock through too many
+        open connections."
+    idlePeriodsUntilTimeout:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 4
+      description: The number of idle periods until peer is considered unreachable.
+      x-weblogic-restart-needed: true
+    instrumentStackTraceEnabled:
+      type: boolean
+      default:
+        secureModeValue:
+          value: false
+        value:
+          value: true
+      description: "Specifies whether the server returns stack traces for RMI calls that generate exceptions.\n\nWith RMI
+        stack tracking enabled, if a client issues an RMI call to a server subsystem or to a module running within the server,
+        and if the subsystem or module generates an exception that includes a stack trace, the server will return the exception
+        as well as the stack trace. With it disabled, the server will return the exception without the stack trace details."
+    log:
+      $ref: '#/components/schemas/Log'
+      description: Returns the log settings for this kernel. A Log MBean is always linked to a particular kernel and 
+        cannot be changed. Individual attributes on the Log MBean may be changed, as documented, but the MBean itself 
+        may not.
+    logCriticalRemoteExceptionsEnabled:
+      type: boolean
+      default:
+        secureModeValue:
+          value: true
+        value:
+          value: false
+      description: Specifies whether the server message log includes only critical exceptions that are raised in remote 
+        systems. Non-critical exceptions, such as javax.management.InstanceNotFoundException and 
+        javax.management.AttributeNotFoundException, will not be included in the message log.
+    logRemoteExceptionsEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether the server message log includes exceptions that are raised in remote systems.
+    maxMessageSize:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 10000000
+      description: "The maximum number of bytes allowed in messages that are received over all supported protocols, unless
+        overridden by a protocol-specific setting or a custom channel setting.\n\nThe order of precedence for setting message
+        size maximums is as follows:\n\n- \n\nA channel-wide maximum in a custom network channel.\n\n- \n- \n\nA protocol-specific
+        setting in the default network channel.\n\nSee\n\n- getMaxCOMMessageSize()\n- \n- getMaxHTTPMessageSize()\n- \n- getMaxIIOPMessageSize()\n\
+        - \n- getMaxT3MessageSize()\n- \n\n- \n- \n\nThe message maximum in this attribute.\n\n- \n\nThis maximum message
+        size helps guard against a denial of service attack in which a caller attempts to force the server to allocate more
+        memory than is available thereby keeping the server from responding quickly to other requests.\n\nA client can set
+        this value using the `-Dweblogic.MaxMessageSize` property."
+    maxOpenSockCount:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: -1
+      description: "The maximum number of open sockets allowed in server at a given point of time.\n\nWhen the maximum threshold
+        is reached, the server stops accepting new requests until the number of sockets drops below the threshold.\n\nA value
+        less than `0` indicates an unlimited size."
+    muxerClass:
+      type: string
+      default:
+        derivedDefault: true
+      description: "Non-blocking IO is enabled by default on the server side.\n\nThe default value is `weblogic.socket.NIOSocketMuxer`.\
+        \ \n\nThe Certicom SSL implementation is not supported with NIOSocketMuxer. If you need to secure internet communication,
+        Oracle recommends enabling JSSE (Java Secure Socket Extension)."
+      x-weblogic-restart-needed: true
+    nativeIOEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Specifies whether native I/O is enabled for the server.
+      x-weblogic-restart-needed: true
+    outboundEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Specifies whether new server-to-server connections may consider the default server channel when initiating
+        a connection. This is only relevant if the connection needs to be bound to the default listen address. This will only
+        work for binary protocols that support both outbound and inbound traffic.\n\nWhen this feature is not enabled, connections
+        are initiated using a local address selected by the underlying hardware. For the default channel this is usually what
+        is wanted for IP-routing to be effective. Note that since the default is false, other outbound channels will be considered
+        in preference to the default channel.\n\nDefault administration channels, created when the domain-wide administration
+        port is turned on, are always considered and bound when initiating an administrative connection. To allow IP-routing
+        for administration traffic create custom admin with NetworkAccessPointMBean.isOutboundEnabled set to false instead
+        of enabling the domain-wide ADMIN port."
+    outboundPrivateKeyEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether the SSL identity specified by SSLMBean.getServerPrivateKeyAlias() for this server 
+        should be used for outbound SSL connections on the default server channel. In normal circumstances the outbound 
+        identity is determined by the caller's environment.
+    periodLength:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 60000
+      description: The time interval in milliseconds of the heartbeat period. A value of 0 indicates that heartbeats are
+        turned off.
+      x-weblogic-restart-needed: true
+    printStackTraceInProduction:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether the server message log includes exception stack trace that are raised in remote 
+        systems.
+    RMIDeserializationMaxTimeLimit:
+      type: integer
+      format: int64
+      default:
+        value:
+          value: 0
+      description: "Sets the maximum time limit, in milliseconds, before a deserialization process is terminated. This time
+        limit helps guard against a denial of service attack.\n\nEnter a value of 100 ms or greater to enable. If set to 0,
+        the RMIDeserializationMaxTimeLimit attribute is disabled and there is no maximum time limit."
+    reverseDNSAllowed:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether the kernel is allowed to perform reverse DNS lookups.
+    SSL:
+      $ref: '#/components/schemas/SSL'
+      description: Returns the kernel's SSL configuration. An SSL MBean is always linked to a particular kernel and 
+        cannot be changed. Individual attributes on the SSL MBean may be changed, as documented, but the MBean itself 
+        may not.
+    scatteredReadsEnabled:
+      type: boolean
+      default:
+        derivedDefault: true
+      description: Enables scattered reads over NIO socket channels. Enabling this attribute increases efficiency during
+        I/O in environments with high network throughput and should be used only when configuring a WebLogic domain for 
+        Oracle Exalogic.
+      x-weblogic-restart-needed: true
+    selfTuningThreadPoolSizeMax:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 400
+      description: "Sets the maximum thread pool size of the self-tuning thread pool.\n\nThe self-tuning thread pool starts
+        with the default size of 1. It grows and shrinks automatically as required. Setting this attribute changes the default
+        maximum pool size. The active thread count will never increase beyond this value. This value defines the maximum number
+        of threads permitted in the server. Note that the server will add threads only if it improves throughput. Measurements
+        are taken every two seconds and the decision to increase or decrease the thread count is based on the current throughput
+        measurement versus past values. \n\nThis attribute is used only when setUse81StyleExecuteQueues is turned off which
+        is the default."
+      x-weblogic-restart-needed: true
+    selfTuningThreadPoolSizeMin:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 1
+      description: "Get the minimum thread pool size of the self-tuning thread pool.\n\nThe self-tuning thread pool starts
+        with the default size of 1. It grows and shrinks automatically as required. Setting this attribute changes the default
+        minimum pool size. The thread count will never shrink below this value. It can add threads to improve throughput but
+        will never decrease below the set minimum. \n\nThis attribute is used only when setUse81StyleExecuteQueues is turned
+        off which is the default."
+      x-weblogic-restart-needed: true
+    socketBufferSizeAsChunkSize:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Specifies whether the server's buffer size for sending or receiving data through a raw socket should be
+        set to 4KB. \n\nOtherwise, the server does not impose a limit to the buffer size and defers to the operating system.
+        This option is useful only on some operating systems for improving performance. It should be disabled in most environments."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    socketReaders:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: -1
+      description: The number of socket reader threads.
+      x-weblogic-restart-needed: true
+    stuckThreadTimerInterval:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 60
+      description: The number of seconds after which WebLogic Server periodically scans threads to see if they have been
+        continually working for the configured maximum length of time.
+      x-weblogic-restart-needed: true
+    threadPoolPercentSocketReaders:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 33
+      description: The percentage of execute threads from the default queue that can be used as socket readers.
+    use81StyleExecuteQueues:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Backward compatibility mode to switch to 8.1 execute queues instead of WorkManagers. Each of the 
+        WorkManagers is converted to an individual execute queue. Setting this attribute requires a server restart.
+      x-weblogic-restart-needed: true
+    useConcurrentQueueForRequestManager:
+      type: boolean
+      default:
+        derivedDefault: true
+      description: Reduces lock contention by using concurrent buffer queue to park incoming requests. Enabling this 
+        attribute increases throughput as requests are scheduled without acquiring any locks.
+      x-weblogic-restart-needed: true
+    useDetailedThreadName:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether to includes detailed information in self-tuning thread pool thread names. Setting 
+        this flag as true would include additional information, such as the name of the Work Manager for which the 
+        execute thread is executing the task, but at the expense of overhead in keeping the thread name updated with 
+        such information.
+    useEnhancedIncrementAdvisor:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Specifies whether self-tuning should use the enhanced IncrementAdvisor implementation that uses a 
+        different algorithm to adjust the size of the self-tuning thread pool.
+      x-weblogic-restart-needed: true
+    useEnhancedPriorityQueueForRequestManager:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Reduces lock contention by using the enhanced ConcurrentCalendarQueue as the priority based queue for
+        pending requests that are waiting for a thread. \n\nThis attribute should be enabled only in an Oracle Exalogic environment."
+      x-weblogic-restart-needed: true
+    virtualThreadEnableOption:
+      type: string
+      enum:
+      - disabled
+      - enabled
+      default:
+        derivedDefault: true
+      description: Get the configuration settings for the virtual thread enable option.
+      x-weblogic-restart-needed: true
+    acceptBacklog:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 300
+      description: "The number of backlogged, new TCP connection requests that should be allowed for this server's regular
+        and SSL ports.\n\nSetting the backlog to `0` may prevent this server from accepting any incoming connection on some
+        operating systems."
+    adminReconnectIntervalSeconds:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 10
+      description: The number of seconds between reconnection attempts to the admin server. When the admin server fails 
+        the managed server will periodically try to connect back to it.
+    administrationPort:
+      type: integer
+      format: int32
+      default:
+        derivedDefault: true
+      description: "The secure administration port for the server. This port requires that you enable the domain's administration
+        port and that SSL is configured and enabled.\n\nBy default, the server uses the administration port that is specified
+        at the domain level. To override the domain-level administration port for the current server instance, set this server's
+        administration port."
+      x-weblogic-restart-needed: true
+    autoMigrationEnabled:
+      type: boolean
+      description: Specifies whether Node Manager can automatically restart this server and its services on another 
+        machine if the server fails.
+      x-weblogic-restart-needed: true
+    autoRestart:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Specifies whether the Node Manager can automatically restart this server if it crashes or otherwise 
+        goes down unexpectedly.
+    COM:
+      $ref: '#/components/schemas/COM'
+      deprecated: true
+      description: "Returns the server's COM configuration.\n\n_Deprecated_: 12.2.1.2.0"
+    COMEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      deprecated: true
+      description: "Specifies whether COM support is enabled on the regular (non-SSL) port. COM is not supported on the SSL
+        port. (The remaining fields on this page are relevant only if you check this box.)\n\n_Deprecated_: 12.2.1.2.0"
+      x-weblogic-restart-needed: true
+    candidateMachines:
+      type: array
+      items:
+        type: array
+        items:
+          type: string
+      description: "Limits the list of candidate machines that the cluster specifies. (Requires you to enable this server
+        for automatic migration and to configure the cluster with a set of candidate machines.)\n\nIf this server fails and
+        if it is enabled for automatic migration, Node Manager automatically restarts it. By default, Node Manager restarts
+        the server on any of the candidate machines that the cluster specifies (in order of preference that you configured
+        in the cluster). To change the default, you use this server's list of candidate machines to create a subset of the
+        cluster-wide candidates. You can also change the order of preference."
+      x-weblogic-restart-needed: true
+    classpathServletDisabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "The ClasspathServlet will serve any class file in the classpath and is registered by default in every
+        Web application (including management). It does not need to be turned on for many applications though, and represents
+        a security hole if unchecked while the ClassPathServletSecureModeEnabled is also set to false.\n\nWLS components such
+        as JDBC and JMS rely on the ClasspathServlet. If the servlet can not be disabled, then set the ClassPathServletSecureModeEnabled
+        to true."
+      x-weblogic-restart-needed: true
+    classpathServletSecureModeEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: "If secure mode is enabled, the ClasspathServlet will serve only class files from wellknown packages required
+        for JDBC and JMS functionality. If secure mode is disabled, it represents a security hole if unchecked as the ClassPatchServlet
+        will serve any class in the classpath and is registered by default in every Web application (including management).\n\
+        \nIf set to true, the ClasspathServlet will not be disabled by the DefaultInternalServletsDisabled value of true."
+      x-weblogic-restart-needed: true
+    cleanupOrphanedSessionsEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Indicates if replication service should cleanup orphaned http and ejb sessions. Orphaned sessions are
+        http and ejb session instances that are not referenced by the replication service.
+    clientCertProxyEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Specifies whether the `HttpClusterServlet` proxies the client certificate in a special header.\n\nBy default
+        (or if you specify `false`), the `weblogic.xml` deployment descriptor for each web application that is deployed on
+        this server determines whether the web application trusts certificates sent from the proxy server plugin. By default
+        (or if the deployment descriptor specifies `false`), users cannot log in to the web application from a proxy server
+        plugin.\n\nA value of `true` causes proxy-server plugins to pass identity certifications from clients to all web applications
+        that are deployed on this server instance. A proxy-server plugin encodes each identify certification in the `WL-Proxy-Client-Cert`
+        header and passes the header to WebLogic Server instances. A WebLogic Server instance takes the certificate information
+        from the header, trusting that it came from a secure source, and uses that information to authenticate the user.\n\
+        \nIf you specify `true`, use a `weblogic.security.net.ConnectionFilter` to ensure that this WebLogic Server instance
+        accepts connections only from the machine on which the proxy-server plugin is running. Specifying `true` without using
+        a connection filter creates a security vulnerability because the `WL-Proxy-Client-Cert` header can be spoofed.\n\n\
+        A cluster can also specify whether the `HttpClusterServlet` proxies the client certificate in a special header. The
+        cluster-level setting overrides the setting in individual servers that are part of the cluster."
+      x-weblogic-restart-needed: true
+    cluster:
+      type: array
+      items:
+        type: string
+      description: "The cluster, or group of WebLogic Server instances, to which this server belongs.\n\nIf set, the server
+        will listen for cluster multicast events."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    clusterWeight:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 100
+      description: "The proportion of the load that this server will bear, relative to other servers in a cluster.\n\nIf all
+        servers have the default weight or the same weight, each bears an equal proportion of the load. If one server has
+        weight 50 and all other servers have weight 100, the 50-weight server will bear half as much load as any other server."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    coherenceClusterSystemResource:
+      type: array
+      items:
+        type: string
+      description: The system-level Coherence cluster resource associated with this server.
+      x-weblogic-restart-needed: true
+    coherenceMemberConfig:
+      $ref: '#/components/schemas/CoherenceMemberConfig'
+      description: Returns the Coherence Operational Config overrides associated with this Server.
+    customIdentityKeyStoreFileName:
+      type: string
+      default:
+        value:
+          value:
+      description: "The source of the identity keystore. For a JKS or PKCS12 keystore, the source is the path and file name.
+        For an Oracle Key Store Service (KSS) keystore, the source is the KSS URI.\n\nIf using a JKS or PKCS12 keystore, the
+        keystore path name must either be absolute or relative to where the server was booted.\n\nIf using a KSS keystore,
+        the keystore URI must be of the form:\n\n`kss://system/keystorename`\n\nwhere `keystorename` is the name of the keystore
+        registered in KSS.\n\nThe value in this attribute is only used if `KeyStores` is `CUSTOM_IDENTITY_AND_JAVA_STANDARD_TRUST`,
+        `CUSTOM_IDENTITY_AND_CUSTOM_TRUST` or `CUSTOM_IDENTITY_AND_COMMAND_LINE_TRUST`."
+    customIdentityKeyStorePassPhrase:
+      type: string
+      description: "The encrypted custom identity keystore's passphrase. If empty or null, then the keystore will be opened
+        without a passphrase.\n\nThis attribute is only used if KeyStores is `CUSTOM_IDENTITY_AND_JAVA_STANDARD_TRUST`, `CUSTOM_IDENTITY_AND_CUSTOM_TRUST`
+        or `CUSTOM_IDENTITY_AND_COMMAND_LINE_TRUST`.\n\nWhen you get the value of this attribute, WebLogic Server does the
+        following:\n\n- Retrieves the value of the `CustomIdentityKeyStorePassPhraseEncrypted` attribute.\n- \n- Decrypts
+        the value and returns the unencrypted password as a String.\n- \n\nWhen you set the value of this attribute, WebLogic
+        Server does the following:\n\n- Encrypts the value.\n- \n- Sets the value of the `CustomIdentityKeyStorePassPhraseEncrypted`
+        attribute to the encrypted value.\n- \n\nUsing this attribute (`CustomIdentityKeyStorePassPhrase`) is a potential
+        security risk because the String object (which contains the unencrypted password) remains in the JVM's memory until
+        garbage collection removes it and the memory is reallocated. Depending on how memory is allocated in the JVM, a significant
+        amount of time could pass before this unencrypted data is removed from memory.\n\nInstead of using this attribute,
+        use `CustomIdentityKeyStorePassPhraseEncrypted`."
+      x-weblogic-restart-needed: true
+    customIdentityKeyStorePassPhraseEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      default:
+        value:
+          value:
+      description: Returns encrypted pass phrase defined when creating the keystore.
+    customIdentityKeyStoreType:
+      type: string
+      default:
+        value:
+          value:
+      description: "The type of the keystore. Generally, this is `JKS` or `PKCS12`. If using the Oracle Key Store Service,
+        this is `KSS`\n\nIf empty or null, then the JDK's default keystore type (specified in `java.security`) is used. The
+        custom identity key store type is only used if `KeyStores` is `CUSTOM_IDENTITY_AND_JAVA_STANDARD_TRUST`, `CUSTOM_IDENTITY_AND_CUSTOM_TRUST`
+        or `CUSTOM_IDENTITY_AND_COMMAND_LINE_TRUST`."
+    customTrustKeyStoreFileName:
+      type: string
+      default:
+        value:
+          value:
+      description: "The source of the custom trust keystore. For a JKS or PKCS12 keystore, the source is the path and file
+        name. For an Oracle Key Store Service (KSS) keystore, the source is the KSS URI.\n\nIf using a JKS or PKCS12 keystore,
+        the keystore path name must either be absolute or relative to where the server was booted.\n\nIf using a KSS keystore,
+        the keystore URI must be of the form:\n\n`kss://system/keystorename`\n\nwhere `keystorename` is the name of the keystore
+        registered in KSS.\n\nThe value in this attribute is only used if `KeyStores` is `CUSTOM_IDENTITY_AND_CUSTOM_TRUST`."
+    customTrustKeyStorePassPhrase:
+      type: string
+      description: "The custom trust keystore's passphrase. If empty or null, then the keystore will be opened without a passphrase.\n\
+        \nThis attribute is only used if KeyStores is CUSTOM_IDENTITY_AND_CUSTOM_TRUST.\n\nWhen you get the value of this
+        attribute, WebLogic Server does the following:\n\n- Retrieves the value of the `CustomTrustKeyStorePassPhraseEncrypted`
+        attribute.\n- \n- Decrypts the value and returns the unencrypted password as a String.\n- \n\nWhen you set the value
+        of this attribute, WebLogic Server does the following:\n\n- Encrypts the value.\n- \n- Sets the value of the `CustomTrustKeyStorePassPhraseEncrypted`
+        attribute to the encrypted value.\n- \n\nUsing this attribute (`CustomTrustKeyStorePassPhrase`) is a potential security
+        risk because the String object (which contains the unencrypted password) remains in the JVM's memory until garbage
+        collection removes it and the memory is reallocated. Depending on how memory is allocated in the JVM, a significant
+        amount of time could pass before this unencrypted data is removed from memory.\n\nInstead of using this attribute,
+        use `CustomTrustKeyStorePassPhraseEncrypted`."
+      x-weblogic-restart-needed: true
+    customTrustKeyStorePassPhraseEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      default:
+        value:
+          value:
+      description: "The custom trust keystore's encrypted passphrase. If empty or null, then the keystore will be opened without
+        a passphrase.\n\nThis attribute is only used if KeyStores is CUSTOM_IDENTITY_AND_CUSTOM_TRUST.\n\nTo set this attribute,
+        use `weblogic.management.EncryptionHelper.encrypt()` to encrypt the value. Then set this attribute to the output of
+        the encrypt() method. \n\nTo compare a password that a user enters with the encrypted value of this attribute, use
+        the same WebLogic Server instance that you used to set and encrypt this attribute and use `weblogic.management.EncryptionHelper.encrypt()`
+        to encrypt the user-supplied password. Then compare the encrypted values."
+    customTrustKeyStoreType:
+      type: string
+      default:
+        value:
+          value:
+      description: "The type of the keystore. Generally, this is `JKS` or `PKCS12`. If using the Oracle Key Store Service,
+        this is `KSS`\n\nIf empty or null, then the JDK's default keystore type (specified in `java.security`) is used. This
+        keystore type is only used if KeyStores is CUSTOM_IDENTITY_AND_CUSTOM_TRUST."
+    dataSource:
+      $ref: '#/components/schemas/DataSource'
+      description: The datasource configuration for the server.
+    defaultFileStore:
+      $ref: '#/components/schemas/DefaultFileStore'
+      description: Controls the configuration of the default persistent store on this server. Each server has a default 
+        store, which is a file-based object repository used by various subsystems.
+    defaultIIOPPassword:
+      type: string
+      default:
+        value:
+          value:
+      description: "The password for the default IIOP user. (Requires you to enable IIOP.)\n\nAs of 8.1 sp4, when you get
+        the value of this attribute, WebLogic Server does the following:\n\n- Retrieves the value of the `DefaultIIOPPasswordEncrypted`
+        attribute.\n- \n- Decrypts the value and returns the unencrypted password as a String.\n- \n\nUsing this attribute
+        (`DefaultIIOPPassword`) is a potential security risk because the String object (which contains the unencrypted password)
+        remains in the JVM's memory until garbage collection removes it and the memory is reallocated. Depending on how memory
+        is allocated in the JVM, a significant amount of time could pass before this unencrypted data is removed from memory.\n\
+        \nInstead of using this attribute, use `DefaultIIOPPasswordEncrypted`."
+      x-weblogic-restart-needed: true
+    defaultIIOPPasswordEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      default:
+        value:
+          value:
+      description: "The encrypted password for the default IIOP user.\n\nTo set this attribute, use `weblogic.management.EncryptionHelper.encrypt()`
+        to encrypt the value. Then set this attribute to the output of the encrypt() method.\n\nTo compare a password that
+        a user enters with the encrypted value of this attribute, go to the same WebLogic Server instance that you used to
+        set and encrypt this attribute and use `weblogic.management.EncryptionHelper.encrypt()` to encrypt the user-supplied
+        password. Then compare the encrypted values."
+      x-weblogic-restart-needed: true
+    defaultIIOPUser:
+      type: string
+      default:
+        value:
+          value:
+      description: The user name of the default IIOP user. (Requires you to enable IIOP.)
+      x-weblogic-restart-needed: true
+    defaultInternalServletsDisabled:
+      type: boolean
+      default:
+        secureModeValue:
+          value: true
+        value:
+          value: false
+      description: "Specifies whether all default servlets in the servlet engine are disabled.\n\nThis includes: weblogic.servlet.ClasspathServlet
+        weblogic.servlet.utils.iiop.GetIORServlet weblogic.rjvm.http.TunnelSendServlet weblogic.rjvm.http.TunnelRecvServlet
+        weblogic.rjvm.http.TunnelLoginServlet weblogic.rjvm.http.TunnelCloseServlet If set to true, this property overrides
+        the ClasspathServletDisabled property."
+      x-weblogic-restart-needed: true
+    defaultTGIOPPassword:
+      type: string
+      description: "The password for the default user associated with the Tuxedo GIOP (TGIOP) protocol. (Requires you to configure
+        WebLogic Tuxedo Connector (WTC) for this server.)\n\nAs of 8.1 sp4, when you get the value of this attribute, WebLogic
+        Server does the following:\n\n- Retrieves the value of the `DefaultTGIOPPasswordEncrypted` attribute.\n- \n- Decrypts
+        the value and returns the unencrypted password as a String.\n- \n\nWhen you set the value of this attribute, WebLogic
+        Server does the following:\n\n- Encrypts the value.\n- \n- Sets the value of the `DefaultTGIOPPasswordEncrypted` attribute
+        to the encrypted value.\n- \n\nUsing this attribute (`DefaultTGIOPPassword`) is a potential security risk in because
+        the String object (which contains the unencrypted password) remains the JVM's memory until garbage collection removes
+        it and the memory is reallocated. Depending on how memory is allocated in the JVM, a significant amount of time could
+        pass before this unencrypted data is removed from memory.\n\nInstead of using this attribute, use `DefaultTGIOPPasswordEncrypted`."
+      x-weblogic-restart-needed: true
+    defaultTGIOPPasswordEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      description: "The encrypted password for the default TGIOP user.\n\nTo set this attribute, use `weblogic.management.EncryptionHelper.encrypt()`
+        to encrypt the value. Then set this attribute to the output of the encrypt() method.\n\nTo compare a password that
+        a user enters with the encrypted value of this attribute, go to the same WebLogic Server instance that you used to
+        set and encrypt this attribute and use `weblogic.management.EncryptionHelper.encrypt()` to encrypt the user-supplied
+        password. Then compare the encrypted values."
+      x-weblogic-restart-needed: true
+    defaultTGIOPUser:
+      type: string
+      default:
+        secureModeValue:
+          value:
+        value:
+          value: guest
+      deprecated: true
+      description: "The default user associated with the Tuxedo GIOP (TGIOP) protocol. (Requires you to configure WebLogic
+        Tuxedo Connector (WTC) for this server.)\n\n_Deprecated_: 12.2.1.3.0"
+      x-weblogic-restart-needed: true
+    externalDNSName:
+      type: string
+      default:
+        value:
+          value:
+      description: "The external IP address or DNS name for this server.\n\nThis address will be sent with HTTP session cookies
+        and with dynamic server lists to HTTP proxies. It will also be used by external application clients to enable the
+        propagation of RMI traffic through network address translating (NAT) firewalls.\n\nYou must specify an external DNS
+        name for configurations in which a firewall is performing network address translation, unless clients are accessing
+        WebLogic Server using t3 and the default channel. For example, define the external DNS name for configurations in
+        which a firewall is performing network address translation, and clients are accessing WebLogic Server using HTTP via
+        a proxy plug-in."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    extraEjbcOptions:
+      type: string
+      default:
+        value:
+          value:
+      description: "The options passed to the EJB compiler during server-side generation.\n\nEach EJB component can override
+        the compiler options that you specify here. The following options are valid:\n\n-forcegeneration Forces generation
+        of wrapper classes. Without this flag the classes may not be regenerated if it is determined to be unnecessary. -disableHotCodeGen
+        Generate ejb stub and skel as part of ejbc. Avoid HotCodeGen to have better performance. -keepgenerated Keep the generated
+        .java files. -compiler javac Java compiler to exec. If not specified, the -compilerclass option will be used. -compilerclass
+        com.sun.tools.javac.Main Specifies the compiler class to invoke. -g Compile debugging info into class file. -normi
+        Passed through to Symantec's sj. -classpath path Classpath to use. -source source Source version. -Joption Flags passed
+        through to java runtime."
+      x-weblogic-restart-needed: true
+    extraRmicOptions:
+      type: string
+      default:
+        value:
+          value:
+      description: "The options passed to the RMIC compiler during server-side generation.\n\nEach EJB component can override
+        the compiler options that you specify here."
+      x-weblogic-restart-needed: true
+    federationServices:
+      $ref: '#/components/schemas/FederationServices'
+      description: Gets the Federation Services MBean
+    gracefulShutdownTimeout:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 0
+      description: "Number of seconds a graceful shutdown operation waits before forcing a shut down. A graceful shutdown
+        gives WebLogic Server subsystems time to complete certain application processing currently in progress. If subsystems
+        are unable to complete processing within the number of seconds that you specify here, then the server will force shutdown
+        automatically.\n\nA value of `0` means that the server will wait indefinitely for graceful shutdown to complete.\n\
+        \nThe graceful shutdown timeout applies only to graceful shutdown operations."
+    healthCheckIntervalSeconds:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 180
+      description: The number of seconds that defines the frequency of this server's self-health monitoring. The server 
+        monitors the health of it's subsystems every HealthCheckIntervalSeconds and changes the Server's overall state 
+        if required.
+    healthCheckStartDelaySeconds:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 120
+      description: The number of seconds the Node Manager should wait before starting to monitor the server.
+    healthScore:
+      $ref: '#/components/schemas/HealthScore'
+      description: Returns HealthScore MBean instance for this Server or ServerTemplate.
+    hostsMigratableServices:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Gets the hostsMigratableServices attribute of the ServerMBean object
+    httpTraceSupportEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Returns the HttpTraceSupportEnabled value
+      x-weblogic-restart-needed: true
+    httpdEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Whether or not HTTP support is enabled on the regular port or SSL port.
+      x-weblogic-restart-needed: true
+    IIOPEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Specifies whether this server has IIOP support enabled for both the regular (non-SSL) and SSL ports.
+      x-weblogic-restart-needed: true
+    ignoreSessionsDuringShutdown:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Indicates whether a graceful shutdown operation drops all HTTP sessions immediately.\n\nIf this is set
+        to `false`, a graceful shutdown operation waits for HTTP sessions to complete or timeout."
+    interfaceAddress:
+      type: string
+      description: The IP address of the NIC that this server should use for multicast traffic.
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    JDBCLLRTableName:
+      type: string
+      description: "The table name for this server's Logging Last Resource (LLR) database table(s). WebLogic Server creates
+        the table(s) and then uses them during transaction processing for the LLR transaction optimization. This setting must
+        be unique for each server. The default table name is `WL_LLR_SERVERNAME`.\n\nThis setting only applies if this server
+        hosts one or more LLR-enabled JDBC data sources.\n\nThe format for the tables that WebLogic Server creates is [[[catalog.]schema.]name.]
+        Each \".\" in the table name is significant, and schema generally corresponds to username in many databases.\n\nIMPORTANT:
+        If this value is changed but the LLR table already exists in the database, you must preserve the existing table's
+        data. Consequently, when changing the table name, the existing database table must be renamed by a database administrator
+        to match the new configured table name. Otherwise, transaction records may be lost, resulting in heuristic failures
+        that aren't logged.\n\nIMPORTANT: Each server's table name must be unique. Multiple LLR-enabled data sources within
+        the same server may share the same table, but multiple servers must not share the same table. If multiple same-named
+        servers share a table, the behavior is undefined and it is likely that transactions will not recover properly after
+        a crash, creating heuristic hazards."
+      x-weblogic-restart-needed: true
+    JDBCLoginTimeoutSeconds:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 0
+      description: The JDBC Login Timeout value. Specified value is passed into 
+        java.sql.DriverManager.setLoginTimeout(). Note that this DriverManager setting will impact *all* JDBC drivers 
+        loaded into this JVM. Feature is disabled by default.
+      x-weblogic-restart-needed: true
+    JMSConnectionFactoryUnmappedResRefMode:
+      type: string
+      enum:
+      - ReturnDefault
+      - FailSafe
+      default:
+        value:
+          value: ReturnDefault
+      description: "Use this unmapped resource reference mode to specify the behavior of any resource reference to a Connection
+        Factory when the resource reference does not directly specify a JNDI name by a lookup attribute, or by a mappedName
+        attribute, or by a jndi-name in a descriptor file. If a JNDI name is specified, the resource reference either resolves
+        to the specified object in the JNDI tree or generates a javax.naming.NameNotFoundException. \n\nFollowing are the
+        available unmapped resource reference modes: \n\n- `FailSafe :` In this mode, an application JMS connection factory
+        resource reference that does not specify a JNDI name resolves to an object bound to the JNDI tree with the same name
+        as the resource reference name if one can be found in JNDI tree. Otherwise, it throws a javax.naming.NameNotFoundException.
+        A resource reference without a JNDI name never returns a Java EE 7 Default Connection Factory in this mode. \n\nThis
+        mode yields pre-12.2.1 WebLogic Server behavior. This mode is Java EE compliant, but the Java EE 7 specification disallows
+        it from being the default mode. \n\n- \n\n- `ReturnDefault :` This policy is a Java EE compliant mode and it is the
+        default mode. It complies with Java EE 7 while doing a best effort to try delivering FailSafe behavior when it is
+        expected. \n\n(a) If the resource reference name matches the local JNDI name of a configured foreign JMS provider
+        mapping, then WebLogic Server returns the remote JNDI entry from the mapping if it can be resolved, or it throws a
+        javax.naming.NameNotFoundException. \n\n(b) If the resource reference does not match with a foreign JMS provider mapping,
+        and if the resource reference name matches the name of an object that is already bound to the JNDI tree, WebLogic
+        Server returns the JNDI tree object. \n\n(c) If neither (a) nor (b) apply, then WebLogic Server returns \"java:comp/DefaultJMSConnectionFactory\"\
+        . In addition, it adds an 'Info' message in the server log indicating that a special behavior has occurred. This log
+        message will occur at most once per application per server boot. \n\n-"
+    JMSDefaultConnectionFactoriesEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: "Specifies whether this server uses JMS default connection factories.\n\nWebLogic Server provides the following
+        JMS default connection factories:\n\n- `weblogic.jms.ConnectionFactory` \n- \n- `weblogic.jms.XAConnectionFactory`
+        An XA factory is required for JMS applications to use JTA user-transactions, but is not required for transacted sessions.
+        All other preconfigured attributes for the default connection factories are set to the same default values as a user-defined
+        connection factory. If the preconfigured settings of the default factories are appropriate for your application, you
+        do not need to configure any additional factories for your application. \n- \n\nNote: When using the default connection
+        factories, you have no control over targeting the WebLogic Server instances where the connection factory may be deployed.
+        However, you can disable the default connection factories on a per-server basis. To deploy a connection factory on
+        independent servers, on specific servers within a cluster, or on an entire cluster, you need to configure a connection
+        factory and specify the appropriate server targets. The default Java EE 7 JMS Connection Factory, java:comp/DefaultJMSConnectionFactory,
+        will be available even when the WebLogic JMS default connection factories are disabled."
+    JNDITransportableObjectFactoryList:
+      type: array
+      items:
+        type: string
+      description: List of factories that create transportable objects.
+      x-weblogic-restart-needed: true
+    JTAMigratableTarget:
+      $ref: '#/components/schemas/JTAMigratableTarget'
+      description: Returns the JTAMigratableTargetMBean that is used to deploy the JTA Recovery Service to (is the 
+        server's cluster is not null).
+    javaCompiler:
+      type: string
+      default:
+        value:
+          value: javac
+      description: The Java compiler to use for all applications hosted on this server that need to compile Java code.
+    javaCompilerPostClassPath:
+      type: string
+      default:
+        value:
+          value:
+      description: The options to append to the Java compiler classpath when compiling Java code.
+      x-weblogic-restart-needed: true
+    javaCompilerPreClassPath:
+      type: string
+      default:
+        value:
+          value:
+      description: The options to prepend to the Java compiler classpath when compiling Java code.
+      x-weblogic-restart-needed: true
+    javaStandardTrustKeyStorePassPhrase:
+      type: string
+      description: "The password for the Java Standard Trust keystore. This password is defined when the keystore is created.\n\
+        \nIf empty or null, then the keystore will be opened without a passphrase.\n\nThis attribute is only used if KeyStores
+        is CUSTOM_IDENTITY_AND_JAVA_STANDARD_TRUST or DEMO_IDENTITY_AND_DEMO_TRUST.\n\nWhen you get the value of this attribute,
+        WebLogic Server does the following:\n\n- Retrieves the value of the `JavaStandardTrustKeyStorePassPhraseEncrypted`
+        attribute.\n- \n- Decrypts the value and returns the unencrypted password as a String.\n- \n\nWhen you set the value
+        of this attribute, WebLogic Server does the following:\n\n- Encrypts the value.\n- \n- Sets the value of the `JavaStandardTrustKeyStorePassPhraseEncrypted`
+        attribute to the encrypted value.\n- \n\nUsing this attribute (`JavaStandardTrustKeyStorePassPhrase`) is a potential
+        security risk because the String object (which contains the unencrypted password) remains in the JVM's memory until
+        garbage collection removes it and the memory is reallocated. Depending on how memory is allocated in the JVM, a significant
+        amount of time could pass before this unencrypted data is removed from memory.\n\nInstead of using this attribute,
+        use `JavaStandardTrustKeyStorePassPhraseEncrypted`."
+      x-weblogic-restart-needed: true
+    javaStandardTrustKeyStorePassPhraseEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      default:
+        value:
+          value:
+      description: "The encrypted password for the Java Standard Trust keystore. This password is defined when the keystore
+        is created.\n\nTo set this attribute, use `weblogic.management.EncryptionHelper.encrypt()` to encrypt the value. Then
+        set this attribute to the output of the encrypt() method.\n\nTo compare a password that a user enters with the encrypted
+        value of this attribute, go to the same WebLogic Server instance that you used to set and encrypt this attribute and
+        use `weblogic.management.EncryptionHelper.encrypt()` to encrypt the user-supplied password. Then compare the encrypted
+        values."
+    keyStores:
+      type: string
+      enum:
+      - DemoIdentityAndDemoTrust
+      - CustomIdentityAndJavaStandardTrust
+      - CustomIdentityAndCustomTrust
+      - CustomIdentityAndCommandLineTrust
+      - DomainKeystores
+      default:
+        value:
+          value: DemoIdentityAndDemoTrust
+      description: Which configuration rules should be used for finding the server's identity and trust keystores?
+    listenAddress:
+      type: string
+      description: "The IP address or DNS name this server uses to listen for incoming connections. For example, enter `12.34.5.67`
+        or `mymachine`, respectively.\n\nNote that the value you specify for the listen address is not the URL to the host
+        machine and it does not include the communication protocol, listen port, or channel.\n\nServers can be reached through
+        the following URL:\n\n`protocol://listen-address:listen-port`\n\nAny network channel that you configure for this server
+        can override this listen address.\n\nIf a server's listen address is undefined, clients can reach the server through
+        an IP address of the computer that hosts the server, a DNS name that resolves to the host, or the localhost string.
+        The localhost string can be used only for requests from clients that are running on the same computer as the server.\n\
+        \nIf you want to limit the valid addresses for a server instance, specify one of the following:\n\n- \n\nIP address.
+        If you provide an IP address, clients can specify either the IP address or a DNS name that maps to the IP address.
+        Clients that specify an IP address and attempt to connect through an SSL port must disable hostname verification.\n\
+        \n- \n- \n\nDNS name. If you provide a DNS name, clients can specify either the DNS name or the corresponding IP address.\n\
+        \n- \n\nDo not leave the listen address undefined on a computer that uses multiple IP address (a multihomed computer).
+        On such a computer, the server will bind to all available IP addresses.\n\nNote also that if you are using the demo
+        certificates in a multi-server domain, Managed Server instances will fail to boot if you specify the fully-qualified
+        DNS name. For information about this limitation and suggested workarounds, see \"Limitation on CertGen Usage\" in
+        Administering Security for Oracle WebLogic Server."
+      x-weblogic-restart-needed: true
+    listenPort:
+      type: integer
+      format: int32
+      default:
+        derivedDefault: true
+      description: "The default TCP port that this server uses to listen for regular (non-SSL) incoming connections.\n\nAdministrators
+        must have the right privileges before binding to a port or else this operation will not be successful and it will
+        render the console un-reachable.\n\nIf this port is disabled, the SSL port must be enabled. Additional ports can be
+        configured using network channels. The cluster (multicast) port is configured separately."
+    listenPortEnabled:
+      type: boolean
+      default:
+        derivedDefault: true
+      description: "Specifies whether this server can be reached through the default plain-text (non-SSL) listen port.\n\n\
+        If you disable this listen port, you must enable the default SSL listen port.\n\nYou can define additional listen
+        ports for this server by configuring network channels.\n\nIf there is no explicit setting for this attribute, it will
+        inherit the value of the DomainMBean's ListenPortEnabled attribute."
+    listenThreadStartDelaySecs:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 60
+      description: "Returns the maximum time that the server will wait for server sockets to bind before starting a listen
+        thread.\n\nProperties to consider for removal"
+      x-weblogic-restart-needed: true
+    listenersBindEarly:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Determines whether the server should bind server sockets early.\n\nEarly binding detects port conflicts
+        quickly and also gives user feedback on the default listen port as to the server state."
+      x-weblogic-restart-needed: true
+    loginTimeoutMillis:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 5000
+      description: "The login timeout for this server's default regular (non-SSL) listen port. This is the maximum amount
+        of time allowed for a new connection to establish.\n\nA value of `0` indicates there is no maximum."
+    machine:
+      type: array
+      items:
+        type: string
+      description: "The WebLogic Server host computer (machine) on which this server is meant to run.\n\nIf you want to use
+        Node Manager to start this server, you must assign the server to a machine and you must configure the machine for
+        Node Manager.\n\nYou cannot change this value if a server instance is already running."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    managedServerIndependenceEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: "Specifies whether this Managed Server can be started when the Administration Server is unavailable.\n\n\
+        In such a case, the Managed Server retrieves its configuration by reading a configuration file and other files directly."
+      x-weblogic-restart-needed: true
+    maxConcurrentLongRunningRequests:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 100
+      description: The maximum number of running long-running requests that can be submitted to all the Managed Executor
+        Services or Managed Scheduled Executor Services in the server.
+    maxConcurrentNewThreads:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 100
+      description: The maximum number of running threads that can be created by all the Managed Thread Factories in the 
+        server.
+    messageIdPrefixEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Indicates whether message IDs in logged messages will include a prefix. Message ids are 6 digit 
+        numeric strings that can be optionally presented in a log entry with a prefix. The prefix used by server 
+        messages is "BEA-".
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    NMSocketCreateTimeoutInMillis:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 180000
+      deprecated: true
+      description: "Returns the timeout value to be used by NodeManagerRuntime when creating a a socket connection to the
+        agent. Default set high as SSH agent may require a high connection establishment time.\n\n_Deprecated_: 12.2.1.2.0"
+      x-weblogic-restart-needed: true
+    networkAccessPoints:
+      type: array
+      items:
+        $ref: '#/components/schemas/NetworkAccessPoint'
+      description: Network access points, or "NAPs", define additional ports and addresses that this server listens on. 
+        Additionally, if two servers both support the same channel for a given protocol, then new connections between 
+        them will use that channel.
+    numOfRetriesBeforeMSIMode:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 3
+      description: Get the number of retries to contact admin server, before starting in Managed Server Independence 
+        Mode
+    overloadProtection:
+      $ref: '#/components/schemas/OverloadProtection'
+      description: get attributes related to server overload protection
+    preferredSecondaryGroup:
+      type: string
+      description: Defines secondary clustered instances considered for hosting replicas of the primary HTTP session 
+        states created on the server.
+      x-weblogic-restart-needed: true
+    reliableDeliveryPolicy:
+      type: array
+      items:
+        type: string
+      description: The reliable delivery policy for web services.
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    replicationGroup:
+      type: string
+      description: Defines preferred clustered instances considered for hosting replicas of the primary HTTP session 
+        states created on the server.
+      x-weblogic-restart-needed: true
+    replicationPorts:
+      type: string
+      description: When WLS is running on Exalogic machines, cluster replication traffic could go over multiple 
+        replication channels. However multiple replication channels need not be configured on each clustered server 
+        instance. Only one replication channel with explicit IP-Address needs to be configured for each server and 
+        replicationPorts range can be specified for each server. For eg. range 7001-7010 will create 10 replication 
+        channels with ports 7001 to 7010 for the given server. These channels inherits all the properties of the 
+        configured replication channel except the listen port.Names of these channels will be derived from the 
+        configured replication channel with suffic {x} added where x could be 1,2.. as per the number of ports 
+        specified. Public ports are same as the listen port for these additional channels.
+      x-weblogic-restart-needed: true
+    resolveDNSName:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Resolve the listen address to use for all T3 communication
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    restartDelaySeconds:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 0
+      description: "The number of seconds the Node Manager should wait before restarting this server.\n\nAfter killing a server
+        process, the system might need several seconds to release the TCP port(s) the server was using. If Node Manager attempts
+        to restart the Managed Server while its ports are still active, the startup attempt fails.\n\nIf AutoMigration is
+        enabled and RestartDelaySeconds is 0, the RestartDelaySeconds is automatically set to the lease time. This prevents
+        the server from failing to restart after migration when the previous lease is still valid."
+    restartIntervalSeconds:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 3600
+      description: The number of seconds during which this server can be restarted, up to the number of times specified 
+        in RestartMax.
+    restartMax:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 2
+      description: The number of times that the Node Manager can restart this server within the interval specified in 
+        RestartIntervalSeconds.
+    retryIntervalBeforeMSIMode:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 5
+      description: Get the number of seconds between the retries to contact admin server, before starting in Managed 
+        Server Independence Mode
+    serverDebug:
+      $ref: '#/components/schemas/ServerDebug'
+      description: The debug setting for this server.
+    serverDiagnosticConfig:
+      $ref: '#/components/schemas/WLDFServerDiagnostic'
+      description: The diagnostic configuration for the servers
+    serverLifeCycleTimeoutVal:
+      type: integer
+      format: int32
+      default:
+        productionModeValue:
+          value: 120
+        secureModeValue:
+          value: 120
+        value:
+          value: 30
+      description: "Number of seconds a force shutdown operation waits before timing out and killing itself. If the operation
+        does not complete within the configured timeout seconds, the server will shutdown automatically if the state of the
+        server at that time was `SHUTTING_DOWN`.\n\nA value of `0` means that the server will wait indefinitely for life cycle
+        operation to complete."
+    serverStart:
+      $ref: '#/components/schemas/ServerStart'
+      description: Returns the ServerStartMBean that can be used to start up this server remotely.
+    sessionReplicationOnShutdownEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Indicates if session replication on server shutdown is enabled. During server shutdown, any active 
+        http and ejb stateful session states will be replicated to a secondary server (if available) in the cluster.
+    singleSignOnServices:
+      $ref: '#/components/schemas/SingleSignOnServices'
+      description: Gets the Single Sign-On Services MBean
+    sitConfigPollingInterval:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 5
+      description: Returns the current polling interval for finding the situational config file in the filesystem
+    sitConfigRequired:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Returns whether situational config files are required and WebLogic Server should fail to boot if 
+        situational config files are not present.
+    stagingDirectoryName:
+      type: string
+      description: "The directory path on the Managed Server where all staged (prepared) applications are placed.\n\nIf an
+        absolute directory name is not specified, the path is relative to the root directory \"/\". Once configured, you cannot
+        change the staging directory name. Remove all applications from the server prior to changing this attribute. The default
+        staging directory is \"stage\", relative to the server root."
+      x-weblogic-restart-needed: true
+    stagingMode:
+      type: string
+      enum:
+      - 
+      default:
+        derivedDefault: true
+      description: "The mode that specifies whether an application's files are copied from a source on the Administration
+        Server to the Managed Server's staging area during application preparation.\n\nDuring application preparation, the
+        application's files are copied from the source on the Administration Server to the Managed Server's staging area.
+        If you specify `nostage` or `external_stage`, the copy will not occur. This is useful when the staging area is a shared
+        directory, already containing the application files, or if this is a single server domain. The administrator must
+        ensure that the Managed Server's staging directory is set appropriately. Deployment errors will result if the application
+        is not available during the preparation or activation of the application. Each application can override the staging
+        mode specified here."
+      x-weblogic-restart-needed: true
+    startupMode:
+      type: string
+      default:
+        value:
+          value: RUNNING
+      description: "The state in which this server should be started. If you specify `STANDBY`, you must also enable the domain-wide
+        administration port.\n\nIf you specify `INACTIVE`, the server will not be started and is just a placeholder server.
+        To bring up this server we need to change startupMode to other value.\n\nIn the `RUNNING` state, a server offers its
+        services to clients and can operate as a full member of a cluster. In the `ADMIN` state, the server is up and running,
+        but available only for administration operations, allowing you to perform server and application-level administration
+        tasks without risk to running applications. In the `STANDBY` state, a server instance does not process any request;
+        its regular Listen Port is closed. The Administration Port is open. It only accepts life cycle commands that transition
+        the server instance to either the `RUNNING` or the `SHUTDOWN` state. Other Administration requests are not accepted.
+        A `STANDBY` server's only purpose is to resume into the `RUNNING` state quickly; it saves server startup time."
+    startupTimeout:
+      type: integer
+      format: int32
+      default:
+        productionModeValue:
+          value: 0
+        value:
+          value: 0
+      description: "Timeout value for server start and resume operations. If the server fails to start in the timeout period,
+        it will force shutdown.\n\nA value of `0` means that the server will wait indefinitely for the operation to complete."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    synchronizedSessionTimeoutEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Indicates whether to also invalidate all the other sessions when one of the sessions that share the 
+        same ID expires.
+    systemPasswordEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      description: "The password required to access administrative functions on this server.\n\nTo set this attribute, use
+        `weblogic.management.EncryptionHelper.encrypt()` to encrypt the value. Then set this attribute to the output of the
+        encrypt() method.\n\nTo compare a password that a user enters with the encrypted value of this attribute, go to the
+        same WebLogic Server instance that you used to set and encrypt this attribute and use `weblogic.management.EncryptionHelper.encrypt()`
+        to encrypt the user-supplied password. Then compare the encrypted values."
+      x-weblogic-restart-needed: true
+    TGIOPEnabled:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: Specifies whether this server supports Tuxedo GIOP (TGIOP) requests. (Requires you to configure 
+        WebLogic Tuxedo Connector (WTC) for this server.)
+      x-weblogic-restart-needed: true
+    transactionLogFilePrefix:
+      type: string
+      default:
+        value:
+          value: ./
+      description: "The path prefix for the server's JTA transaction log files. If the pathname is not absolute, the path
+        is assumed to be relative to the server's root directory.\n\nFor a clustered server, if you plan to be able to migrate
+        the Transaction Recovery Service from this server if it fails to another server (backup server) in the same cluster,
+        you must store transaction log files on persistent storage, such as a Storage Area Network (SAN) device or a dual-ported
+        disk, available to both servers.\n\nDo not use an NFS file system to store transaction log files. Because of the caching
+        scheme in NFS, transaction log files on disk may not always be current. Using transaction log files stored on an NFS
+        device for recovery may cause data corruption."
+      x-weblogic-restart-needed: true
+    transactionLogFileWritePolicy:
+      type: string
+      enum:
+      - Cache-Flush
+      - Direct-Write
+      default:
+        value:
+          value: Direct-Write
+      description: "The policy that determines how transaction log file entries are written to disk. This policy can affect
+        transaction performance. (Note: To be transactionally safe, the Direct-Write policy may require additional OS or environment
+        changes on some Windows systems.)\n\nWebLogic Server supports the following policies:\n\n- \n\nCache-Flush. Flushes
+        operating system and on-disk caches after each write.\n\n- \n- \n\nDirect-Write. Tells the operating system to write
+        directly to disk with each write. Direct-Write performs better than Cache-Flush.\n\n- \n\nIf Direct-Write is not supported
+        on the host platform, the policy becomes Cache-Flush and a log message is printed.\n\nNote: On Windows, the \"Direct-Write\"\
+        \ policy may leave transaction data in the on-disk cache without writing it to disk immediately. This is not transactionally
+        safe because a power failure can cause loss of on-disk cache data. For transactionally safe writes using \"Direct-Write\"\
+        \ on Windows, either disable all write caching for the disk (enabled by default), or use a disk with a battery-backed
+        cache.\n\nThe on-disk cache for a hard-drive on Windows can be disabled through system administration: Control-Panel
+        -> System -> Hardware-tab -> Device-Manager-button -> Disk-Drives -> name-of-drive -> Policies-tab -> \"Enable write
+        caching on the disk\" check-box. Some file systems do not allow this value to be changed. For example, a RAID system
+        that has a reliable cache."
+      x-weblogic-restart-needed: true
+    transactionLogJDBCStore:
+      $ref: '#/components/schemas/TransactionLogJDBCStore'
+      description: The JDBC TLOG store used for transaction logging.
+    transactionPrimaryChannelName:
+      type: string
+      description: Returns the name of the server network channel to derive the default URL used for internal JTA 
+        communication with this server.
+      x-weblogic-restart-needed: true
+    transactionPublicChannelName:
+      type: string
+      description: Returns the name of the server network channel to derive the public URL used for internal JTA 
+        communication with this server.
+      x-weblogic-restart-needed: true
+    transactionPublicSecureChannelName:
+      type: string
+      description: Returns the name of the server network channel to derive the public secure URL used for internal JTA 
+        communication with this server.
+      x-weblogic-restart-needed: true
+    transactionSecureChannelName:
+      type: string
+      description: Returns the name of the server network channel to derive the secure URL used for internal JTA 
+        communication with this server.
+      x-weblogic-restart-needed: true
+    tunnelingClientPingSecs:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 45
+      description: "The interval (in seconds) at which to check a tunneled client to see if it is still alive.\n\nIf you create
+        network channels for this server, each channel can override this setting."
+    tunnelingClientTimeoutSecs:
+      type: integer
+      format: int32
+      default:
+        value:
+          value: 40
+      description: "The amount of time (in seconds) after which a missing tunneled client is considered dead.\n\nIf you create
+        network channels for this server, each channel can override this setting."
+    tunnelingEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Specifies whether tunneling for the T3, T3S, HTTP, HTTPS, IIOP, and IIOPS protocols should be enabled
+        for this server.\n\nIf you create network channels for this server, each channel can override this setting."
+    uploadDirectoryName:
+      type: string
+      description: "The directory path on the Administration Server where all uploaded applications are placed.\n\nIf an absolute
+        directory name is not specified, the path is relative to the root directory \"/\". The default staging directory is
+        \"stage\", relative to the server root. On the Managed Server this returns null, and is not configurable."
+    useFusionForLLR:
+      type: boolean
+      description: "Enables the use of the `ADM_DDL ` store procedure for LLR. The default value is `false` (not enabled).\
+        \ \n\nWhen enabled, a `WLS_` prefix and `_DYD` suffix is is automatically added to the LLR table name at runtime so
+        the LLR table name in server configuration is not consistent with the actual table name in database."
+      x-weblogic-restart-needed: true
+    webServer:
+      $ref: '#/components/schemas/WebServer'
+      description: Returns the web server for this server. A server has exactly one WebServer. A server may also have 
+        one or more VirtualHosts. A VirtualHost is a subclass of WebServer.
+    webService:
+      $ref: '#/components/schemas/WebService'
+      description: Gets Web service configuration for this server
+    weblogicPluginEnabled:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: "Specifies whether this server uses the proprietary `WL-Proxy-Client-IP` header.\n\nSet this attribute
+        to `true` to specify that this server instance uses the proprietary `WL-Proxy-Client-IP` header, which is recommended
+        if the server instance will receive requests from a proxy plug-in. If the server instance is a member of a cluster
+        that will receive proxied requests, enable the WebLogic plug-in at the cluster level. For servers that are members
+        of a cluster, the setting at the cluster level overrides the server's setting. When the WebLogic plug-in is enabled
+        at the cluster level, a call to `getRemoteAddr` will return the address of the browser client from the proprietary
+        `WL-Proxy-Client-IP` header instead of the Web server.\n\nSet this attrbute to `false` to disable the `weblogic-plugin-enabled`
+        parameter, `weblogic-plugin-enabled=false`, in the `config.xml` file.\n\nNote: If you are using Oracle HTTP Server,
+        the WebLogic Proxy Plug-In, or Oracle Traffic Director to distribute client requests to a Managed Server or a cluster,
+        Oracle recommends setting this attribute to `true`."
+      x-weblogic-restart-needed: true
+    XMLEntityCache:
+      type: array
+      items:
+        type: string
+      description: The server's XML entity cache, which is used to configure the behavior of JAXP (Java API for XML 
+        Parsing).
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    XMLRegistry:
+      type: array
+      items:
+        type: string
+      description: The server's XML registry, which is used to configure the behavior of JAXP (Java API for XML 
+        Parsing).
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    serverTemplate:
+      type: array
+      items:
+        type: string
+      description: The template used to configure this server.
+      x-weblogic-restart-needed: true

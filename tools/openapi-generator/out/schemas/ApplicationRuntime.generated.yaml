@@ -1,0 +1,150 @@
+ApplicationRuntime:
+  type: object
+  description: "An application represents a Java EE enterprise application packaged in an EAR file or EAR exploded directory.
+    The EAR file or directory contains a set of components such as WAR, EJB, and RAR connector components, each of which can
+    be deployed on one or more targets. A target is a server or a cluster. Modules in the application can have one of the
+    following states:\n\n- UNPREPARED - Indicates that none of the modules in this application are currently prepared or active.\n\
+    - \n- PREPARED - Indicates that none of the modules in this application are currently prepared or active.\n- \n- ACTIVATED
+    - Indicates that at least one module in this application is currently active.\n- \n\nApplicationRuntimeMBean encapsulates
+    runtime information about a deployed enterprise application."
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    activeVersionState:
+      type: integer
+      format: int32
+      description: "Specifies whether this application version is the currently active version.\n\nAn application can be the
+        only version currently deployed, or it can have more than one version currently deployed, using the side-by-side deployment
+        feature. If more than one version is deployed, only one version can be active. This attribute specifies the state
+        the current application version is in.\n\nAn application can be in an INACTIVE state, which means that it has not
+        been activated yet, or that there is more than one version of the application deployed (using side-by-side deployment)
+        and this version is retiring.\n\nAn application can be in ACTIVE_ADMIN state, which means that it is the currently
+        active version for administrative channel requests.\n\nAn application can be in ACTIVE state, which means that it
+        is the currently active version for normal (non-administrative) channel requests."
+      readOnly: true
+    applicationName:
+      type: string
+      description: The name of the application.
+      readOnly: true
+    applicationVersion:
+      type: string
+      description: "The application's version identifier.\n\nThis is particularly useful, when using the side-by-side deployment
+        feature, to differentiate between two different versions of the same application that are deployed at the same time."
+      readOnly: true
+    classLoaderRuntime:
+      $ref: '#/components/schemas/ClassLoaderRuntime'
+      description: Get statistics for system-level class loading.
+    classRedefinitionRuntime:
+      $ref: '#/components/schemas/ClassRedefinitionRuntime'
+      description: If the class FastSwap feature is enabled for the application, returns the runtime MBean to monitor 
+        and control the class FastSwap within the application.
+    coherenceClusterRuntime:
+      $ref: '#/components/schemas/CoherenceClusterRuntime'
+      description: Returns the Coherence Cluster related runtime MBean.
+    componentRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ComponentRuntime'
+      description: Returns the list of component runtime instances for each Java EE component (such as an EJB or a web 
+        application) that is contained in this enterprise application.
+      readOnly: true
+    healthState:
+      $ref: '#/components/schemas/HealthState'
+      description: The HealthState MBean for the application.
+    internal:
+      type: boolean
+      description: Indicates whether this application is an internal application. Such applications are not displayed in
+        the console or persisted in the config.xml.
+      readOnly: true
+    libraryRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/LibraryRuntime'
+      description: Returns the list of library runtime instances for each Java EE library that is contained in this 
+        enterprise application.
+      readOnly: true
+    managedExecutorServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedExecutorServiceRuntime'
+      description: Returns the list of managed executor service runtime instances for each application-scoped managed 
+        executor service that is associated with this enterprise application.
+      readOnly: true
+    managedScheduledExecutorServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedScheduledExecutorServiceRuntime'
+      description: Returns the list of managed scheduled executor service runtime instances for each application-scoped 
+        managed scheduled executor service that is associated with this enterprise application.
+      readOnly: true
+    managedThreadFactoryRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedThreadFactoryRuntime'
+      description: Returns the list of managed thread factory runtime instances for each application-scoped managed 
+        thread factory that is associated with this enterprise application.
+      readOnly: true
+    maxThreadsConstraintRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MaxThreadsConstraintRuntime'
+      description: Get the runtime MBeans for all MaxThreadsConstraints defined at the application level.
+      readOnly: true
+    minThreadsConstraintRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MinThreadsConstraintRuntime'
+      description: Get the runtime MBeans for all MinThreadsConstraints defined at the application level.
+      readOnly: true
+    optionalPackageRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/LibraryRuntime'
+      description: Returns the list of optional package runtime instances for each Java EE optional package that is 
+        contained in this enterprise application.
+      readOnly: true
+    overallHealthState:
+      $ref: '#/components/schemas/HealthState'
+      description: The overall health of the application including that of some of the components that report health. 
+        Currently, only connector modules report health status and are the only ones considered in the overall health 
+        state of the application.
+    persistenceUnitRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/PersistenceUnitRuntime'
+      description: Provides an array of PersistenceUnitRuntimeMBean objects for this EAR module.
+      readOnly: true
+    queryCacheRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueryCacheRuntime'
+      description: Returns a list of QueryCacheRuntimeMBeans configured for this application.
+      readOnly: true
+    requestClassRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequestClassRuntime'
+      description: Get the runtime MBeans for all request classes defined at the application level.
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Returns the list of work manager runtime instances for each application-scoped work manager that is 
+        associated with this enterprise application.
+      readOnly: true
+    wseeV2Runtimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeV2Runtime'
+      description: Returns the list of Web Service runtime instances that are contained at the application scope of this
+        enterprise application. This can happen when javax.xml.ws.Endpoint.publish() is called from within an 
+        application lifecycle listener.
+      readOnly: true

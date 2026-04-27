@@ -1,0 +1,163 @@
+# Virtual operations — REST endpoints that have no MBean in harvested.
+# Currently only the change-manager surface lives here. The schemas
+# (ChangeManagerState, ChangeManagerLockOwner-like fields) are also
+# defined in this file because they have no harvested counterpart.
+#
+# Consumed by the generator orchestrator. The structure mirrors
+# OpenAPI 3.0 components/paths so the orchestrator can splice it in
+# directly under each tree's root.
+
+components:
+  schemas:
+    ChangeManagerState:
+      type: object
+      description: |
+        Edit-session state. Returned by `GET /edit/changeManager`.
+      properties:
+        locked:
+          type: boolean
+          description: Whether someone currently holds the edit lock.
+        lockOwner:
+          type: string
+          description: "User holding the lock, when `locked: true`."
+        hasChanges:
+          type: boolean
+        mergeNeeded:
+          type: boolean
+          description: True when the global config has advanced under the session.
+        editSession:
+          type: string
+          example: default
+
+paths:
+  /edit/changeManager:
+    get:
+      operationId: getChangeManagerState
+      tags: [changeManager]
+      summary: Read current edit-session state.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+      responses:
+        '200':
+          description: Session state envelope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeManagerState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/startEdit:
+    post:
+      operationId: startEdit
+      tags: [changeManager]
+      summary: Acquire the edit lock.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Lock acquired or already held.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/cancelEdit:
+    post:
+      operationId: cancelEdit
+      tags: [changeManager]
+      summary: Discard pending changes and release the edit lock.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Pending changes discarded.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/activate:
+    post:
+      operationId: activate
+      tags: [changeManager]
+      summary: Activate pending changes.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Changes activated.
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/safeResolve:
+    post:
+      operationId: safeResolve
+      tags: [changeManager]
+      summary: Reconcile session against global config (safe mode).
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Reconciliation succeeded.
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/forceResolve:
+    post:
+      operationId: forceResolve
+      tags: [changeManager]
+      summary: Reconcile session against global config (force mode, your changes win).
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Reconciliation succeeded.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
