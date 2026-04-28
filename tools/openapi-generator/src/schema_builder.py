@@ -299,12 +299,53 @@ def build_property_schema(
         inner["readOnly"] = True
 
     # 7) Custom extensions.
-    if prop.get("restartNeeded") is True:
+    # `restartNeeded` and `redeployNeeded` indicate the side-effect of
+    # changing this property's value. When the property is read-only
+    # (the consumer cannot mutate it via REST), the flag is semantically
+    # meaningless: there is nothing to "need a restart for". On runtime
+    # MBeans this catches cases like `ServerRuntime.currentMachine` —
+    # a status field that happens to inherit `restartNeeded` from its
+    # underlying config layer. Filter when the property ends up readOnly.
+    is_read_only = bool(inner.get("readOnly"))
+    if not is_read_only:
+        # Walk allOf (we may have wrapped) for the readOnly flag.
+        if "allOf" in inner and isinstance(inner["allOf"], list):
+            is_read_only = any(
+                isinstance(p, dict) and p.get("readOnly") for p in inner["allOf"]
+            )
+    if prop.get("restartNeeded") is True and not is_read_only:
         inner = _ensure_writable(inner)
         inner["x-weblogic-restart-needed"] = True
-    if prop.get("redeployNeeded") is True:
+    if prop.get("redeployNeeded") is True and not is_read_only:
         inner = _ensure_writable(inner)
         inner["x-weblogic-redeploy-needed"] = True
+
+    # Per-property RBAC. Harvested `getRoles.allowed` is rare (~30 hits in
+    # 14.1.2) but useful for audit; emit as a sibling extension when present.
+    roles = (prop.get("getRoles") or {}).get("allowed")
+    if roles:
+        inner = _ensure_writable(inner)
+        inner["x-weblogic-required-role"] = list(roles)
+
+    # 8) Honored UI overlay fields. Most overlay vocabulary is UI-only
+    # (labels, help blurbs, presentation hints) and stays ignored. Three
+    # fields carry semantics worth lifting into the OpenAPI schema:
+    #
+    # - `dateAsLong`: harvested type is `long` but the value is millis-
+    #   since-epoch. Keep the integer type so the wire format is honest,
+    #   but mark via `x-weblogic-date-as-long` so consumers can render.
+    # - `multiLineString`: the property is a multi-line string. Useful
+    #   doc signal (e.g. JVM thread dump, log file paths). Emit as
+    #   `x-weblogic-multiline`.
+    # - `required` (at the property level) is collected by the caller
+    #   for schema-level `required: [...]`; ignored here.
+    if overlay:
+        if overlay.get("dateAsLong") is True:
+            inner = _ensure_writable(inner)
+            inner["x-weblogic-date-as-long"] = True
+        if overlay.get("multiLineString") is True:
+            inner = _ensure_writable(inner)
+            inner["x-weblogic-multiline"] = True
 
     return inner
 
@@ -341,6 +382,7 @@ def build_component_schema(
         overlay.update(load_type_overlay(level))
 
     properties: dict[str, Any] = {}
+    required_names: list[str] = []
     skipped: list[tuple[str, str]] = []
 
     for prop in merged["properties"]:
@@ -357,13 +399,19 @@ def build_component_schema(
             continue
         java_name = prop["name"]
         rest_name = _name_to_property(java_name)
+        prop_overlay = overlay.get(java_name)
         properties[rest_name] = build_property_schema(
-            prop, parent_is_runtime, overlay.get(java_name)
+            prop, parent_is_runtime, prop_overlay
         )
+        # Lift overlay-declared `required: true` to schema-level required[].
+        if prop_overlay and prop_overlay.get("required") is True:
+            required_names.append(rest_name)
 
     schema: dict[str, Any] = {"type": "object"}
     if description:
         schema["description"] = description
+    if required_names:
+        schema["required"] = required_names
     schema["properties"] = properties
 
     schema_name = normalize_schema_name(mbean_name)
