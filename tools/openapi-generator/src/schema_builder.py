@@ -65,8 +65,56 @@ PRIMITIVE_MAP: dict[str, tuple[str, str | None]] = {
     "java.lang.String": ("string", None),
     "java.lang.Object": ("string", None),
     "java.util.Date": ("string", "date-time"),
+    "java.sql.Date": ("string", "date-time"),
+    "java.sql.Timestamp": ("string", "date-time"),
     "java.util.Properties": ("object", None),
     "java.util.Map": ("object", None),
+    "java.util.Collection": ("object", None),
+    # Java SDK exception hierarchy — opaque exception JSON. Tests for these
+    # types appear on `error`, `taskError`, `lastException` fields.
+    "java.lang.Throwable": ("object", None),
+    "java.lang.Exception": ("object", None),
+    "java.lang.RuntimeException": ("object", None),
+    # `java.util.List` without a generic parameter — treat as opaque array.
+    # The harvested YAMLs use the `array: true` flag separately for typed
+    # arrays, so a bare `List` here means generic-erased.
+    "java.util.List": ("array", None),
+}
+
+# JMX / WLS internal types that surface in harvested data but are not
+# part of the harvested MBean set themselves. We map them to opaque
+# objects rather than auto-stubs for cleanliness.
+OPAQUE_OBJECT_TYPES: set[str] = {
+    # JMX standard types — represented by the framework, not harvested.
+    "javax.management.openmbean.CompositeData",
+    "javax.management.openmbean.TabularData",
+    "javax.management.ObjectName",
+    "java.io.InputStream",
+    "java.io.OutputStream",
+    "java.io.Reader",
+    # WLS internal types referenced from harvested MBeans but without
+    # their own harvested YAMLs. Treat as opaque objects rather than
+    # auto-stubbing.
+    "weblogic.management.deploy.DeploymentData",
+    "weblogic.management.deploy.TargetStatus",
+    "weblogic.diagnostics.accessor.ColumnInfo",
+    "weblogic.management.runtime.SecurityValidationWarningVBean",
+    "weblogic.management.configuration.DeterminerCandidateResourceInfoVBean",
+}
+
+
+# JNI-style array binary descriptors map to OpenAPI `array<...>`. The
+# pattern `[L<binaryName>;` denotes an array of object instances; the
+# pattern `[<descriptor>` (`[J`, `[I`, …) denotes a primitive array.
+_JNI_PRIMITIVE: dict[str, str] = {
+    "[B": "byte",
+    "[S": "short",
+    "[I": "int",
+    "[J": "long",
+    "[F": "float",
+    "[D": "double",
+    "[C": "char",
+    "[Z": "boolean",
 }
 
 
@@ -103,12 +151,24 @@ def _strip_html(html: str) -> str:
 def _java_to_openapi_type(java_type: str) -> dict[str, Any]:
     if java_type in PRIMITIVE_MAP:
         t, fmt = PRIMITIVE_MAP[java_type]
+        if t == "array":
+            return {"type": "array", "items": {"type": "object"}}
         out: dict[str, Any] = {"type": t}
         if fmt:
             out["format"] = fmt
         return out
+    if java_type in OPAQUE_OBJECT_TYPES:
+        return {"type": "object"}
     if java_type.endswith("[]"):
         return {"type": "array", "items": _java_to_openapi_type(java_type[:-2])}
+    # JNI-style array binary descriptors. Examples:
+    #   `[Ljava.lang.Long;`  → array of Long
+    #   `[J`                 → long[]
+    if java_type.startswith("[L") and java_type.endswith(";"):
+        elem = java_type[2:-1]
+        return {"type": "array", "items": _java_to_openapi_type(elem)}
+    if java_type in _JNI_PRIMITIVE:
+        return {"type": "array", "items": _java_to_openapi_type(_JNI_PRIMITIVE[java_type])}
     if "." in java_type:
         simple = java_type.rsplit(".", 1)[1]
         return {"$ref": f"#/components/schemas/{normalize_schema_name(simple)}"}
@@ -183,6 +243,20 @@ def build_property_schema(
             enum_values = None
 
     if enum_values:
+        # If the overlay declared string-shaped legal values but the
+        # underlying Java type is non-string (e.g. boolean property whose
+        # overlay carries free-text labels — `DefaultUnitOfOrder` lists
+        # `System-generated`, `Unit-of-Order`, `User-Generated`), the
+        # overlay wins on shape. The harvested type was the JMX getter
+        # signature; the overlay represents the REST projection. Coerce
+        # the inner type to match so spectral's `typed-enum` rule is
+        # satisfied.
+        if all(isinstance(v, str) for v in enum_values) and inner.get("type") in (
+            "boolean",
+            "integer",
+            "number",
+        ):
+            inner = {"type": "string"}
         if "type" in inner and inner["type"] in {"string", "integer", "number", "boolean"}:
             inner["enum"] = enum_values
         elif inner.get("type") == "array" and isinstance(inner.get("items"), dict):

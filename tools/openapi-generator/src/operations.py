@@ -22,31 +22,21 @@ from schema_builder import normalize_schema_name, _name_to_property
 EXTENSIONS_ROOT = Path("/tmp/wrc/resources/src/main/resources")
 
 
-# Java-type -> OpenAPI type fragment (subset; extension.yaml only uses a few).
-_TYPE_MAP: dict[str, dict[str, str]] = {
-    "void": {},
-    "int": {"type": "integer", "format": "int32"},
-    "long": {"type": "integer", "format": "int64"},
-    "boolean": {"type": "boolean"},
-    "java.lang.String": {"type": "string"},
-    "String": {"type": "string"},
-    "double": {"type": "number", "format": "double"},
-    "float": {"type": "number", "format": "float"},
-}
-
-
+# Action-parameter and return-type Java-type → OpenAPI fragment.
+# Delegates to `schema_builder._java_to_openapi_type` so the same
+# expanded type table (Date, JNI arrays, opaque objects) applies here.
 def _java_to_oas(java_type: str) -> dict[str, Any]:
-    if java_type in _TYPE_MAP:
-        return dict(_TYPE_MAP[java_type])
-    if java_type.endswith("[]"):
-        return {"type": "array", "items": _java_to_oas(java_type[:-2])}
-    if "." in java_type:
-        simple = java_type.rsplit(".", 1)[1]
-        return {"$ref": f"#/components/schemas/{normalize_schema_name(simple)}"}
-    if java_type:
-        # Bare class name without package (extension.yaml does this often).
-        return {"$ref": f"#/components/schemas/{normalize_schema_name(java_type)}"}
-    return {"type": "object"}
+    if not java_type or java_type == "void":
+        return {}
+    # Bare class name without package — extension.yaml writes some
+    # actions this way (`type: "ServerLifeCycleTaskRuntimeMBean"`).
+    if "." not in java_type and not java_type.endswith("[]") and not java_type.startswith("["):
+        # Primitive token?
+        from schema_builder import _java_to_openapi_type as _impl
+        # _impl handles the unqualified primitive case.
+        return _impl(java_type)
+    from schema_builder import _java_to_openapi_type as _impl
+    return _impl(java_type)
 
 
 def _strip_html(html: str | None) -> str:
@@ -161,13 +151,25 @@ def _action_op(
 
 
 def _example_for(java_type: str) -> Any:
+    """Generate an example value matching the OpenAPI schema for the type."""
     if java_type in ("int", "long", "short", "byte"):
         return 0
-    if java_type in ("boolean",):
+    if java_type == "boolean":
         return False
     if java_type in ("float", "double"):
         return 0.0
-    return ""
+    if java_type in ("java.lang.String", "String", "char", "java.lang.Character"):
+        return ""
+    if java_type in ("java.util.Date", "java.sql.Date", "java.sql.Timestamp"):
+        return "1970-01-01T00:00:00Z"
+    if java_type.endswith("[]") or java_type.startswith("[L") or java_type.startswith("[J"):
+        return []
+    if java_type == "java.util.List":
+        return []
+    # Anything that maps to an object schema in OpenAPI (Properties, Map,
+    # opaque WLS types, $ref to a bean…) → an empty object satisfies all
+    # `oas3-valid-media-example` checks for these shapes.
+    return {}
 
 
 def _url_to_op_id(url: str) -> str:

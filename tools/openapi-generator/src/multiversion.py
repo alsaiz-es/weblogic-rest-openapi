@@ -67,13 +67,15 @@ def _customize_info(doc: dict[str, Any], version: str) -> None:
     info["version"] = version
 
 
-def build_all_versions(versions: list[str] = VERSIONS) -> list[VersionResult]:
+def build_all_versions(
+    versions: list[str] = VERSIONS, bulk: bool = False
+) -> list[VersionResult]:
     yaml = _ordered_yaml()
     results: list[VersionResult] = []
     for v in versions:
-        sys.stdout.write(f"  building {v} ... ")
+        sys.stdout.write(f"  building {v}{' (bulk)' if bulk else ''} ... ")
         sys.stdout.flush()
-        result = build_spec(v)
+        result = build_spec(v, bulk=bulk)
         doc = result["doc"]
         _customize_info(doc, v)
 

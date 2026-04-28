@@ -60,13 +60,33 @@ def _stub_schema(name: str) -> dict[str, Any]:
     }
 
 
-def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
+def list_all_mbeans(wls_version: str) -> list[str]:
+    """Enumerate every harvested MBean YAML for the given WLS version."""
+    from harvested_loader import HARVESTED_ROOT
+
+    path = HARVESTED_ROOT / wls_version
+    if not path.is_dir():
+        raise FileNotFoundError(f"harvested directory not found: {path}")
+    return sorted(p.stem for p in path.glob("*.yaml"))
+
+
+def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str, Any]:
     loader = HarvestedLoader(wls_version)
 
-    # 1) Generate schemas for every Phase 4b target.
+    # Pick the input MBean set. The 22-bean curated list is the default;
+    # `bulk=True` ingests every harvested MBean for the version (Phase 4e).
+    if bulk:
+        mbean_names = list_all_mbeans(wls_version)
+        target_tuples: list[tuple[str, str | None, str | None, str]] = [
+            (n, None, None, "bulk") for n in mbean_names
+        ]
+    else:
+        target_tuples = list(PHASE4B_TARGETS)
+
+    # 1) Generate schemas for every target MBean.
     generated_schemas: dict[str, dict[str, Any]] = {}
     skipped_per_target: dict[str, list[tuple[str, str]]] = {}
-    for mbean, _spec_rel, _manual, _group in PHASE4B_TARGETS:
+    for mbean, _spec_rel, _manual, _group in target_tuples:
         try:
             built = build_component_schema(mbean, wls_version, loader=loader)
         except FileNotFoundError:
@@ -120,7 +140,7 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
             mbean_to_paths.setdefault(schema, []).append(url)
 
     # Iterate over the same target list — the MBeans we actually generate.
-    for mbean, _spec_rel, _manual, group in PHASE4B_TARGETS:
+    for mbean, _spec_rel, _manual, group in target_tuples:
         try:
             schema_name = normalize_schema_name(mbean)
         except Exception:
@@ -177,7 +197,7 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
     # parent MBean whose UI overlay declares `subTypeDiscriminatorProperty`.
     from polymorphism import detect_hierarchies, apply_polymorphism
 
-    target_mbean_names = [t[0] for t in PHASE4B_TARGETS]
+    target_mbean_names = [t[0] for t in target_tuples]
     hierarchies, polymorphism_skipped = detect_hierarchies(target_mbean_names)
     polymorphism_stats = apply_polymorphism(
         components["schemas"], hierarchies, _stub_schema
