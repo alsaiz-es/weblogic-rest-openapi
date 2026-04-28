@@ -16,7 +16,13 @@ The WebLogic REST Management API is **dynamically generated at runtime** from th
 
 1. **Available resources depend on domain configuration.** A domain with 3 data sources exposes 3 JDBC runtime resources; a domain with none exposes zero. This spec documents the _structure_ and _operations_, not the specific instances.
 2. **The API is HATEOAS-driven.** Responses include `links` arrays for navigation between related resources. This spec documents the known link patterns but cannot capture the full dynamic graph.
-3. **Version-specific differences exist.** This spec targets **WebLogic Server 14.1.1.0 (14c)** and **14.1.2.0**. Earlier versions (12.2.1.x) share most of the structure but may differ in details.
+3. **Version-specific differences exist.** The generated specifications under
+   [`tools/openapi-generator/out/`](tools/openapi-generator/out/) cover **all
+   five WLS versions** present in Oracle's harvested MBean data: 12.2.1.3,
+   12.2.1.4, 14.1.1, 14.1.2, 15.1.1. Cross-version diffs are documented in
+   [`VERSION_DELTAS.md`](tools/openapi-generator/out/VERSION_DELTAS.md). The
+   manual `specs/` directory (the v0.3.x hand-written spec) explicitly
+   targets 12.2.1.4 and 14.1.2 and is preserved as the verification baseline.
 4. **Coverage is partial.** v0.3.x specifications cover monitoring and
    administration of servers, clusters, and datasources, plus
    lifecycle. Several large subsystems (deployments, full JMS
@@ -99,6 +105,48 @@ the v0.1.0 LinkedIn announcement framed the project as if it covered
 the whole API. It does not, and never did. The framing has been
 tightened in v0.3.1 to set realistic expectations for anyone arriving
 at the repository.
+
+## Generated specifications (per WLS version)
+
+Phase 4d-5 of the generator pipeline emits one OpenAPI 3.0 specification
+per supported WLS version, based on Oracle's harvested MBean YAMLs plus
+the project's manual overlay layer (envelopes, virtual operations,
+quirks, polymorphic discriminators):
+
+| File | WLS version | Schemas | Paths |
+|---|---|---:|---:|
+| `tools/openapi-generator/out/spec-12.2.1.3.0.yaml` | 12.2.1.3.0 | 479 | 2341 |
+| `tools/openapi-generator/out/spec-12.2.1.4.0.yaml` | 12.2.1.4.0 | 482 | 2353 |
+| `tools/openapi-generator/out/spec-14.1.1.0.0.yaml` | 14.1.1.0.0 | 433 | 1110 |
+| `tools/openapi-generator/out/spec-14.1.2.0.0.yaml` | 14.1.2.0.0 | 439 | 1144 |
+| `tools/openapi-generator/out/spec-15.1.1.0.0.yaml` | 15.1.1.0.0 | 451 | 1178 |
+
+To consume a specific version, point your tool at the corresponding
+file. Examples:
+
+```bash
+# Render the 14.1.2 spec in Swagger UI via Docker
+docker run -p 8080:8080 -e SWAGGER_JSON=/spec.yaml \
+  -v "$(pwd)/tools/openapi-generator/out/spec-14.1.2.0.0.yaml:/spec.yaml" \
+  swaggerapi/swagger-ui
+
+# Generate a Python client for 12.2.1.4
+# (12.2.1.x specs exceed Swagger Parser's default YAML codepoint limit;
+#  feed the JSON form instead)
+python -c "import yaml, json; \
+  json.dump(yaml.safe_load(open('tools/openapi-generator/out/spec-12.2.1.4.0.yaml')), \
+  open('/tmp/spec.json','w'))"
+npx @openapitools/openapi-generator-cli generate -i /tmp/spec.json -g python -o ./client
+```
+
+Cross-version differences (property additions, path additions/removals,
+Multi-Tenant deprecation in 14.1.x, JDK-21 / virtual-thread additions
+in 14.1.2 and 15.1.1) are documented in
+[`tools/openapi-generator/out/VERSION_DELTAS.md`](tools/openapi-generator/out/VERSION_DELTAS.md).
+
+The path count delta between 12.2.1.x (~2350) and 14.1.x+ (~1100) is
+dominated by Multi-Tenant feature deprecation in 14.1.x; this is real
+WebLogic behaviour, not a generator artifact.
 
 ## Spec Structure
 

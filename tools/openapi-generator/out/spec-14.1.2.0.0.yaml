@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: WebLogic REST Management API — Generated Specification
+  title: WebLogic REST Management API — Generated Specification (14.1.2.0.0)
   description: "Generated OpenAPI 3.0 specification for WebLogic Server 14.1.2.0.0.\n\nSchemas are derived mechanically from
     Oracle's WebLogic Remote Console harvested MBean YAMLs ([weblogic-remote-console](https://github.com/oracle/weblogic-remote-console),
     UPL 1.0). UI overlays from the same source provide enums and read-only hints; the rest of the structure is computed from
