@@ -66020,28 +66020,8 @@ components:
             description: Get the runtime interface to publish single sign-on services information.
             readOnly: true
           state:
-            type: string
-            enum:
-            - ACTIVATE_LATER
-            - ADMIN
-            - DISCOVERED
-            - FAILED
-            - FAILED_MIGRATABLE
-            - FAILED_NOT_RESTARTABLE
-            - FAILED_RESTARTING
-            - FORCE_SHUTTING_DOWN
-            - FORCE_SUSPENDING
-            - RESTART_REQUIRED
-            - RESUMING
-            - RUNNING
-            - SHUTDOWN
-            - SHUTDOWN_IN_PROCESS
-            - SHUTDOWN_PENDING
-            - SHUTTING_DOWN
-            - STANDBY
-            - STARTING
-            - SUSPENDING
-            - UNKNOWN
+            allOf:
+            - $ref: '#/components/schemas/ServerState'
             description: "The current life cycle state of this server.\n\nFor example, a server can be in a RUNNING state
               in which it can receive and process requests or in an ADMIN state in which it can receive only administrative
               requests."
@@ -66337,319 +66317,22 @@ components:
             readOnly: true
       description: This class is used for monitoring a WebLogic JDBC service. It maps to a JDBCResource JMO.
     JDBCDataSourceRuntime:
-      allOf:
-      - $ref: '#/components/schemas/EnvelopeBase'
-      - type: object
-        description: This class is used for monitoring a WebLogic JDBC Data Source and its associated connection pool.
-        properties:
-          name:
-            type: string
-            description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
-              configuration.
-            readOnly: true
-          type:
-            type: string
-            description: Returns the type of the MBean.
-            readOnly: true
-          deploymentState:
-            type: integer
-            format: int32
-            enum:
-            - 0
-            - 1
-            - 2
-            - 3
-            description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
-              states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
-              module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
-              prepared, but not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED.
-              State indicating at this module is currently active.\n- \n- NEW. State indicating this module has just been
-              created and is being initialized.\n-"
-            readOnly: true
-          moduleId:
-            type: string
-            description: "Returns the identifier for this Component. The identifier is unique within the application.\n\n\
-              Typical modules will use the URI for their id. Web Modules will return their context-root since the web-uri
-              may not be unique within an EAR."
-            readOnly: true
-          workManagerRuntimes:
-            type: array
-            items:
-              $ref: '#/components/schemas/WorkManagerRuntime'
-            description: Get the runtime mbeans for all work managers defined in this component
-            readOnly: true
-          activeConnectionsAverageCount:
-            type: integer
-            format: int32
-            description: "Average number of active connections in this instance of the data source.\n\nActive connections
-              are connections in use by an application. This value is only valid if the resource is configured to allow shrinking."
-            readOnly: true
-          activeConnectionsCurrentCount:
-            type: integer
-            format: int32
-            description: The number of connections currently in use by applications.
-            readOnly: true
-          activeConnectionsHighCount:
-            type: integer
-            format: int32
-            description: "Highest number of active database connections in this instance of the data source since the data
-              source was instantiated. \n\nActive connections are connections in use by an application."
-            readOnly: true
-          commitOutcomeRetryTotalCount:
-            type: integer
-            format: int64
-            description: The cumulative total number of commit outcome query retries conducted before resolving the 
-              outcome or exceeding the retry seconds in this data source since the data source was deployed.
-            readOnly: true
-          connectionDelayTime:
-            type: integer
-            format: int32
-            description: "The average amount of time, in milliseconds, that it takes to create a physical connection to the
-              database.\n\nThe value is calculated as summary of all times to connect divided by the total number of connections."
-            readOnly: true
-          connectionsTotalCount:
-            type: integer
-            format: int32
-            description: The cumulative total number of database connections created in this data source since the data 
-              source was deployed.
-            readOnly: true
-          currCapacity:
-            type: integer
-            format: int32
-            description: The current count of JDBC connections in the connection pool in the data source.
-            readOnly: true
-          currCapacityHighCount:
-            type: integer
-            format: int32
-            description: Highest number of database connections available or in use (current capacity) in this instance 
-              of the data source since the data source was deployed.
-            readOnly: true
-          databaseProductName:
-            type: string
-            description: The product name of the database that this data source is connected to.
-            readOnly: true
-          databaseProductVersion:
-            type: string
-            description: The product version of the database that this data source is connected to.
-            readOnly: true
-          driverName:
-            type: string
-            description: The product name of the JDBC driver that this data source is configured to use.
-            readOnly: true
-          driverVersion:
-            type: string
-            description: The version of the JDBC driver that this data source is configured to use.
-            readOnly: true
-          enabled:
-            type: boolean
-            description: "Indicates whether the data source is enabled or disabled:\n\n- `true` if the data source is enabled.\n\
-              - \n- `false` if the data source is disabled.\n-"
-            readOnly: true
-          failedRepurposeCount:
-            type: integer
-            format: int64
-            description: The number of repurpose errors that have occurred since the datasource was deployed.
-            readOnly: true
-          failedReserveRequestCount:
-            type: integer
-            format: int64
-            description: The cumulative, running count of requests for a connection from this data source that could not
-              be fulfilled.
-            readOnly: true
-          failuresToReconnectCount:
-            type: integer
-            format: int32
-            description: "The number of times that the data source attempted to refresh a database connection and failed.\n\
-              \nFailures may occur when the database is unavailable or when the network connection to the database is interrupted."
-            readOnly: true
-          highestNumAvailable:
-            type: integer
-            format: int32
-            description: Highest number of database connections that were idle and available to be used by an 
-              application at any time in this instance of the data source since the data source was deployed.
-            readOnly: true
-          highestNumUnavailable:
-            type: integer
-            format: int32
-            description: Highest number of database connections that were in use by applications or being tested by the 
-              system in this instance of the data source since the data source was deployed.
-            readOnly: true
-          JDBCDriverRuntime:
-            allOf:
-            - $ref: '#/components/schemas/JDBCDriverRuntime'
-            description: Gets the JDBCDriverRuntimeMBean associated with this data source.
-            readOnly: true
-          JDBCReplayStatisticsRuntimeMBean:
-            allOf:
-            - $ref: '#/components/schemas/JDBCReplayStatisticsRuntime'
-            description: Get the statistics for replay only if the datasource is using an Oracle replay driver for 
-              12.1.0.2 and later. Otherwise, null is returned. The statistics are a snapshort. To update the snapshot, 
-              call refreshStatistics() on the mbean.
-            readOnly: true
-          lastTask:
-            type: array
-            items:
-              type: string
-            description: Get the last datasource Task
-            readOnly: true
-          leakedConnectionCount:
-            type: integer
-            format: int32
-            description: The number of leaked connections. A leaked connection is a connection that was reserved from 
-              the data source but was not returned to the data source by calling `close()`.
-            readOnly: true
-          numAvailable:
-            type: integer
-            format: int32
-            description: The number of database connections that are currently idle and available to be used by 
-              applications in this instance of the data source.
-            readOnly: true
-          numUnavailable:
-            type: integer
-            format: int32
-            description: The number of connections currently in use by applications or being tested in this instance of 
-              the data source.
-            readOnly: true
-          prepStmtCacheAccessCount:
-            type: integer
-            format: int64
-            description: The cumulative, running count of the number of times that the statement cache was accessed.
-            readOnly: true
-          prepStmtCacheAddCount:
-            type: integer
-            format: int64
-            description: "The cumulative, running count of the number of statements added to the statement cache.\n\nEach
-              connection in the connection pool has its own cache of statements. This number is the sum of the number of statements
-              added to the caches for all connections in the connection pool."
-            readOnly: true
-          prepStmtCacheCurrentSize:
-            type: integer
-            format: int32
-            description: "The number of prepared and callable statements currently cached in the statement cache.\n\nEach
-              connection in the connection pool has its own cache of statements. This number is the sum of the number of statements
-              in the caches for all connections in the connection pool."
-            readOnly: true
-          prepStmtCacheDeleteCount:
-            type: integer
-            format: int64
-            description: "The cumulative, running count of statements discarded from the cache.\n\nEach connection in the
-              connection pool has its own cache of statements. This number is the sum of the number of statements that were
-              discarded from the caches for all connections in the connection pool."
-            readOnly: true
-          prepStmtCacheHitCount:
-            type: integer
-            format: int32
-            description: The cumulative, running count of the number of times that statements from the cache were used.
-            readOnly: true
-          prepStmtCacheMissCount:
-            type: integer
-            format: int32
-            description: The number of times that a statement request could not be satisfied with a statement from the 
-              cache.
-            readOnly: true
-          properties:
-            type: object
-            description: "The list of properties for a data source that are passed to the JDBC driver when creating database
-              connections.\n\nThis is a privileged operation that can only be invoked by an authorized user."
-            readOnly: true
-          repurposeCount:
-            type: integer
-            format: int64
-            description: The number of times connections have been repurposed since the datasource was deployed.
-            readOnly: true
-          reserveRequestCount:
-            type: integer
-            format: int64
-            description: The cumulative, running count of requests for a connection from this data source.
-            readOnly: true
-          resolvedAsCommittedTotalCount:
-            type: integer
-            format: int64
-            description: The cumulative total number of commit outcomes successfully resolved as committed in this data 
-              source since the data source was deployed. This does not refer to the number of outcome query retries used
-              to resolve the outcomes.
-            readOnly: true
-          resolvedAsNotCommittedTotalCount:
-            type: integer
-            format: int64
-            description: The cumulative total number of commit outcomes successfully resolved as not committed in this 
-              data source since the data source was deployed. This does not refer to the number of outcome query retries
-              used to resolve the outcomes.
-            readOnly: true
-          state:
-            type: string
-            enum:
-            - Running
-            - Suspended
-            - Shutdown
-            - Unhealthy
-            - Overloaded
-            - Unknown
-            description: "The current state of the data source.\n\nPossible states are:\n\n- `Running` - the data source is
-              enabled (deployed and not `Suspended`). This is the normal state of the data source. This state includes conditions
-              when the database server is not available and the data source is created (creation retry must be enabled) or
-              when all connections have failed connection tests (on creation, on reserve, or periodic testing).\n- \n- `Suspended`
-              - the data source has been disabled.\n- \n- `Shutdown` - the data source is shutdown and all database connections
-              have been closed.\n- \n- `Overloaded` - all resources in pool are in use.\n- \n- `Unknown` - the data source
-              state is unknown.\n-"
-            readOnly: true
-          tasks:
-            type: array
-            items:
-              $ref: '#/components/schemas/JDBCDataSourceTaskRuntime'
-            description: Get preexisting datasource Tasks
-            readOnly: true
-          unresolvedTotalCount:
-            type: integer
-            format: int64
-            description: The cumulative total number of commit outcomes unsuccessfully resolved in this data source 
-              since the data source was deployed. This does not refer to the number of outcome query retries used to 
-              resolve the outcomes.
-            readOnly: true
-          versionJDBCDriver:
-            type: string
-            description: The driver class name of the JDBC driver used to create database connections.
-            readOnly: true
-          waitSecondsHighCount:
-            type: integer
-            format: int32
-            description: "The highest number of seconds that an application waited for a connection (the longest connection
-              reserve wait time) from this instance of the connection pool since the connection pool was instantiated.\n\n\
-              This value is updated when a completed `getConnection` request takes longer to return a connection than any
-              previous request."
-            readOnly: true
-          waitingForConnectionCurrentCount:
-            type: integer
-            format: int32
-            description: The number of connection requests waiting for a database connection.
-            readOnly: true
-          waitingForConnectionFailureTotal:
-            type: integer
-            format: int64
-            description: "The cumulative, running count of requests for a connection from this data source that had to wait
-              before getting a connection and eventually failed to get a connection.\n\nWaiting connection requests can fail
-              for a variety of reasons, including waiting for longer than the ConnectionReserveTimeoutSeconds."
-            readOnly: true
-          waitingForConnectionHighCount:
-            type: integer
-            format: int32
-            description: Highest number of application requests concurrently waiting for a connection from this instance
-              of the data source.
-            readOnly: true
-          waitingForConnectionSuccessTotal:
-            type: integer
-            format: int64
-            description: The cumulative, running count of requests for a connection from this data source that had to 
-              wait before getting a connection and eventually succeeded in getting a connection.
-            readOnly: true
-          waitingForConnectionTotal:
-            type: integer
-            format: int64
-            description: The cumulative, running count of requests for a connection from this data source that had to 
-              wait before getting a connection, including those that eventually got a connection and those that did not 
-              get a connection.
-            readOnly: true
-      description: This class is used for monitoring a WebLogic JDBC Data Source and its associated connection pool.
+      oneOf:
+      - $ref: '#/components/schemas/JDBCUCPDataSourceRuntime'
+      - $ref: '#/components/schemas/JDBCAbstractDataSourceRuntime'
+      - $ref: '#/components/schemas/JDBCProxyDataSourceRuntime'
+      - $ref: '#/components/schemas/JDBCOracleDataSourceRuntime'
+      - $ref: '#/components/schemas/JDBCDataSourceRuntimeDefault'
+      discriminator:
+        propertyName: type
+        mapping:
+          JDBCUCPDataSourceRuntime: '#/components/schemas/JDBCUCPDataSourceRuntime'
+          JDBCAbstractDataSourceRuntime: '#/components/schemas/JDBCAbstractDataSourceRuntime'
+          JDBCProxyDataSourceRuntime: '#/components/schemas/JDBCProxyDataSourceRuntime'
+          JDBCOracleDataSourceRuntime: '#/components/schemas/JDBCOracleDataSourceRuntime'
+          JDBCDataSourceRuntime: '#/components/schemas/JDBCDataSourceRuntimeDefault'
+      description: Polymorphic `JDBCDataSourceRuntime` — the concrete subtype is selected by the `type` discriminator 
+        property. Common base properties live in `JDBCDataSourceRuntimeBase`.
     ApplicationRuntime:
       allOf:
       - $ref: '#/components/schemas/EnvelopeBase'
@@ -66823,17 +66506,40 @@ components:
         encapsulates runtime information about a deployed enterprise application."
     ComponentRuntime:
       oneOf:
-      - $ref: '#/components/schemas/ComponentRuntimeBase'
-      - $ref: '#/components/schemas/WebAppComponentRuntime'
-      - $ref: '#/components/schemas/EJBComponentRuntime'
-      - $ref: '#/components/schemas/ConnectorComponentRuntime'
+      - $ref: '#/components/schemas/JDBCReplayStatisticsRuntime'
+      - $ref: '#/components/schemas/InterceptionComponentRuntime'
+      - $ref: '#/components/schemas/JDBCMultiDataSourceRuntime'
+      - $ref: '#/components/schemas/SCAPojoComponentRuntime'
+      - $ref: '#/components/schemas/SCASpringComponentRuntime'
+      - $ref: '#/components/schemas/JMSComponentRuntime'
       - $ref: '#/components/schemas/AppClientComponentRuntime'
-      description: Polymorphic component runtime. The concrete type (`WebApp`, `EJB`, `Connector`, `AppClient`) depends 
-        on what was deployed; all subtypes share the `ComponentRuntimeBase` properties. Discriminator/mapping refinement
-        is pending in Phase 4d-3.
+      - $ref: '#/components/schemas/ComponentConcurrentRuntime'
+      - $ref: '#/components/schemas/JDBCDataSourceRuntime'
+      - $ref: '#/components/schemas/JDBCOracleDataSourceRuntime'
+      - $ref: '#/components/schemas/ConnectorComponentRuntime'
+      - $ref: '#/components/schemas/EJBComponentRuntime'
+      - $ref: '#/components/schemas/WebAppComponentRuntime'
+      discriminator:
+        propertyName: type
+        mapping:
+          JDBCReplayStatisticsRuntime: '#/components/schemas/JDBCReplayStatisticsRuntime'
+          InterceptionComponentRuntime: '#/components/schemas/InterceptionComponentRuntime'
+          JDBCMultiDataSourceRuntime: '#/components/schemas/JDBCMultiDataSourceRuntime'
+          SCAPojoComponentRuntime: '#/components/schemas/SCAPojoComponentRuntime'
+          SCASpringComponentRuntime: '#/components/schemas/SCASpringComponentRuntime'
+          JMSComponentRuntime: '#/components/schemas/JMSComponentRuntime'
+          AppClientComponentRuntime: '#/components/schemas/AppClientComponentRuntime'
+          ComponentConcurrentRuntime: '#/components/schemas/ComponentConcurrentRuntime'
+          JDBCDataSourceRuntime: '#/components/schemas/JDBCDataSourceRuntime'
+          JDBCOracleDataSourceRuntime: '#/components/schemas/JDBCOracleDataSourceRuntime'
+          ConnectorComponentRuntime: '#/components/schemas/ConnectorComponentRuntime'
+          EJBComponentRuntime: '#/components/schemas/EJBComponentRuntime'
+          WebAppComponentRuntime: '#/components/schemas/WebAppComponentRuntime'
+      description: Polymorphic `ComponentRuntime` — the concrete subtype is selected by the `type` discriminator 
+        property. Common base properties live in `ComponentRuntimeBase`.
     WebAppComponentRuntime:
       allOf:
-      - $ref: '#/components/schemas/EnvelopeBase'
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
       - type: object
         description: Describes a servlet component (servlet context).
         properties:
@@ -66843,16 +66549,12 @@ components:
             readOnly: true
           type:
             type: string
-            description: Returns the type of the MBean.
-            readOnly: true
-          deploymentState:
-            type: integer
-            format: int32
             enum:
-            - 0
-            - 1
-            - 2
-            - 3
+            - WebAppComponentRuntime
+            description: Discriminator. Always `WebAppComponentRuntime` for this subtype.
+          deploymentState:
+            allOf:
+            - $ref: '#/components/schemas/DeploymentState'
             description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
               states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
               module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
@@ -67128,10 +66830,12 @@ components:
             description: Returns the list of Web Service runtime instances that are contained in this web application 
               within an enterprise application.
             readOnly: true
+        required:
+        - type
       description: Describes a servlet component (servlet context).
     EJBComponentRuntime:
       allOf:
-      - $ref: '#/components/schemas/EnvelopeBase'
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
       - type: object
         description: This is the top level interface for all runtime information collected for an EJB module.
         properties:
@@ -67142,16 +66846,12 @@ components:
             readOnly: true
           type:
             type: string
-            description: Returns the type of the MBean.
-            readOnly: true
-          deploymentState:
-            type: integer
-            format: int32
             enum:
-            - 0
-            - 1
-            - 2
-            - 3
+            - EJBComponentRuntime
+            description: Discriminator. Always `EJBComponentRuntime` for this subtype.
+          deploymentState:
+            allOf:
+            - $ref: '#/components/schemas/DeploymentState'
             description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
               states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
               module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
@@ -67226,10 +66926,12 @@ components:
             description: Returns the list of Web Service runtime instances that are contained in this EJB within an 
               Enterprise application.
             readOnly: true
+        required:
+        - type
       description: This is the top level interface for all runtime information collected for an EJB module.
     ConnectorComponentRuntime:
       allOf:
-      - $ref: '#/components/schemas/EnvelopeBase'
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
       - type: object
         description: "Generates notifications about the deployment state of resource adapters. (Each resource adapter is represented
           by an instance of weblogic.management.configuration.ConnectorComponentMBean.)\n\nIn 2-phase deployment, if a resource
@@ -67245,16 +66947,12 @@ components:
             readOnly: true
           type:
             type: string
-            description: Returns the type of the MBean.
-            readOnly: true
-          deploymentState:
-            type: integer
-            format: int32
             enum:
-            - 0
-            - 1
-            - 2
-            - 3
+            - ConnectorComponentRuntime
+            description: Discriminator. Always `ConnectorComponentRuntime` for this subtype.
+          deploymentState:
+            allOf:
+            - $ref: '#/components/schemas/DeploymentState'
             description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
               states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
               module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
@@ -67406,6 +67104,8 @@ components:
             description: Runtime information for WebLogic's work manager that serves the adapter. It provides general 
               runtime information by WebLogic work manager.
             readOnly: true
+        required:
+        - type
       description: "Generates notifications about the deployment state of resource adapters. (Each resource adapter is represented
         by an instance of weblogic.management.configuration.ConnectorComponentMBean.)\n\nIn 2-phase deployment, if a resource
         adapter's state is `PREPARED` then it has achieved the first phase of deployment (everything is set up and all that
@@ -67414,7 +67114,7 @@ components:
         creates an instance of this interface when it creates an instance of `weblogic.management.configuration.ConnectorComponentMBean`."
     AppClientComponentRuntime:
       allOf:
-      - $ref: '#/components/schemas/EnvelopeBase'
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
       - type: object
         description: This is the ComponentRuntimeMBean for Java EE Application Client Containers.
         properties:
@@ -67425,16 +67125,12 @@ components:
             readOnly: true
           type:
             type: string
-            description: Returns the type of the MBean.
-            readOnly: true
-          deploymentState:
-            type: integer
-            format: int32
             enum:
-            - 0
-            - 1
-            - 2
-            - 3
+            - AppClientComponentRuntime
+            description: Discriminator. Always `AppClientComponentRuntime` for this subtype.
+          deploymentState:
+            allOf:
+            - $ref: '#/components/schemas/DeploymentState'
             description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
               states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
               module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
@@ -67454,6 +67150,8 @@ components:
               $ref: '#/components/schemas/WorkManagerRuntime'
             description: Get the runtime mbeans for all work managers defined in this component
             readOnly: true
+        required:
+        - type
       description: This is the ComponentRuntimeMBean for Java EE Application Client Containers.
     ServerChannelRuntime:
       allOf:
@@ -67854,14 +67552,8 @@ components:
               of longer ramp up time.\n-"
             x-weblogic-restart-needed: true
           administrationProtocol:
-            type: string
-            enum:
-            - t3s
-            - https
-            - iiops
-            - t3
-            - http
-            - iiop
+            allOf:
+            - $ref: '#/components/schemas/WebLogicProtocol'
             deprecated: true
             description: "Returns the protocol to be used for administrative connections when none is specified.\n\n_Deprecated_:
               14.1.2.0.0"
@@ -67903,14 +67595,8 @@ components:
             description: The number of idle periods allowed before the object is collected.
             x-weblogic-restart-needed: true
           defaultProtocol:
-            type: string
-            enum:
-            - t3
-            - t3s
-            - http
-            - https
-            - iiop
-            - iiops
+            allOf:
+            - $ref: '#/components/schemas/WebLogicProtocol'
             description: The protocol to use for connections when none is specified.
             x-weblogic-restart-needed: true
           defaultSecureProtocol:
@@ -70149,28 +69835,8 @@ components:
               everytime.
             readOnly: true
           state:
-            type: string
-            enum:
-            - ACTIVATE_LATER
-            - ADMIN
-            - DISCOVERED
-            - FAILED
-            - FAILED_MIGRATABLE
-            - FAILED_NOT_RESTARTABLE
-            - FAILED_RESTARTING
-            - FORCE_SHUTTING_DOWN
-            - FORCE_SUSPENDING
-            - RESTART_REQUIRED
-            - RESUMING
-            - RUNNING
-            - SHUTDOWN
-            - SHUTDOWN_IN_PROCESS
-            - SHUTDOWN_PENDING
-            - SHUTTING_DOWN
-            - STANDBY
-            - STARTING
-            - SUSPENDING
-            - UNKNOWN
+            allOf:
+            - $ref: '#/components/schemas/ServerState'
             description: The current state of the server.
             readOnly: true
           tasks:
@@ -70207,6 +69873,315 @@ components:
         editSession:
           type: string
           example: default
+    JDBCDataSourceRuntimeBase:
+      allOf:
+      - $ref: '#/components/schemas/EnvelopeBase'
+      - type: object
+        description: This class is used for monitoring a WebLogic JDBC Data Source and its associated connection pool.
+        properties:
+          name:
+            type: string
+            description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+              configuration.
+            readOnly: true
+          type:
+            type: string
+            description: Returns the type of the MBean.
+            readOnly: true
+          deploymentState:
+            allOf:
+            - $ref: '#/components/schemas/DeploymentState'
+            description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
+              states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
+              module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
+              prepared, but not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED.
+              State indicating at this module is currently active.\n- \n- NEW. State indicating this module has just been
+              created and is being initialized.\n-"
+            readOnly: true
+          moduleId:
+            type: string
+            description: "Returns the identifier for this Component. The identifier is unique within the application.\n\n\
+              Typical modules will use the URI for their id. Web Modules will return their context-root since the web-uri
+              may not be unique within an EAR."
+            readOnly: true
+          workManagerRuntimes:
+            type: array
+            items:
+              $ref: '#/components/schemas/WorkManagerRuntime'
+            description: Get the runtime mbeans for all work managers defined in this component
+            readOnly: true
+          activeConnectionsAverageCount:
+            type: integer
+            format: int32
+            description: "Average number of active connections in this instance of the data source.\n\nActive connections
+              are connections in use by an application. This value is only valid if the resource is configured to allow shrinking."
+            readOnly: true
+          activeConnectionsCurrentCount:
+            type: integer
+            format: int32
+            description: The number of connections currently in use by applications.
+            readOnly: true
+          activeConnectionsHighCount:
+            type: integer
+            format: int32
+            description: "Highest number of active database connections in this instance of the data source since the data
+              source was instantiated. \n\nActive connections are connections in use by an application."
+            readOnly: true
+          commitOutcomeRetryTotalCount:
+            type: integer
+            format: int64
+            description: The cumulative total number of commit outcome query retries conducted before resolving the 
+              outcome or exceeding the retry seconds in this data source since the data source was deployed.
+            readOnly: true
+          connectionDelayTime:
+            type: integer
+            format: int32
+            description: "The average amount of time, in milliseconds, that it takes to create a physical connection to the
+              database.\n\nThe value is calculated as summary of all times to connect divided by the total number of connections."
+            readOnly: true
+          connectionsTotalCount:
+            type: integer
+            format: int32
+            description: The cumulative total number of database connections created in this data source since the data 
+              source was deployed.
+            readOnly: true
+          currCapacity:
+            type: integer
+            format: int32
+            description: The current count of JDBC connections in the connection pool in the data source.
+            readOnly: true
+          currCapacityHighCount:
+            type: integer
+            format: int32
+            description: Highest number of database connections available or in use (current capacity) in this instance 
+              of the data source since the data source was deployed.
+            readOnly: true
+          databaseProductName:
+            type: string
+            description: The product name of the database that this data source is connected to.
+            readOnly: true
+          databaseProductVersion:
+            type: string
+            description: The product version of the database that this data source is connected to.
+            readOnly: true
+          driverName:
+            type: string
+            description: The product name of the JDBC driver that this data source is configured to use.
+            readOnly: true
+          driverVersion:
+            type: string
+            description: The version of the JDBC driver that this data source is configured to use.
+            readOnly: true
+          enabled:
+            type: boolean
+            description: "Indicates whether the data source is enabled or disabled:\n\n- `true` if the data source is enabled.\n\
+              - \n- `false` if the data source is disabled.\n-"
+            readOnly: true
+          failedRepurposeCount:
+            type: integer
+            format: int64
+            description: The number of repurpose errors that have occurred since the datasource was deployed.
+            readOnly: true
+          failedReserveRequestCount:
+            type: integer
+            format: int64
+            description: The cumulative, running count of requests for a connection from this data source that could not
+              be fulfilled.
+            readOnly: true
+          failuresToReconnectCount:
+            type: integer
+            format: int32
+            description: "The number of times that the data source attempted to refresh a database connection and failed.\n\
+              \nFailures may occur when the database is unavailable or when the network connection to the database is interrupted."
+            readOnly: true
+          highestNumAvailable:
+            type: integer
+            format: int32
+            description: Highest number of database connections that were idle and available to be used by an 
+              application at any time in this instance of the data source since the data source was deployed.
+            readOnly: true
+          highestNumUnavailable:
+            type: integer
+            format: int32
+            description: Highest number of database connections that were in use by applications or being tested by the 
+              system in this instance of the data source since the data source was deployed.
+            readOnly: true
+          JDBCDriverRuntime:
+            allOf:
+            - $ref: '#/components/schemas/JDBCDriverRuntime'
+            description: Gets the JDBCDriverRuntimeMBean associated with this data source.
+            readOnly: true
+          JDBCReplayStatisticsRuntimeMBean:
+            allOf:
+            - $ref: '#/components/schemas/JDBCReplayStatisticsRuntime'
+            description: Get the statistics for replay only if the datasource is using an Oracle replay driver for 
+              12.1.0.2 and later. Otherwise, null is returned. The statistics are a snapshort. To update the snapshot, 
+              call refreshStatistics() on the mbean.
+            readOnly: true
+          lastTask:
+            type: array
+            items:
+              type: string
+            description: Get the last datasource Task
+            readOnly: true
+          leakedConnectionCount:
+            type: integer
+            format: int32
+            description: The number of leaked connections. A leaked connection is a connection that was reserved from 
+              the data source but was not returned to the data source by calling `close()`.
+            readOnly: true
+          numAvailable:
+            type: integer
+            format: int32
+            description: The number of database connections that are currently idle and available to be used by 
+              applications in this instance of the data source.
+            readOnly: true
+          numUnavailable:
+            type: integer
+            format: int32
+            description: The number of connections currently in use by applications or being tested in this instance of 
+              the data source.
+            readOnly: true
+          prepStmtCacheAccessCount:
+            type: integer
+            format: int64
+            description: The cumulative, running count of the number of times that the statement cache was accessed.
+            readOnly: true
+          prepStmtCacheAddCount:
+            type: integer
+            format: int64
+            description: "The cumulative, running count of the number of statements added to the statement cache.\n\nEach
+              connection in the connection pool has its own cache of statements. This number is the sum of the number of statements
+              added to the caches for all connections in the connection pool."
+            readOnly: true
+          prepStmtCacheCurrentSize:
+            type: integer
+            format: int32
+            description: "The number of prepared and callable statements currently cached in the statement cache.\n\nEach
+              connection in the connection pool has its own cache of statements. This number is the sum of the number of statements
+              in the caches for all connections in the connection pool."
+            readOnly: true
+          prepStmtCacheDeleteCount:
+            type: integer
+            format: int64
+            description: "The cumulative, running count of statements discarded from the cache.\n\nEach connection in the
+              connection pool has its own cache of statements. This number is the sum of the number of statements that were
+              discarded from the caches for all connections in the connection pool."
+            readOnly: true
+          prepStmtCacheHitCount:
+            type: integer
+            format: int32
+            description: The cumulative, running count of the number of times that statements from the cache were used.
+            readOnly: true
+          prepStmtCacheMissCount:
+            type: integer
+            format: int32
+            description: The number of times that a statement request could not be satisfied with a statement from the 
+              cache.
+            readOnly: true
+          properties:
+            type: object
+            description: "The list of properties for a data source that are passed to the JDBC driver when creating database
+              connections.\n\nThis is a privileged operation that can only be invoked by an authorized user."
+            readOnly: true
+          repurposeCount:
+            type: integer
+            format: int64
+            description: The number of times connections have been repurposed since the datasource was deployed.
+            readOnly: true
+          reserveRequestCount:
+            type: integer
+            format: int64
+            description: The cumulative, running count of requests for a connection from this data source.
+            readOnly: true
+          resolvedAsCommittedTotalCount:
+            type: integer
+            format: int64
+            description: The cumulative total number of commit outcomes successfully resolved as committed in this data 
+              source since the data source was deployed. This does not refer to the number of outcome query retries used
+              to resolve the outcomes.
+            readOnly: true
+          resolvedAsNotCommittedTotalCount:
+            type: integer
+            format: int64
+            description: The cumulative total number of commit outcomes successfully resolved as not committed in this 
+              data source since the data source was deployed. This does not refer to the number of outcome query retries
+              used to resolve the outcomes.
+            readOnly: true
+          state:
+            type: string
+            enum:
+            - Running
+            - Suspended
+            - Shutdown
+            - Unhealthy
+            - Overloaded
+            - Unknown
+            description: "The current state of the data source.\n\nPossible states are:\n\n- `Running` - the data source is
+              enabled (deployed and not `Suspended`). This is the normal state of the data source. This state includes conditions
+              when the database server is not available and the data source is created (creation retry must be enabled) or
+              when all connections have failed connection tests (on creation, on reserve, or periodic testing).\n- \n- `Suspended`
+              - the data source has been disabled.\n- \n- `Shutdown` - the data source is shutdown and all database connections
+              have been closed.\n- \n- `Overloaded` - all resources in pool are in use.\n- \n- `Unknown` - the data source
+              state is unknown.\n-"
+            readOnly: true
+          tasks:
+            type: array
+            items:
+              $ref: '#/components/schemas/JDBCDataSourceTaskRuntime'
+            description: Get preexisting datasource Tasks
+            readOnly: true
+          unresolvedTotalCount:
+            type: integer
+            format: int64
+            description: The cumulative total number of commit outcomes unsuccessfully resolved in this data source 
+              since the data source was deployed. This does not refer to the number of outcome query retries used to 
+              resolve the outcomes.
+            readOnly: true
+          versionJDBCDriver:
+            type: string
+            description: The driver class name of the JDBC driver used to create database connections.
+            readOnly: true
+          waitSecondsHighCount:
+            type: integer
+            format: int32
+            description: "The highest number of seconds that an application waited for a connection (the longest connection
+              reserve wait time) from this instance of the connection pool since the connection pool was instantiated.\n\n\
+              This value is updated when a completed `getConnection` request takes longer to return a connection than any
+              previous request."
+            readOnly: true
+          waitingForConnectionCurrentCount:
+            type: integer
+            format: int32
+            description: The number of connection requests waiting for a database connection.
+            readOnly: true
+          waitingForConnectionFailureTotal:
+            type: integer
+            format: int64
+            description: "The cumulative, running count of requests for a connection from this data source that had to wait
+              before getting a connection and eventually failed to get a connection.\n\nWaiting connection requests can fail
+              for a variety of reasons, including waiting for longer than the ConnectionReserveTimeoutSeconds."
+            readOnly: true
+          waitingForConnectionHighCount:
+            type: integer
+            format: int32
+            description: Highest number of application requests concurrently waiting for a connection from this instance
+              of the data source.
+            readOnly: true
+          waitingForConnectionSuccessTotal:
+            type: integer
+            format: int64
+            description: The cumulative, running count of requests for a connection from this data source that had to 
+              wait before getting a connection and eventually succeeded in getting a connection.
+            readOnly: true
+          waitingForConnectionTotal:
+            type: integer
+            format: int64
+            description: The cumulative, running count of requests for a connection from this data source that had to 
+              wait before getting a connection, including those that eventually got a connection and those that did not 
+              get a connection.
+            readOnly: true
+      description: This class is used for monitoring a WebLogic JDBC Data Source and its associated connection pool.
     ComponentRuntimeBase:
       allOf:
       - $ref: '#/components/schemas/EnvelopeBase'
@@ -70223,13 +70198,8 @@ components:
             description: Returns the type of the MBean.
             readOnly: true
           deploymentState:
-            type: integer
-            format: int32
-            enum:
-            - 0
-            - 1
-            - 2
-            - 3
+            allOf:
+            - $ref: '#/components/schemas/DeploymentState'
             description: "The current deployment state of the module.\n\nA module can be in one and only one of the following
               states. State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this
               module is neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is
@@ -70250,6 +70220,207 @@ components:
             description: Get the runtime mbeans for all work managers defined in this component
             readOnly: true
       description: Base class for all runtime mbeans that provide status of running modules.
+    JDBCUCPDataSourceRuntime:
+      allOf:
+      - $ref: '#/components/schemas/JDBCDataSourceRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JDBCUCPDataSourceRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCUCPDataSourceRuntime
+        required:
+        - type
+      x-stub: true
+    JDBCAbstractDataSourceRuntime:
+      allOf:
+      - $ref: '#/components/schemas/JDBCDataSourceRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JDBCAbstractDataSourceRuntime`. Body deferred to Phase 4e coverage 
+          expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCAbstractDataSourceRuntime
+        required:
+        - type
+      x-stub: true
+    JDBCProxyDataSourceRuntime:
+      allOf:
+      - $ref: '#/components/schemas/JDBCDataSourceRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JDBCProxyDataSourceRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCProxyDataSourceRuntime
+        required:
+        - type
+      x-stub: true
+    JDBCOracleDataSourceRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JDBCOracleDataSourceRuntime`. Body deferred to Phase 4e coverage 
+          expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCOracleDataSourceRuntime
+        required:
+        - type
+      x-stub: true
+    JDBCDataSourceRuntimeDefault:
+      allOf:
+      - $ref: '#/components/schemas/JDBCDataSourceRuntimeBase'
+      - type: object
+        description: Concrete `JDBCDataSourceRuntime` (no further subtype specialization).
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCDataSourceRuntime
+        required:
+        - type
+    JDBCReplayStatisticsRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JDBCReplayStatisticsRuntime`. Body deferred to Phase 4e coverage 
+          expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCReplayStatisticsRuntime
+        required:
+        - type
+      x-stub: true
+    InterceptionComponentRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `InterceptionComponentRuntime`. Body deferred to Phase 4e coverage 
+          expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - InterceptionComponentRuntime
+        required:
+        - type
+      x-stub: true
+    JDBCMultiDataSourceRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JDBCMultiDataSourceRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JDBCMultiDataSourceRuntime
+        required:
+        - type
+      x-stub: true
+    SCAPojoComponentRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `SCAPojoComponentRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - SCAPojoComponentRuntime
+        required:
+        - type
+      x-stub: true
+    SCASpringComponentRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `SCASpringComponentRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - SCASpringComponentRuntime
+        required:
+        - type
+      x-stub: true
+    JMSComponentRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `JMSComponentRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - JMSComponentRuntime
+        required:
+        - type
+      x-stub: true
+    ComponentConcurrentRuntime:
+      allOf:
+      - $ref: '#/components/schemas/ComponentRuntimeBase'
+      - type: object
+        description: Stub schema for subtype `ComponentConcurrentRuntime`. Body deferred to Phase 4e coverage expansion.
+        properties:
+          type:
+            type: string
+            enum:
+            - ComponentConcurrentRuntime
+        required:
+        - type
+      x-stub: true
+    ServerState:
+      type: string
+      enum:
+      - ACTIVATE_LATER
+      - ADMIN
+      - DISCOVERED
+      - FAILED
+      - FAILED_MIGRATABLE
+      - FAILED_NOT_RESTARTABLE
+      - FAILED_RESTARTING
+      - FORCE_SHUTTING_DOWN
+      - FORCE_SUSPENDING
+      - RESTART_REQUIRED
+      - RESUMING
+      - RUNNING
+      - SHUTDOWN
+      - SHUTDOWN_IN_PROCESS
+      - SHUTDOWN_PENDING
+      - SHUTTING_DOWN
+      - STANDBY
+      - STARTING
+      - SUSPENDING
+      - UNKNOWN
+      description: Shared enum extracted by Phase 4d-3 from 2 occurrences.
+    DeploymentState:
+      type: integer
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      description: Shared enum extracted by Phase 4d-3 from 6 occurrences.
+    WebLogicProtocol:
+      type: string
+      enum:
+      - http
+      - https
+      - iiop
+      - iiops
+      - t3
+      - t3s
+      description: Shared enum extracted by Phase 4d-3 from 2 occurrences.
     Adjudicator:
       type: object
       description: Stub schema for `Adjudicator`. Full schema not yet generated; expand coverage via Phase 4e by adding 
@@ -70830,11 +71001,6 @@ components:
       description: Stub schema for `JDBCDriverRuntime`. Full schema not yet generated; expand coverage via Phase 4e by 
         adding the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
       x-stub: true
-    JDBCMultiDataSourceRuntime:
-      type: object
-      description: Stub schema for `JDBCMultiDataSourceRuntime`. Full schema not yet generated; expand coverage via 
-        Phase 4e by adding the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
-      x-stub: true
     JDBCOracleParamsBean:
       type: object
       description: Stub schema for `JDBCOracleParamsBean`. Full schema not yet generated; expand coverage via Phase 4e 
@@ -70849,11 +71015,6 @@ components:
       type: object
       description: Stub schema for `JDBCPropertyBean`. Full schema not yet generated; expand coverage via Phase 4e by 
         adding the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
-      x-stub: true
-    JDBCReplayStatisticsRuntime:
-      type: object
-      description: Stub schema for `JDBCReplayStatisticsRuntime`. Full schema not yet generated; expand coverage via 
-        Phase 4e by adding the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
       x-stub: true
     JDBCStore:
       type: object

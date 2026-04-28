@@ -172,31 +172,25 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
     for section in ("schemas",):
         components[section].update(virtual.get("components", {}).get(section, {}))
 
-    # Retrofit ComponentRuntime as a polymorphic union over its subtypes so
-    # the subtype schemas (WebApp / EJB / Connector / AppClient) are
-    # actually referenced. Full discriminator+mapping setup is Phase 4d-3.
-    component_subtypes = [
-        n
-        for n in (
-            "WebAppComponentRuntime",
-            "EJBComponentRuntime",
-            "ConnectorComponentRuntime",
-            "AppClientComponentRuntime",
-        )
-        if n in components["schemas"]
-    ]
-    if "ComponentRuntime" in components["schemas"] and component_subtypes:
-        components["schemas"]["ComponentRuntimeBase"] = components["schemas"]["ComponentRuntime"]
-        components["schemas"]["ComponentRuntime"] = {
-            "oneOf": [{"$ref": "#/components/schemas/ComponentRuntimeBase"}]
-            + [{"$ref": f"#/components/schemas/{s}"} for s in component_subtypes],
-            "description": (
-                "Polymorphic component runtime. The concrete type (`WebApp`, "
-                "`EJB`, `Connector`, `AppClient`) depends on what was deployed; "
-                "all subtypes share the `ComponentRuntimeBase` properties. "
-                "Discriminator/mapping refinement is pending in Phase 4d-3."
-            ),
-        }
+    # Phase 4d-3: discriminator-based polymorphism. Replaces the 4d-1
+    # `oneOf` retrofit for ComponentRuntime and extends to any other
+    # parent MBean whose UI overlay declares `subTypeDiscriminatorProperty`.
+    from polymorphism import detect_hierarchies, apply_polymorphism
+
+    target_mbean_names = [t[0] for t in PHASE4B_TARGETS]
+    hierarchies, polymorphism_skipped = detect_hierarchies(target_mbean_names)
+    polymorphism_stats = apply_polymorphism(
+        components["schemas"], hierarchies, _stub_schema
+    )
+
+    # Phase 4d-3: enum extraction. Extract any inline enum that appears in
+    # ≥2 (schema, property) locations to a named schema and replace
+    # occurrences with $ref. Runs AFTER polymorphism so single-element
+    # discriminator enums aren't candidates.
+    from enum_extractor import detect as detect_enums, apply_extraction as apply_enum_extraction
+
+    enum_result = detect_enums(components["schemas"])
+    enums_replaced = apply_enum_extraction(components["schemas"], enum_result)
 
     # 6) Stubs for any orphan reference. Compute by walking the
     # whole document we've assembled so far + paths.
@@ -360,6 +354,23 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
             "operations_added": len(operations_added),
             "operations_detail": operations_added,
             "warnings": pb.warnings,
+            "polymorphism": polymorphism_stats,
+            "polymorphism_skipped": polymorphism_skipped,
+            "enum_extraction": {
+                "extracted": {
+                    name: {
+                        "values": info["values"],
+                        "occurrences": [
+                            (o.schema_name, ".".join(o.property_path))
+                            for o in info["occurrences"]
+                        ],
+                    }
+                    for name, info in enum_result.extracted.items()
+                },
+                "replacements_count": enums_replaced,
+                "inline_kept_count": len(enum_result.inline_kept),
+                "divergences": enum_result.divergences,
+            },
         },
     }
 
