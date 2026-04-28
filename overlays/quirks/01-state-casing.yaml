@@ -1,0 +1,34 @@
+id: state-casing-inconsistencies
+title: "Same conceptual `state` values use different casing across runtime beans"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: property
+    schema: ServerRuntime
+    property: state
+  - type: property
+    schema: ServerLifeCycleRuntime
+    property: state
+  - type: property
+    schema: JDBCDataSourceRuntimeBase
+    property: state
+inject:
+  description_append: |
+    **Quirk — casing differs across runtimes.** WebLogic's REST projection
+    serializes `state` with different casing depending on the bean:
+
+    - `ServerRuntime.state` → UPPERCASE (`RUNNING`, `ADMIN`, `STANDBY`,
+      `FORCE_SUSPENDING`, …).
+    - `JDBCDataSourceRuntime.state` → Title Case (`Running`, `Suspended`,
+      `Shutdown`, `Unhealthy`, `Overloaded`, `Unknown`).
+    - `healthState.state` (see `HealthState` schema) → lowercase tokens
+      (`ok`, `warning`, `critical`, `failed`, `overloaded`).
+
+    Treat these as three separate enums; reusing a single shared
+    `ServerState` for JDBC runtimes will deserialize wrong. Verified on
+    WLS 12.2.1.4 and 14.1.2.
+external_doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes

@@ -1,0 +1,50 @@
+id: jdbc-systemresources-400-staged-create
+title: "POST /edit/JDBCSystemResources returns 400 but registers the parent shell anyway"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: path
+    path: "/edit/JDBCSystemResources"
+    method: post
+inject:
+  description_append: |
+    **Quirk — non-fatal `400`, parent created, staged-create required.**
+    The minimal create call (`{"name": "<unique>"}`) returns
+    `400 Bad Request` with a detail like
+    `JDBCDataSource: Name cannot be null` — but **the parent shell
+    JDBCSystemResource is registered in the edit session anyway**. A
+    subsequent `GET /edit/JDBCSystemResources/<unique>` returns 200
+    with the 15-field shell.
+
+    Posting the full nested tree (`{"name": ..., "JDBCResource":
+    {...}}`) returns the same 400 with the same partial-create. The
+    nested fields are silently ignored at this level.
+
+    The reliable workflow is **staged**:
+
+    1. `POST /edit/JDBCSystemResources {"name": "<unique>"}` — accept
+       the 400.
+    2. `POST /edit/JDBCSystemResources/<unique>/JDBCResource
+       {"name": "<unique>"}`.
+    3. `POST .../JDBCResource/JDBCDataSourceParams {...}`.
+    4. `POST .../JDBCResource/JDBCDriverParams {...}`.
+    5. `POST .../JDBCResource/JDBCConnectionPoolParams {...}`.
+    6. Set `targets` on the parent or via the dedicated subresource.
+    7. `activate` the change session.
+
+    Each sub-resource POST returns `200 {}` cleanly. Treating the
+    initial 400 as fatal causes clients to delete the partial parent
+    and retry, producing the same 400 in a loop.
+
+    Cross-version detail: WLS 12.2.1.4 carries the FQCN of the
+    validation exception in the `detail` (e.g.
+    `weblogic.management.provider.EditNotEditorException: ...`).
+    14.1.2 strips the FQCN and keeps only the message.
+  x_extensions:
+    x-weblogic-staged-create: true
+    x-weblogic-non-fatal-status: 400
+external_doc: docs/QUIRKS.md#6-post-editjdbcsystemresources-always-returns-http-400

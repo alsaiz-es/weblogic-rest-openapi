@@ -1,0 +1,36 @@
+id: name-semantics-vary
+title: "`name` semantics differ across beans (instance vs. configuration vs. derived)"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: global
+inject:
+  description_append: |
+    **Cross-bean note — `name` is not a single concept.** WebLogic's
+    REST projection exposes a `name` field on virtually every bean,
+    inherited from `WebLogicMBean.Name`. The semantics differ:
+
+    - On a **runtime** bean (e.g. `ServerRuntime`, `ApplicationRuntime`),
+      `name` is the instance identifier as the running domain knows it
+      — typically the configured name plus, in some cases, a partition
+      or version suffix.
+    - On an **edit/config** bean (e.g. `Server`, `Cluster`,
+      `JDBCSystemResource`), `name` is the URL key — the path segment
+      used to address the resource, and what the runtime later
+      reports back. Setting it is a CREATE-only operation; updates
+      against `/edit/<collection>/{name}` use the existing identifier.
+    - On a **task** bean (e.g. `LifecycleTaskResponse`,
+      `JDBCDataSourceTaskRuntime`), `name` is a synthesized job key
+      such as `_<n>_<operation>` — informative for log correlation,
+      not a stable identifier across restarts.
+
+    A few beans further override `name` with a derived value (channel
+    runtimes use `channelName` as the canonical field but still emit
+    `name`). When in doubt, prefer the most specific field
+    (`channelName`, `serverName`, `componentName`, …) over the inherited
+    `name`.
+external_doc: docs/QUIRKS.md

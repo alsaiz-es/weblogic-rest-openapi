@@ -1,0 +1,24 @@
+id: jvm-os-prefix-uppercase
+title: "JVMRuntime.OSName / OSVersion keep an uppercase `OS` prefix"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: property
+    schema: JVMRuntime
+    property: OSName
+  - type: property
+    schema: JVMRuntime
+    property: OSVersion
+inject:
+  description_append: |
+    **Quirk — non-camelCase property name.** The WLS REST projection
+    keeps the uppercase `OS` prefix on these two fields, against the
+    rest of the API which would have spelled them `osName` /
+    `osVersion`. Clients that auto-lowercase JSON keys (some JS
+    helpers, some Go libraries) will not find them under the
+    "expected" names.
+external_doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes

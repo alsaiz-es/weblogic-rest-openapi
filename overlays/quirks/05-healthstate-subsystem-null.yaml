@@ -1,0 +1,23 @@
+id: healthstate-subsystemname-null
+title: "`HealthState.subsystemName` is null on roll-up state, populated on per-subsystem state"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: property
+    schema: HealthState
+    property: subsystemName
+inject:
+  description_append: |
+    **Quirk — null on aggregate health.** When `HealthState` is returned
+    as the top-level health roll-up of a server (`ServerRuntime.healthState`,
+    `overallHealthState`), `subsystemName` is **null**. Only when
+    `HealthState` is returned for a specific subsystem (e.g. as part of a
+    multi-subsystem `health` payload, where each entry names its
+    subsystem) does this field carry a value. Treat null as "this is a
+    composite/aggregate health, no single subsystem owns it" rather than
+    as an error.
+external_doc: docs/QUIRKS.md

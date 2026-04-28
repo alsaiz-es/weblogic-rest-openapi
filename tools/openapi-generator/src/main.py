@@ -341,6 +341,13 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
         "components": components,
     }
 
+    # Phase 4d-2: apply editorial quirk overlays. Runs after the document is
+    # fully assembled so it can target schemas, paths, properties, or the
+    # global info block.
+    from quirks import apply_quirks
+
+    quirks_stats = apply_quirks(doc, wls_version)
+
     return {
         "doc": doc,
         "stats": {
@@ -356,6 +363,7 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
             "warnings": pb.warnings,
             "polymorphism": polymorphism_stats,
             "polymorphism_skipped": polymorphism_skipped,
+            "quirks": quirks_stats,
             "enum_extraction": {
                 "extracted": {
                     name: {

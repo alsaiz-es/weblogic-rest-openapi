@@ -1,0 +1,37 @@
+id: jdbc-properties-user-exposure
+title: "JDBC user account is exposed on read via JDBCDriverParams.properties"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: schema
+    schema: JDBCDriverParamsBean
+inject:
+  description_append: |
+    **Quirk — database account name is readable on the edit tree.** The
+    JDBC connection user account is not stored as a top-level
+    `username` field on `JDBCDriverParams`. It is one entry in the
+    nested `properties` collection — typically
+    `{"name": "user", "value": "<dbuser>"}` — alongside any other
+    JDBC driver options.
+
+    Implications:
+
+    - Any caller with `Monitor` role on `/edit/JDBCSystemResources/.../
+      JDBCResource/JDBCDriverParams/properties/properties` can read
+      the database account name. The `password` field on
+      `JDBCDriverParams` is write-only and never echoed; the **user**
+      is not.
+    - Auditing the database identities used by the domain requires
+      walking every JDBC system resource's
+      `JDBCDriverParams.properties.properties` array, not a flat
+      field.
+    - On creation, set the user via the same `properties` array (one
+      property entry with `name: user`); setting it as a top-level
+      `username` is silently ignored.
+  x_extensions:
+    x-weblogic-readable-credential-fragment: true
+external_doc: docs/QUIRKS.md

@@ -1,0 +1,34 @@
+id: jvm-threadstackdump-size
+title: "JVMRuntime.threadStackDump returns the entire thread dump (>100 KB on busy servers)"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: property
+    schema: JVMRuntime
+    property: threadStackDump
+inject:
+  description_append: |
+    **Quirk — payload size.** Despite the field name, this is a complete
+    `Thread.dumpAllStacks()`-style multi-line text dump of every JVM
+    thread. We measured ~108 KB on a busy 12.2.1.4 OSB server and
+    ~53 KB on an idle 14.1.2 AdminServer.
+
+    On busy servers it can exceed 100 KB and produces noticeable HTTP
+    latency. Polling `JVMRuntime` at default field set on an
+    AdminServer monitoring many managed servers can produce >MB of
+    monitoring traffic per cycle.
+
+    **Always exclude this field from monitoring polls.** Recommended
+    idiom:
+
+    - `?excludeFields=threadStackDump&links=none`, or
+    - `?fields=heapFreeCurrent,heapSizeCurrent,uptime,javaVersion,...`
+      (allow-list).
+  x_extensions:
+    x-weblogic-large-payload: true
+    x-weblogic-recommended-exclude: true
+external_doc: docs/QUIRKS.md#9-jvmruntimethreadstackdump-payload-size

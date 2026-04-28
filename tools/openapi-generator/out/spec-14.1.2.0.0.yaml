@@ -7,7 +7,22 @@ info:
     JMX containment.\n\nThis is a Phase 4d-1 build: generated paths, generated schemas, and a minimal envelope/error overlay.
     Quirks documentation, curated descriptions, live samples, sub-type discriminators, enum extraction, and surface curation
     are pending in PHASE4D2 through PHASE4D5.\n\n**Tooling**: `tools/openapi-generator/` (Python + uv, ruamel.yaml, openapi-spec-validator).
-    Branch: `feat/openapi-generator`."
+    Branch: `feat/openapi-generator`.\n\n**Cross-bean note — `name` is not a single concept.** WebLogic's\nREST projection
+    exposes a `name` field on virtually every bean,\ninherited from `WebLogicMBean.Name`. The semantics differ:\n\n- On a
+    **runtime** bean (e.g. `ServerRuntime`, `ApplicationRuntime`),\n  `name` is the instance identifier as the running domain
+    knows it\n  — typically the configured name plus, in some cases, a partition\n  or version suffix.\n- On an **edit/config**
+    bean (e.g. `Server`, `Cluster`,\n  `JDBCSystemResource`), `name` is the URL key — the path segment\n  used to address
+    the resource, and what the runtime later\n  reports back. Setting it is a CREATE-only operation; updates\n  against `/edit/<collection>/{name}`
+    use the existing identifier.\n- On a **task** bean (e.g. `LifecycleTaskResponse`,\n  `JDBCDataSourceTaskRuntime`), `name`
+    is a synthesized job key\n  such as `_<n>_<operation>` — informative for log correlation,\n  not a stable identifier across
+    restarts.\n\nA few beans further override `name` with a derived value (channel\nruntimes use `channelName` as the canonical
+    field but still emit\n`name`). When in doubt, prefer the most specific field\n(`channelName`, `serverName`, `componentName`,
+    …) over the inherited\n`name`.\n\n**Universal — `X-Requested-By` on mutations.** Every mutating\nrequest to the WebLogic
+    REST API (POST, PUT, DELETE on `/edit/*`,\nPOST to `/domainRuntime/serverLifeCycleRuntimes/<server>/<action>`,\nPOST to
+    `/domainRuntime/search`) requires the `X-Requested-By`\nrequest header. Any non-empty value is accepted; clients\ntypically
+    send their product name or version\n(`X-Requested-By: openapi-generator`, `X-Requested-By: ansible`,\netc.). Without the
+    header, the server returns `400 Bad Request`\nwith a plain-text body and no JSON diagnostic.\n\nThe header is also conditionally
+    required on a single GET endpoint\n(`/domainRuntime/serverRuntimes` — see the `csrf-serverRuntimes`\nquirk)."
   version: 14.1.2.0.0
   contact:
     name: weblogic-rest-openapi (unofficial)
@@ -15,6 +30,10 @@ info:
   license:
     name: Apache-2.0 (generator + overlays); UPL-1.0 (harvested schemas)
     url: https://www.apache.org/licenses/LICENSE-2.0
+  x-quirks-global:
+  - name-semantics-vary
+  - csrf-on-mutations
+  x-weblogic-csrf-header: X-Requested-By
 servers:
 - url: http://{host}:{port}
   description: WebLogic Administration Server (HTTP).
@@ -1937,6 +1956,97 @@ paths:
       description: Identifier of the parent collection item (`taskName2`).
       schema:
         type: string
+  /management/weblogic/{version}/domainRuntime/search:
+    post:
+      operationId: searchDomainRuntime
+      tags:
+      - domainRuntime
+      summary: Bulk-fetch a tree slice of runtime beans in one request.
+      description: "Accepts a `BulkSearchRequest` body describing the desired tree\nshape and answers with a JSON document
+        that mirrors the request\nstructure, populated with the requested fields. Allows a single\nrequest to harvest many
+        runtime values that would otherwise\nrequire N separate REST round-trips.\n\n### Body shape (verified)\n\n- `fields`
+        — array of property names to read on the current\n  node. Unknown property names are silently ignored.\n- `links`
+        — array of link relation names to keep in the response.\n  Pass `[]` to suppress the HATEOAS `links` array on this
+        node\n  entirely. **Must be an array** — passing the string `\"none\"`\n  (which is valid as a query parameter on
+        GET) returns `400`\n  with detail `The property 'links' must be an array.`\n- `children` — object whose keys are child
+        collection or\n  singleton names (e.g. `serverRuntimes`, `threadPoolRuntime`)\n  and whose values are themselves `BulkSearchRequest`
+        nodes.\n  Recursive to arbitrary depth.\n- `name` — when used inside a `children.<collection>` node,\n  restricts
+        the collection to the listed instance names.\n\nTop-level keys not listed above are silently ignored.\n\n### Response
+        shape\n\nMirrors the request: each requested child appears as either a\nsingle object (when targeting a singleton
+        MBean such as\n`threadPoolRuntime`) or an `{\"items\": [...]}` envelope (when\ntargeting a collection such as `serverRuntimes`).
+        The fields\nlisted in `fields` populate each node, and any `links` array\nrequested is appended at the same level.\n\
+        \n### Failure modes (verified, WLS 14.1.2)\n\n| Condition | HTTP | Body |\n|---|---|---|\n| No `X-Requested-By` header
+        | 400 | `Bad Request` (text/html) |\n| Wrong content type | 415 | `Unsupported Media Type` |\n| GET instead of POST
+        | 405 | RFC-7807-style JSON error |\n| `/management/wls/latest/...` namespace | 404 | `Not Found` |\n| Invalid JSON
+        body | 400 | `Bad Request` (text/html) |\n| `\"links\": \"none\"` (string) | 400 | RFC-7807 JSON: `must be an array`
+        |\n"
+      parameters:
+      - $ref: '#/components/parameters/VersionPathParam'
+      - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkSearchRequest'
+            examples:
+              empty:
+                summary: Empty body — returns the full domainRuntime root with HATEOAS links.
+                value: {}
+              serversBasic:
+                summary: Names and states of every running server.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      fields:
+                      - name
+                      - state
+                      links: []
+              serversWithThreadPool:
+                summary: Server state plus thread pool counters in one call.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      fields:
+                      - name
+                      - state
+                      links: []
+                      children:
+                        threadPoolRuntime:
+                          fields:
+                          - executeThreadTotalCount
+                          - hoggingThreadCount
+                          - stuckThreadCount
+                          links: []
+      responses:
+        '200':
+          description: Tree slice mirroring the request structure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkSearchResponse'
+        '400':
+          description: "Returned for two distinct reasons. **`text/html` body\ncontaining `Bad Request`**: the CSRF check
+            or JSON parser\nrejected the request before it reached the DSL validator —\nmost commonly because the `X-Requested-By`
+            header is\nmissing. **RFC-7807 JSON body**: the DSL validator rejected\na value (e.g. `links` was not an array).\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+            text/html:
+              schema:
+                type: string
+                description: Plain `Bad Request` page; rejection happened before DSL validation.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '405':
+          description: Wrong HTTP method (only POST is accepted).
+        '415':
+          description: Unsupported `Content-Type` (only `application/json` is accepted).
   /management/weblogic/{version}/domainRuntime/serverLifeCycleRuntimes:
     get:
       operationId: listServerLifeCycleRuntime__domainRuntime_serverLifeCycleRuntimes
@@ -2192,6 +2302,98 @@ paths:
       description: Identifier of the parent collection item (`serverName`).
       schema:
         type: string
+  /management/weblogic/{version}/domainRuntime/serverLifeCycleRuntimes/{serverName}/startInAdmin:
+    parameters:
+    - $ref: '#/components/parameters/VersionPathParam'
+    - name: serverName
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: startServerInAdmin
+      tags:
+      - lifecycle
+      summary: Start the server, halting in ADMIN state.
+      description: "Boots the server through NodeManager but stops it in `ADMIN`\nstate — the server runs but accepts only
+        administrative\ntraffic. This action is **not** declared in the WebLogic Remote\nConsole's `extension.yaml` overlay;
+        it is recovered here\nmanually. See the Phase 4d-2 report for the decision rationale\n(Java scraping was attempted;
+        only `startInAdminMode` for\napplication deployments was found, distinct from this server-\nlifecycle action).\n\n\
+        Like the other lifecycle actions, the call returns a\npopulated `ServerLifeCycleTaskRuntime` envelope (see the\n`lifecycle-async-task-shape`
+        quirk). Failures surface via\n`taskError` rather than HTTP status.\n"
+      parameters:
+      - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: array
+                  description: Optional NodeManager start properties (server.start.* keys).
+                  items:
+                    type: string
+            example: {}
+      responses:
+        '200':
+          description: Lifecycle task descriptor (always populated, even on synchronous completion).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLifeCycleTaskRuntime'
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /management/weblogic/{version}/domainRuntime/serverLifeCycleRuntimes/{serverName}/startInStandby:
+    parameters:
+    - $ref: '#/components/parameters/VersionPathParam'
+    - name: serverName
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: startServerInStandby
+      tags:
+      - lifecycle
+      summary: Start the server, halting in STANDBY state.
+      description: "Boots the server through NodeManager but stops it in `STANDBY`\nstate — listen ports closed, server initialized
+        but not\naccepting any traffic. Useful as a \"warm spare\" before\npromoting the instance with a follow-up `resume`.\n\
+        \nAs with `startInAdmin`, this action is not declared in the\nRemote Console `extension.yaml` overlay; recovered manually\n\
+        for the generated spec. Same async-task envelope as the other\nlifecycle actions (`lifecycle-async-task-shape` quirk).\n"
+      parameters:
+      - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: array
+                  description: Optional NodeManager start properties (server.start.* keys).
+                  items:
+                    type: string
+            example: {}
+      responses:
+        '200':
+          description: Lifecycle task descriptor (always populated, even on synchronous completion).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLifeCycleTaskRuntime'
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /management/weblogic/{version}/domainRuntime/serverLifeCycleRuntimes/{serverName}/suspend:
     post:
       operationId: suspend__domainRuntime_serverLifeCycleRuntimes_by_serverName_suspend
@@ -2495,13 +2697,24 @@ paths:
       tags:
       - domainRuntime
       summary: List ServerRuntime
-      description: List all `ServerRuntimes` resources in this collection.
+      description: "List all `ServerRuntimes` resources in this collection.\n\n**Quirk — selective CSRF gate on this read
+        endpoint.** Oracle's\ndocs state that `X-Requested-By` is required only on mutating\nmethods. On this collection it
+        is also required for GET — but\n**only when at least one managed server is in `RUNNING` state**.\nWith only the AdminServer
+        up and no managed servers running, the\nsame anonymous GET returns `200`. Once any managed server reaches\nRUNNING,
+        anonymous calls return `400 Bad Request` (JSON envelope\nwith no useful detail).\n\nOf the eight `/domainRuntime/*`
+        endpoints we probed\n(`serverRuntimes`, `migrationDataRuntimes`, `nodeManagerRuntimes`,\n`serviceMigrationDataRuntimes`,
+        `serverLifeCycleRuntimes`,\n`systemComponentLifeCycleRuntimes`, plus the `/domainRuntime`\nroot and the `JNDI` singleton),
+        **only this one** enforces the\nheader. We have not found any Oracle documentation calling this\nout.\n\nWorkarounds
+        when the header cannot be sent: fetch each server by\nname (`/domainRuntime/serverRuntimes/{serverName}` is unaffected),\n\
+        or use `POST /domainRuntime/search` with a `serverRuntimes` child\n(which always requires `X-Requested-By` per the
+        standard CSRF\nguard)."
       parameters:
       - $ref: '#/components/parameters/VersionPathParam'
       - $ref: '#/components/parameters/FieldsParam'
       - $ref: '#/components/parameters/ExcludeFieldsParam'
       - $ref: '#/components/parameters/LinksParam'
       - $ref: '#/components/parameters/ExcludeLinksParam'
+      - $ref: '#/components/parameters/XRequestedByHeader'
       responses:
         '200':
           description: Collection of `ServerRuntime`.
@@ -2520,6 +2733,12 @@ paths:
                       $ref: '#/components/schemas/Link'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      x-weblogic-conditional-csrf:
+        header: X-Requested-By
+        condition: at-least-one-managed-server-in-RUNNING-state
+      x-weblogic-quirks:
+      - id: csrf-serverRuntimes
+        doc: docs/QUIRKS.md#2-selective-x-requested-by-enforcement-on-get-domainruntimeserverruntimes
   /management/weblogic/{version}/domainRuntime/serverRuntimes/{serverName}:
     get:
       operationId: getServerRuntime__domainRuntime_serverRuntimes_by_serverName
@@ -20789,7 +21008,19 @@ paths:
       tags:
       - edit
       summary: Create JDBCSystemResource
-      description: Create a new `JDBCSystemResource` resource within this collection. Requires `X-Requested-By`.
+      description: "Create a new `JDBCSystemResource` resource within this collection. Requires `X-Requested-By`.\n\n**Quirk
+        — non-fatal `400`, parent created, staged-create required.**\nThe minimal create call (`{\"name\": \"<unique>\"}`)
+        returns\n`400 Bad Request` with a detail like\n`JDBCDataSource: Name cannot be null` — but **the parent shell\nJDBCSystemResource
+        is registered in the edit session anyway**. A\nsubsequent `GET /edit/JDBCSystemResources/<unique>` returns 200\nwith
+        the 15-field shell.\n\nPosting the full nested tree (`{\"name\": ..., \"JDBCResource\":\n{...}}`) returns the same
+        400 with the same partial-create. The\nnested fields are silently ignored at this level.\n\nThe reliable workflow
+        is **staged**:\n\n1. `POST /edit/JDBCSystemResources {\"name\": \"<unique>\"}` — accept\n   the 400.\n2. `POST /edit/JDBCSystemResources/<unique>/JDBCResource\n\
+        \   {\"name\": \"<unique>\"}`.\n3. `POST .../JDBCResource/JDBCDataSourceParams {...}`.\n4. `POST .../JDBCResource/JDBCDriverParams
+        {...}`.\n5. `POST .../JDBCResource/JDBCConnectionPoolParams {...}`.\n6. Set `targets` on the parent or via the dedicated
+        subresource.\n7. `activate` the change session.\n\nEach sub-resource POST returns `200 {}` cleanly. Treating the\n\
+        initial 400 as fatal causes clients to delete the partial parent\nand retry, producing the same 400 in a loop.\n\n\
+        Cross-version detail: WLS 12.2.1.4 carries the FQCN of the\nvalidation exception in the `detail` (e.g.\n`weblogic.management.provider.EditNotEditorException:
+        ...`).\n14.1.2 strips the FQCN and keeps only the message."
       parameters:
       - $ref: '#/components/parameters/VersionPathParam'
       - $ref: '#/components/parameters/XRequestedByHeader'
@@ -20810,6 +21041,11 @@ paths:
           $ref: '#/components/responses/EditError'
         '401':
           $ref: '#/components/responses/Unauthorized'
+      x-weblogic-staged-create: true
+      x-weblogic-non-fatal-status: 400
+      x-weblogic-quirks:
+      - id: jdbc-systemresources-400-staged-create
+        doc: docs/QUIRKS.md#6-post-editjdbcsystemresources-always-returns-http-400
   /management/weblogic/{version}/edit/JDBCSystemResources/{systemResourceName}:
     get:
       operationId: getJDBCSystemResource__edit_JDBCSystemResources_by_systemResourceName
@@ -37865,7 +38101,18 @@ paths:
           $ref: '#/components/responses/EditError'
         '401':
           $ref: '#/components/responses/Unauthorized'
-      description: Acquire the edit lock.
+      description: "Acquire the edit lock.\n\n**Quirk — idempotent for the existing owner.** Calling `startEdit`\nwhile you
+        already hold the lock is **not** an error; it returns\n`200 {}` and leaves the session in the same state. The intuitive\n\
+        REST semantics for a \"lock acquire\" would be `409 Conflict` or\n`423 Locked`; WLS does not enforce that for the
+        same owner.\n\nOperational benefit: clients that crash mid-session can re-acquire\ncleanly. A finally-clause cleanup
+        of `startEdit → cancelEdit →\ndone` is safe regardless of prior state.\n\nThe documented `safeResolve` / `forceResolve`
+        operations are still\nneeded when **another** user has activated changes underneath you\n— that scenario manifests
+        as `mergeNeeded: true` on the session\nstate. Cross-user contention (a different user trying to\n`startEdit` while
+        another holds the lock) is presumed to collide\nand was not verified."
+      x-weblogic-idempotent-for-owner: true
+      x-weblogic-quirks:
+      - id: startedit-idempotent
+        doc: docs/QUIRKS.md#5-startedit-is-idempotent
   /management/weblogic/{version}/edit/clusters:
     get:
       operationId: listCluster__edit_clusters
@@ -65672,6 +65919,69 @@ components:
                 - FAILURE
               message:
                 type: string
+    HealthSymptom:
+      type: object
+      description: "A single symptom contributing to a subsystem's health state.\nField set inferred from the `weblogic.health.Symptom`
+        Java\nAPI; the REST serialization may downcase the `severity`\nvalues to match the lowercase tokens used elsewhere
+        on\n`HealthState`.\n"
+      properties:
+        severity:
+          type: string
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+        cause:
+          type: string
+          description: Short description of the contributing cause.
+        mitigationMessages:
+          type: array
+          items:
+            type: string
+        panicMessage:
+          type: string
+          nullable: true
+    HealthState:
+      type: object
+      description: "Composite health state reported by a subsystem or server. The\n`state` field is the coarse roll-up; `symptoms`
+        provides the\nunderlying contributing conditions when available.\n"
+      required:
+      - state
+      properties:
+        state:
+          type: string
+          enum:
+          - ok
+          - warning
+          - critical
+          - failed
+          - overloaded
+          - unknown
+          description: "**Quirk — lowercase serialization.** Oracle's\n`weblogic.health.HealthState` Java API documents the
+            constants as\n`HEALTH_OK`, `HEALTH_WARN`, `HEALTH_CRITICAL`, `HEALTH_FAILED`,\n`HEALTH_OVERLOADED`, `HEALTH_UNKNOWN`.
+            The REST serialization\n**downcases** them to `ok`, `warning`, `critical`, `failed`,\n`overloaded`, `unknown`.
+            Note the `WARN` → `warning` expansion.\nVerified on 12.2.1.4 and 14.1.2."
+          x-weblogic-quirks:
+          - id: healthstate-lowercase
+            doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
+        subsystemName:
+          type: string
+          description: "Name of the subsystem reporting this health state.\n\n**Quirk — null on aggregate health.** When `HealthState`
+            is returned\nas the top-level health roll-up of a server (`ServerRuntime.healthState`,\n`overallHealthState`),
+            `subsystemName` is **null**. Only when\n`HealthState` is returned for a specific subsystem (e.g. as part of a\n\
+            multi-subsystem `health` payload, where each entry names its\nsubsystem) does this field carry a value. Treat
+            null as \"this is a\ncomposite/aggregate health, no single subsystem owns it\" rather than\nas an error."
+          nullable: true
+          x-weblogic-quirks:
+          - id: healthstate-subsystemname-null
+            doc: docs/QUIRKS.md
+        partitionName:
+          type: string
+          nullable: true
+        symptoms:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthSymptom'
     EditErrorDetail:
       type: object
       required:
@@ -65685,10 +65995,30 @@ components:
           type: string
         detail:
           type: string
+      description: "**Quirk — distinct envelope, namespaced field, version-divergent detail.**\nEdit-session validation failures
+        use this richer envelope, distinct\nfrom the standard `ErrorResponse`. The `wls:errorsDetails` field\ncarries one
+        or more nested errors. The colon in the property name is\nreal — JSON-valid but unfortunate for clients that auto-generate\n\
+        Java/TypeScript/Go types: most generators silently rewrite `:` to\n`_`.\n\nCross-version difference: **WLS 12.2.1.4**
+        keeps the fully-qualified\nJava exception class name in each `detail` (e.g.\n`weblogic.management.provider.EditNotEditorException:
+        Not edit\nlock owner`). **14.1.2** strips the FQCN and keeps only the\nmessage. Same pattern visible in JDBC validation
+        errors.\n\nClients consuming `/edit/` errors must branch on the presence of\n`wls:errorsDetails` to distinguish edit-tree
+        errors from the\nstandard `ErrorResponse`. String comparison on `detail` text breaks\nacross versions; either match
+        the trailing fragment or normalize."
+      x-weblogic-quirks:
+      - id: edit-error-envelope-fqcn
+        doc: docs/QUIRKS.md#4-edit-tree-validation-errors-use-a-different-envelope
     EditErrorResponse:
       type: object
       description: "Edit-tree validation error envelope. Carries `wls:errorsDetails`\nwith one or more nested errors. Distinct
-        from `ErrorResponse`.\n"
+        from `ErrorResponse`.\n\n**Quirk — distinct envelope, namespaced field, version-divergent detail.**\nEdit-session
+        validation failures use this richer envelope, distinct\nfrom the standard `ErrorResponse`. The `wls:errorsDetails`
+        field\ncarries one or more nested errors. The colon in the property name is\nreal — JSON-valid but unfortunate for
+        clients that auto-generate\nJava/TypeScript/Go types: most generators silently rewrite `:` to\n`_`.\n\nCross-version
+        difference: **WLS 12.2.1.4** keeps the fully-qualified\nJava exception class name in each `detail` (e.g.\n`weblogic.management.provider.EditNotEditorException:
+        Not edit\nlock owner`). **14.1.2** strips the FQCN and keeps only the\nmessage. Same pattern visible in JDBC validation
+        errors.\n\nClients consuming `/edit/` errors must branch on the presence of\n`wls:errorsDetails` to distinguish edit-tree
+        errors from the\nstandard `ErrorResponse`. String comparison on `detail` text breaks\nacross versions; either match
+        the trailing fragment or normalize."
       required:
       - status
       - title
@@ -65705,6 +66035,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EditErrorDetail'
+      x-weblogic-quirks:
+      - id: edit-error-envelope-fqcn
+        doc: docs/QUIRKS.md#4-edit-tree-validation-errors-use-a-different-envelope
     ServerRuntime:
       allOf:
       - $ref: '#/components/schemas/EnvelopeBase'
@@ -66024,8 +66357,16 @@ components:
             - $ref: '#/components/schemas/ServerState'
             description: "The current life cycle state of this server.\n\nFor example, a server can be in a RUNNING state
               in which it can receive and process requests or in an ADMIN state in which it can receive only administrative
-              requests."
+              requests.\n\n**Quirk — casing differs across runtimes.** WebLogic's REST projection\nserializes `state` with
+              different casing depending on the bean:\n\n- `ServerRuntime.state` → UPPERCASE (`RUNNING`, `ADMIN`, `STANDBY`,\n\
+              \  `FORCE_SUSPENDING`, …).\n- `JDBCDataSourceRuntime.state` → Title Case (`Running`, `Suspended`,\n  `Shutdown`,
+              `Unhealthy`, `Overloaded`, `Unknown`).\n- `healthState.state` (see `HealthState` schema) → lowercase tokens\n\
+              \  (`ok`, `warning`, `critical`, `failed`, `overloaded`).\n\nTreat these as three separate enums; reusing a
+              single shared\n`ServerState` for JDBC runtimes will deserialize wrong. Verified on\nWLS 12.2.1.4 and 14.1.2."
             readOnly: true
+            x-weblogic-quirks:
+            - id: state-casing-inconsistencies
+              doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
           stateVal:
             type: integer
             format: int32
@@ -66257,16 +66598,39 @@ components:
           OSName:
             type: string
             description: "Returns the operating system on which the JVM is running.\n\nThe operating system on which the JVM
-              is running."
+              is running.\n\n**Quirk — non-camelCase property name.** The WLS REST projection\nkeeps the uppercase `OS` prefix
+              on these two fields, against the\nrest of the API which would have spelled them `osName` /\n`osVersion`. Clients
+              that auto-lowercase JSON keys (some JS\nhelpers, some Go libraries) will not find them under the\n\"expected\"\
+              \ names."
             readOnly: true
+            x-weblogic-quirks:
+            - id: jvm-os-prefix-uppercase
+              doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
           OSVersion:
             type: string
-            description: The version of the operating system on which the JVM is running.
+            description: "The version of the operating system on which the JVM is running.\n\n**Quirk — non-camelCase property
+              name.** The WLS REST projection\nkeeps the uppercase `OS` prefix on these two fields, against the\nrest of the
+              API which would have spelled them `osName` /\n`osVersion`. Clients that auto-lowercase JSON keys (some JS\n\
+              helpers, some Go libraries) will not find them under the\n\"expected\" names."
             readOnly: true
+            x-weblogic-quirks:
+            - id: jvm-os-prefix-uppercase
+              doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
           threadStackDump:
             type: string
-            description: JVM thread dump. Thread dump is available only on 1.5 VM
+            description: "JVM thread dump. Thread dump is available only on 1.5 VM\n\n**Quirk — payload size.** Despite the
+              field name, this is a complete\n`Thread.dumpAllStacks()`-style multi-line text dump of every JVM\nthread. We
+              measured ~108 KB on a busy 12.2.1.4 OSB server and\n~53 KB on an idle 14.1.2 AdminServer.\n\nOn busy servers
+              it can exceed 100 KB and produces noticeable HTTP\nlatency. Polling `JVMRuntime` at default field set on an\n\
+              AdminServer monitoring many managed servers can produce >MB of\nmonitoring traffic per cycle.\n\n**Always exclude
+              this field from monitoring polls.** Recommended\nidiom:\n\n- `?excludeFields=threadStackDump&links=none`, or\n\
+              - `?fields=heapFreeCurrent,heapSizeCurrent,uptime,javaVersion,...`\n  (allow-list)."
             readOnly: true
+            x-weblogic-large-payload: true
+            x-weblogic-recommended-exclude: true
+            x-weblogic-quirks:
+            - id: jvm-threadstackdump-size
+              doc: docs/QUIRKS.md#9-jvmruntimethreadstackdump-payload-size
           uptime:
             type: integer
             format: int64
@@ -67211,7 +67575,15 @@ components:
             type: string
             description: The physical URL that this channel is listening on.
             readOnly: true
-      description: Runtime information for NetworkAccessPoints or "Channels".
+      description: "Runtime information for NetworkAccessPoints or \"Channels\".\n\n**Quirk — REST projection does not expose
+        channel network triplet.**\nThe underlying `ServerChannelRuntimeMBean` declares\n`listenAddress`, `listenPort`, `protocol`,
+        `publicAddress`, and\n`publicPort` as readable Java properties. The REST projection\nreturns **none** of them — even
+        when explicitly requested via\n`?fields=listenAddress,listenPort,protocol,publicAddress,publicPort`.\nOnly the concatenated
+        `publicURL` string\n(`<protocol>://<host>:<port>`) is surfaced.\n\nClients needing the components separately must
+        parse `publicURL`.\nNo other REST path obtains them. Verified on WLS 12.2.1.4 and\n14.1.2."
+      x-weblogic-quirks:
+      - id: channel-missing-listenAddress-listenPort
+        doc: docs/QUIRKS.md#10-serverchannelruntime-does-not-expose-listenaddress-listenport-or-protocol
     JMSRuntime:
       allOf:
       - $ref: '#/components/schemas/EnvelopeBase'
@@ -69495,7 +69867,19 @@ components:
             x-weblogic-restart-needed: true
             x-weblogic-redeploy-needed: true
       description: "Contains the driver parameters of a data source.\n\nConfiguration parameters for the JDBC Driver used
-        by a data source are specified using a driver parameters bean."
+        by a data source are specified using a driver parameters bean.\n\n**Quirk — database account name is readable on the
+        edit tree.** The\nJDBC connection user account is not stored as a top-level\n`username` field on `JDBCDriverParams`.
+        It is one entry in the\nnested `properties` collection — typically\n`{\"name\": \"user\", \"value\": \"<dbuser>\"\
+        }` — alongside any other\nJDBC driver options.\n\nImplications:\n\n- Any caller with `Monitor` role on `/edit/JDBCSystemResources/.../\n\
+        \  JDBCResource/JDBCDriverParams/properties/properties` can read\n  the database account name. The `password` field
+        on\n  `JDBCDriverParams` is write-only and never echoed; the **user**\n  is not.\n- Auditing the database identities
+        used by the domain requires\n  walking every JDBC system resource's\n  `JDBCDriverParams.properties.properties` array,
+        not a flat\n  field.\n- On creation, set the user via the same `properties` array (one\n  property entry with `name:
+        user`); setting it as a top-level\n  `username` is silently ignored."
+      x-weblogic-readable-credential-fragment: true
+      x-weblogic-quirks:
+      - id: jdbc-properties-user-exposure
+        doc: docs/QUIRKS.md
     JDBCConnectionPoolParamsBean:
       allOf:
       - $ref: '#/components/schemas/EnvelopeBase'
@@ -69837,8 +70221,17 @@ components:
           state:
             allOf:
             - $ref: '#/components/schemas/ServerState'
-            description: The current state of the server.
+            description: "The current state of the server.\n\n**Quirk — casing differs across runtimes.** WebLogic's REST
+              projection\nserializes `state` with different casing depending on the bean:\n\n- `ServerRuntime.state` → UPPERCASE
+              (`RUNNING`, `ADMIN`, `STANDBY`,\n  `FORCE_SUSPENDING`, …).\n- `JDBCDataSourceRuntime.state` → Title Case (`Running`,
+              `Suspended`,\n  `Shutdown`, `Unhealthy`, `Overloaded`, `Unknown`).\n- `healthState.state` (see `HealthState`
+              schema) → lowercase tokens\n  (`ok`, `warning`, `critical`, `failed`, `overloaded`).\n\nTreat these as three
+              separate enums; reusing a single shared\n`ServerState` for JDBC runtimes will deserialize wrong. Verified on\n\
+              WLS 12.2.1.4 and 14.1.2."
             readOnly: true
+            x-weblogic-quirks:
+            - id: state-casing-inconsistencies
+              doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
           tasks:
             type: array
             items:
@@ -69855,6 +70248,45 @@ components:
         Servers.\n\nYou cannot use it to start an Administration Server, and if you want to use it to start Managed Servers,
         you must first set up a Node Manager on each Managed Server's host machine.\n\nIf you want to use the methods that
         transition a server into the `ADMIN` state, you must first set up an administration channel for that server."
+    BulkSearchRequest:
+      type: object
+      description: "Recursive description of a tree slice. Every node may carry\n`fields`, `links`, and `children`. Inside
+        `children.<X>`,\nwhen `<X>` is a collection, `name` may filter to a subset.\n"
+      properties:
+        fields:
+          type: array
+          description: Property names to read on this node. Unknown names are silently ignored.
+          items:
+            type: string
+          example:
+          - name
+          - state
+        links:
+          type: array
+          description: "Link relation names to keep in the `links` array of this\nnode's response. Pass `[]` to suppress all
+            links on this\nnode. **Must be an array** even when empty — the string\n`\"none\"` (valid on GET) is rejected
+            here.\n"
+          items:
+            type: string
+          example: []
+        children:
+          type: object
+          description: "Map of child collection or singleton names to nested\n`BulkSearchRequest` nodes. Recursive to arbitrary
+            depth.\n"
+          additionalProperties:
+            $ref: '#/components/schemas/BulkSearchRequest'
+        name:
+          type: array
+          description: "Restricts a `children.<collection>` node to instances\nwith these names. Has no observed effect at
+            the root\nnode — only inside a child collection.\n"
+          items:
+            type: string
+    BulkSearchResponse:
+      type: object
+      description: "Mirror of the request structure populated with values.\nEach child collection appears as `{ \"items\"\
+        : [...] }`;\neach child singleton appears as a plain object. The shape\nis structural — no fixed property set is enforced
+        because\nit depends entirely on which fields and children the\nrequest asked for.\n"
+      additionalProperties: true
     ChangeManagerState:
       type: object
       description: "Edit-session state. Returned by `GET /edit/changeManager`.\n"
@@ -70123,8 +70555,16 @@ components:
               when all connections have failed connection tests (on creation, on reserve, or periodic testing).\n- \n- `Suspended`
               - the data source has been disabled.\n- \n- `Shutdown` - the data source is shutdown and all database connections
               have been closed.\n- \n- `Overloaded` - all resources in pool are in use.\n- \n- `Unknown` - the data source
-              state is unknown.\n-"
+              state is unknown.\n-\n\n**Quirk — casing differs across runtimes.** WebLogic's REST projection\nserializes `state`
+              with different casing depending on the bean:\n\n- `ServerRuntime.state` → UPPERCASE (`RUNNING`, `ADMIN`, `STANDBY`,\n\
+              \  `FORCE_SUSPENDING`, …).\n- `JDBCDataSourceRuntime.state` → Title Case (`Running`, `Suspended`,\n  `Shutdown`,
+              `Unhealthy`, `Overloaded`, `Unknown`).\n- `healthState.state` (see `HealthState` schema) → lowercase tokens\n\
+              \  (`ok`, `warning`, `critical`, `failed`, `overloaded`).\n\nTreat these as three separate enums; reusing a
+              single shared\n`ServerState` for JDBC runtimes will deserialize wrong. Verified on\nWLS 12.2.1.4 and 14.1.2."
             readOnly: true
+            x-weblogic-quirks:
+            - id: state-casing-inconsistencies
+              doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
           tasks:
             type: array
             items:
@@ -70961,11 +71401,6 @@ components:
       description: Stub schema for `HealthScore`. Full schema not yet generated; expand coverage via Phase 4e by adding 
         the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
       x-stub: true
-    HealthState:
-      type: object
-      description: Stub schema for `HealthState`. Full schema not yet generated; expand coverage via Phase 4e by adding 
-        the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
-      x-stub: true
     Http2Config:
       type: object
       description: Stub schema for `Http2Config`. Full schema not yet generated; expand coverage via Phase 4e by adding 
@@ -71673,9 +72108,21 @@ components:
       x-stub: true
     ServerLifeCycleTaskRuntime:
       type: object
-      description: Stub schema for `ServerLifeCycleTaskRuntime`. Full schema not yet generated; expand coverage via 
-        Phase 4e by adding the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.
+      description: "Stub schema for `ServerLifeCycleTaskRuntime`. Full schema not yet generated; expand coverage via Phase
+        4e by adding the source MBean to `tools/openapi-generator/src/phase4b_runner.py:TARGETS`.\n\n**Quirk — every lifecycle
+        action returns this task envelope, even when\nit completes synchronously.** `start`, `suspend`, `resume`,\n`forceSuspend`,
+        `shutdown`, `forceShutdown`, `startInAdmin`,\n`startInStandby` all return a populated\n`ServerLifeCycleTaskRuntime`
+        JSON object describing the job — not\nan empty `200`. Even ~35 ms operations follow the async-job\nprotocol; `taskStatus:
+        \"TASK COMPLETED\"` and `completed: true`\nappear synchronously in the response on success.\n\nFailures are reported
+        via `taskError` (non-null), **not via HTTP\nstatus**. A misbehaving NodeManager returns `200` with a non-null\n`taskError`
+        carrying the wrapped exception. Clients should not\ntreat the HTTP code alone as success/failure for lifecycle calls;\n\
+        inspect `taskStatus` / `taskError`.\n\n`suspend` requests are internally recorded as `suspendWithTimeout`\nregardless
+        of whether the body included a timeout. The `tasks`\ncollection child of each lifecycle runtime accumulates the\n\
+        history of all past invocations. Verified on WLS 12.2.1.4 and\n14.1.2 with identical 18-field shape."
       x-stub: true
+      x-weblogic-quirks:
+      - id: lifecycle-async-task-shape
+        doc: docs/QUIRKS.md#7-lifecycle-operations-return-an-async-task-descriptor
     ServerLogRuntime:
       type: object
       description: Stub schema for `ServerLogRuntime`. Full schema not yet generated; expand coverage via Phase 4e by 

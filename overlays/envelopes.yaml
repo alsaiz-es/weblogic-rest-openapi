@@ -144,6 +144,53 @@ components:
               message:
                 type: string
 
+    HealthSymptom:
+      type: object
+      description: |
+        A single symptom contributing to a subsystem's health state.
+        Field set inferred from the `weblogic.health.Symptom` Java
+        API; the REST serialization may downcase the `severity`
+        values to match the lowercase tokens used elsewhere on
+        `HealthState`.
+      properties:
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        cause:
+          type: string
+          description: Short description of the contributing cause.
+        mitigationMessages:
+          type: array
+          items:
+            type: string
+        panicMessage:
+          type: string
+          nullable: true
+
+    HealthState:
+      type: object
+      description: |
+        Composite health state reported by a subsystem or server. The
+        `state` field is the coarse roll-up; `symptoms` provides the
+        underlying contributing conditions when available.
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          enum: [ok, warning, critical, failed, overloaded, unknown]
+        subsystemName:
+          type: string
+          description: Name of the subsystem reporting this health state.
+          nullable: true
+        partitionName:
+          type: string
+          nullable: true
+        symptoms:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthSymptom'
+
     EditErrorDetail:
       type: object
       required:

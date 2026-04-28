@@ -1,0 +1,34 @@
+id: edit-error-envelope-fqcn
+title: "Edit-tree validation errors use a richer envelope; 12.2.1.4 leaks Java exception class names"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: schema
+    schema: EditErrorResponse
+  - type: schema
+    schema: EditErrorDetail
+inject:
+  description_append: |
+    **Quirk — distinct envelope, namespaced field, version-divergent detail.**
+    Edit-session validation failures use this richer envelope, distinct
+    from the standard `ErrorResponse`. The `wls:errorsDetails` field
+    carries one or more nested errors. The colon in the property name is
+    real — JSON-valid but unfortunate for clients that auto-generate
+    Java/TypeScript/Go types: most generators silently rewrite `:` to
+    `_`.
+
+    Cross-version difference: **WLS 12.2.1.4** keeps the fully-qualified
+    Java exception class name in each `detail` (e.g.
+    `weblogic.management.provider.EditNotEditorException: Not edit
+    lock owner`). **14.1.2** strips the FQCN and keeps only the
+    message. Same pattern visible in JDBC validation errors.
+
+    Clients consuming `/edit/` errors must branch on the presence of
+    `wls:errorsDetails` to distinguish edit-tree errors from the
+    standard `ErrorResponse`. String comparison on `detail` text breaks
+    across versions; either match the trailing fragment or normalize.
+external_doc: docs/QUIRKS.md#4-edit-tree-validation-errors-use-a-different-envelope

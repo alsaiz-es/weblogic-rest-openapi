@@ -1,0 +1,22 @@
+id: healthstate-lowercase
+title: "`healthState.state` returns lowercase tokens, not the Java HEALTH_* constants"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: property
+    schema: HealthState
+    property: state
+inject:
+  description_append: |
+    **Quirk — lowercase serialization.** Oracle's
+    `weblogic.health.HealthState` Java API documents the constants as
+    `HEALTH_OK`, `HEALTH_WARN`, `HEALTH_CRITICAL`, `HEALTH_FAILED`,
+    `HEALTH_OVERLOADED`, `HEALTH_UNKNOWN`. The REST serialization
+    **downcases** them to `ok`, `warning`, `critical`, `failed`,
+    `overloaded`, `unknown`. Note the `WARN` → `warning` expansion.
+    Verified on 12.2.1.4 and 14.1.2.
+external_doc: docs/QUIRKS.md#1-casing-inconsistencies-across-runtimes
