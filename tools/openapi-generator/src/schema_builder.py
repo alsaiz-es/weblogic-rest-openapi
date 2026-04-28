@@ -174,6 +174,14 @@ def build_property_schema(
     if overlay_enum:
         enum_values = overlay_enum
 
+    # WLS UI overlays sometimes encode "use default; no override" as a
+    # null-valued legal value (e.g. ServerTemplateMBean.StagingMode). OAS
+    # requires enum entries to match the schema type, so we strip nulls.
+    if enum_values is not None:
+        enum_values = [v for v in enum_values if v is not None]
+        if not enum_values:
+            enum_values = None
+
     if enum_values:
         if "type" in inner and inner["type"] in {"string", "integer", "number", "boolean"}:
             inner["enum"] = enum_values

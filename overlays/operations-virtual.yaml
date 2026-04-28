@@ -33,7 +33,7 @@ paths:
   /edit/changeManager:
     get:
       operationId: getChangeManagerState
-      tags: [changeManager]
+      tags: [change-manager]
       summary: Read current edit-session state.
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'
@@ -50,7 +50,7 @@ paths:
   /edit/changeManager/startEdit:
     post:
       operationId: startEdit
-      tags: [changeManager]
+      tags: [change-manager]
       summary: Acquire the edit lock.
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'
@@ -77,7 +77,7 @@ paths:
   /edit/changeManager/cancelEdit:
     post:
       operationId: cancelEdit
-      tags: [changeManager]
+      tags: [change-manager]
       summary: Discard pending changes and release the edit lock.
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'
@@ -98,7 +98,7 @@ paths:
   /edit/changeManager/activate:
     post:
       operationId: activate
-      tags: [changeManager]
+      tags: [change-manager]
       summary: Activate pending changes.
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'
@@ -121,7 +121,7 @@ paths:
   /edit/changeManager/safeResolve:
     post:
       operationId: safeResolve
-      tags: [changeManager]
+      tags: [change-manager]
       summary: Reconcile session against global config (safe mode).
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'
@@ -144,7 +144,7 @@ paths:
   /edit/changeManager/forceResolve:
     post:
       operationId: forceResolve
-      tags: [changeManager]
+      tags: [change-manager]
       summary: Reconcile session against global config (force mode, your changes win).
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'

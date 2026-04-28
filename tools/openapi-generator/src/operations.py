@@ -123,12 +123,20 @@ def _action_op(
             }
         }
 
-    summary = _strip_html(action.get("descriptionHTML")) or f"Invoke `{action['name']}`."
+    schema_name = normalize_schema_name(mbean_name)
+    action_name = action["name"]
+    harvested_desc = _strip_html(action.get("descriptionHTML"))
+    summary_template = f"{action_name} on {schema_name}"
+    description = (
+        harvested_desc
+        if harvested_desc
+        else f"Invoke the `{action_name}` operation on `{schema_name}`. Requires `X-Requested-By`."
+    )
     op = {
-        "operationId": f"{action['name']}__{_url_to_op_id(op_path)}",
+        "operationId": f"{action_name}__{_url_to_op_id(op_path)}",
         "tags": tags,
-        "summary": summary[:120].splitlines()[0] if summary else f"Invoke {action['name']}",
-        "description": summary,
+        "summary": summary_template,
+        "description": description,
         "parameters": [
             {"$ref": version_param_ref},
             {"$ref": x_requested_by_ref},
@@ -163,13 +171,22 @@ def _example_for(java_type: str) -> Any:
 
 
 def _url_to_op_id(url: str) -> str:
+    """Bounded-length operationId fragment (matches path_builder helper)."""
+    import hashlib
+
     parts = []
     for seg in url.strip("/").split("/"):
         if seg.startswith("{") and seg.endswith("}"):
-            parts.append("byName")
+            parts.append("by_" + seg[1:-1])
         else:
             parts.append(seg)
-    return "_".join(parts)
+    full = "_".join(parts)
+    if len(full) <= 80:
+        return full
+    h = hashlib.sha1(url.encode()).hexdigest()[:8]
+    head = "_".join(parts[:2])
+    tail = "_".join(parts[-2:])
+    return f"{head}__{tail}_{h}"
 
 
 def collect_actions_for(

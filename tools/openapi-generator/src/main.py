@@ -130,9 +130,13 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
             # Skip — no path mounts this MBean (e.g. JDBCDataSourceBean is
             # accessed via the JDBCResource synthetic, not directly by name).
             continue
-        # Determine tag based on tree.
+        # Determine tag based on the URL prefix (matches PathBuilder logic).
         for parent_path in parent_paths:
-            if parent_path.startswith("/edit"):
+            if parent_path.startswith("/edit/changeManager"):
+                tags = ["change-manager"]
+            elif parent_path.startswith("/domainRuntime/serverLifeCycleRuntimes"):
+                tags = ["lifecycle"]
+            elif parent_path.startswith("/edit"):
                 tags = ["edit"]
             else:
                 tags = ["domainRuntime"]
@@ -167,6 +171,32 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
     # Virtual schemas (ChangeManagerState).
     for section in ("schemas",):
         components[section].update(virtual.get("components", {}).get(section, {}))
+
+    # Retrofit ComponentRuntime as a polymorphic union over its subtypes so
+    # the subtype schemas (WebApp / EJB / Connector / AppClient) are
+    # actually referenced. Full discriminator+mapping setup is Phase 4d-3.
+    component_subtypes = [
+        n
+        for n in (
+            "WebAppComponentRuntime",
+            "EJBComponentRuntime",
+            "ConnectorComponentRuntime",
+            "AppClientComponentRuntime",
+        )
+        if n in components["schemas"]
+    ]
+    if "ComponentRuntime" in components["schemas"] and component_subtypes:
+        components["schemas"]["ComponentRuntimeBase"] = components["schemas"]["ComponentRuntime"]
+        components["schemas"]["ComponentRuntime"] = {
+            "oneOf": [{"$ref": "#/components/schemas/ComponentRuntimeBase"}]
+            + [{"$ref": f"#/components/schemas/{s}"} for s in component_subtypes],
+            "description": (
+                "Polymorphic component runtime. The concrete type (`WebApp`, "
+                "`EJB`, `Connector`, `AppClient`) depends on what was deployed; "
+                "all subtypes share the `ComponentRuntimeBase` properties. "
+                "Discriminator/mapping refinement is pending in Phase 4d-3."
+            ),
+        }
 
     # 6) Stubs for any orphan reference. Compute by walking the
     # whole document we've assembled so far + paths.
@@ -204,6 +234,18 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
         else:
             paths_out[full_url] = item
 
+    # 7.4) Ensure every operation has a `description`. The virtual overlay
+    # carries `summary` only on some change-manager ops; fall back to summary
+    # when description is missing so spectral's `operation-description` rule
+    # is satisfied.
+    for url, item in paths_out.items():
+        for verb in ("get", "post", "put", "delete", "patch"):
+            op = item.get(verb)
+            if not isinstance(op, dict):
+                continue
+            if not op.get("description"):
+                op["description"] = op.get("summary") or f"`{verb.upper()}` on `{url}`."
+
     # 7.5) Inject path-item-level parameter declarations for any {name*}
     # placeholder. The {version} parameter is already referenced via $ref in
     # every operation; only the collection-item name placeholders need
@@ -221,7 +263,7 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
                 "name": ph,
                 "in": "path",
                 "required": True,
-                "description": "Bean name for this collection item.",
+                "description": f"Identifier of the parent collection item (`{ph}`).",
                 "schema": {"type": "string"},
             })
         if path_params:
@@ -236,20 +278,33 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
                     existing.append(p)
 
     # 8) Final document.
+    info_description = (
+        f"Generated OpenAPI 3.0 specification for WebLogic Server {wls_version}.\n\n"
+        "Schemas are derived mechanically from Oracle's WebLogic Remote Console "
+        "harvested MBean YAMLs ([weblogic-remote-console](https://github.com/oracle/weblogic-remote-console), "
+        "UPL 1.0). UI overlays from the same source provide enums and read-only "
+        "hints; the rest of the structure is computed from JMX containment.\n\n"
+        "This is a Phase 4d-1 build: generated paths, generated schemas, and a "
+        "minimal envelope/error overlay. Quirks documentation, curated descriptions, "
+        "live samples, sub-type discriminators, enum extraction, and surface "
+        "curation are pending in PHASE4D2 through PHASE4D5.\n\n"
+        "**Tooling**: `tools/openapi-generator/` (Python + uv, ruamel.yaml, "
+        "openapi-spec-validator). Branch: `feat/openapi-generator`."
+    )
     doc = {
         "openapi": "3.0.3",
         "info": {
-            "title": "WebLogic REST Management API (generated)",
-            "version": "0.4.0-phase4c",
-            "description": (
-                f"Generated OpenAPI 3.0 specification for WebLogic Server {wls_version}. "
-                "Schemas derived from Oracle Remote Console harvested MBean YAMLs "
-                "(https://github.com/oracle/weblogic-remote-console, UPL 1.0). "
-                "Manual overlays for envelopes, virtual operations, quirks, and "
-                "examples are merged in by the generator. See "
-                "tools/openapi-generator/ for tooling."
-            ),
-            "license": {"name": "Apache-2.0"},
+            "title": "WebLogic REST Management API — Generated Specification",
+            "description": info_description,
+            "version": wls_version,
+            "contact": {
+                "name": "weblogic-rest-openapi (unofficial)",
+                "url": "https://github.com/alsaiz-es/weblogic-rest-openapi",
+            },
+            "license": {
+                "name": "Apache-2.0 (generator + overlays); UPL-1.0 (harvested schemas)",
+                "url": "https://www.apache.org/licenses/LICENSE-2.0",
+            },
         },
         "servers": [
             {
@@ -271,9 +326,22 @@ def build_spec(wls_version: str = "14.1.2.0.0") -> dict[str, Any]:
         ],
         "security": [{"basicAuth": []}],
         "tags": [
-            {"name": "domainRuntime", "description": "Read-only domain monitoring."},
-            {"name": "edit", "description": "Edit-tree configuration mutations."},
-            {"name": "changeManager", "description": "Edit-session lifecycle."},
+            {
+                "name": "domainRuntime",
+                "description": "Read-only domain-wide runtime monitoring (`/domainRuntime`).",
+            },
+            {
+                "name": "lifecycle",
+                "description": "Server lifecycle actions (start, suspend, shutdown, …).",
+            },
+            {
+                "name": "edit",
+                "description": "Edit-tree configuration mutations (`/edit`). Wrap mutations between `startEdit` and `activate`.",
+            },
+            {
+                "name": "change-manager",
+                "description": "Edit-session lifecycle: `startEdit`, `activate`, `cancelEdit`, `safeResolve`, `forceResolve`.",
+            },
         ],
         "paths": dict(sorted(paths_out.items())),
         "components": components,

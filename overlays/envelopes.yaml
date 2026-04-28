@@ -116,22 +116,6 @@ components:
           items:
             $ref: '#/components/schemas/Link'
 
-    CollectionEnvelope:
-      type: object
-      description: |
-        Generic envelope for collection responses. The `items` array holds
-        bean instances; `links` carries collection-level HATEOAS links.
-        The concrete item schema is referenced by each path's response.
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
-
     ErrorResponse:
       type: object
       description: Standard error envelope for read-tree failures (RFC 7807-ish).
