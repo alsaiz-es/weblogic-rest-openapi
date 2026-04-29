@@ -1,0 +1,10 @@
+schema: JMSSystemResource
+schema_level:
+  operational_note: |
+    Top-level config wrapper for a JMS module. The actual
+    destinations / connection factories / templates live under the
+    referenced descriptor (`JMSBean` tree); this bean only carries
+    the targeting and metadata. Editing destinations inside an
+    active JMS module requires an edit session like any other
+    config change — the JMS subsystem does not have a per-module
+    fast-path.

@@ -1,0 +1,9 @@
+schema: DeploymentManager
+schema_level:
+  operational_note: |
+    Domain-level deployment orchestrator. Use this bean (not the
+    per-application `AppDeploymentRuntime`) for new deployments,
+    redeployments, and library updates. Requires the user to be in
+    the `Deployer` or `Admin` role — `Operator` is insufficient.
+    Emits JMX notifications on application create / remove / state
+    change events.

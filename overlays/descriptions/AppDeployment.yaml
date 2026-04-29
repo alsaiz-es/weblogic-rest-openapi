@@ -1,0 +1,19 @@
+schema: AppDeployment
+properties:
+  targets:
+    operational_note: |
+      Each entry is a tuple `["servers"|"clusters", "<name>"]`. Empty
+      array means the application is registered in config but not
+      bound to any runtime — `AppDeploymentRuntime.start` will fail
+      until at least one target is added.
+  deploymentOrder:
+    operational_note: |
+      Lower numbers deploy first at server startup. Set explicit
+      values when applications depend on shared libraries — the
+      library's `Library.deploymentOrder` must be lower than every
+      app that references it, or the app fails to start.
+  moduleType:
+    operational_note: |
+      Common values: `ear`, `war`, `jar` (for EJB-jar), `rar`
+      (for JCA resource adapter). The harvested set may surface
+      additional internal types — treat unknowns as opaque.

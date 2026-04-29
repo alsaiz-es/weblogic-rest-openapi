@@ -1,0 +1,7 @@
+schema: AppRuntimeStateRuntime
+schema_level:
+  operational_note: |
+    Domain-wide aggregator of per-server application state. Useful
+    when you need a single answer to "is this app active across the
+    cluster?" rather than walking every `serverRuntime/applicationRuntimes`
+    collection. Lives only on the AdminServer.

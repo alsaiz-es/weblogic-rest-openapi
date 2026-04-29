@@ -1,0 +1,8 @@
+schema: DeploymentProgressObject
+schema_level:
+  operational_note: |
+    AdminServer-only polling target for tracking long-running
+    deployment operations initiated through `DeploymentManager` or
+    `AppDeploymentRuntime`. Poll periodically rather than blocking
+    on a single request — large EAR deployments or cluster-wide
+    redeployments routinely take minutes.

@@ -1,0 +1,8 @@
+schema: LibDeploymentRuntime
+schema_level:
+  operational_note: |
+    Per-library deployment runtime. Libraries are referenced by name
+    + version from `AppDeployment` units; an application that
+    references a library version that is not currently deployed
+    will fail to start. Use this bean to verify the deployed
+    library set before activating dependent apps.
