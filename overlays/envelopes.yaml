@@ -178,7 +178,11 @@ components:
       properties:
         state:
           type: string
-          enum: [ok, warning, critical, failed, overloaded, unknown]
+          enum: [ok, warn, warning, critical, failed, overloaded, unknown]
+          # `warn` and `warning` both observed live: 14.1.2 returns
+          # `warning`, 12.2.1.4 returns `warn` on overallHealthState
+          # roll-ups. Quirk 02 documents the lowercase pattern; this
+          # enum accepts both forms for cross-version interoperability.
         subsystemName:
           type: string
           description: Name of the subsystem reporting this health state.

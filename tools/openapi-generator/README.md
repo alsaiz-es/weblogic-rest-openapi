@@ -97,6 +97,54 @@ npx --yes @openapitools/openapi-generator-cli@latest generate \
   --skip-validate-spec
 ```
 
+## Test battery (Phase 4g)
+
+Three levels of regression coverage. Levels 1 + 2 run offline in CI;
+level 3 requires a live WebLogic domain and is opt-in.
+
+```bash
+cd tools/openapi-generator
+uv sync --group dev
+
+# Levels 1 + 2 (offline). The default — `live`-marked tests are
+# deselected automatically.
+uv run pytest tests/
+
+# Level 3 only (against a real WLS domain).
+WLS_HOST=192.168.1.29 WLS_USER=weblogic WLS_PASS=welcome1 \
+WLS_VERSION=14.1.2.0.0 uv run pytest tests/ -m live -v
+```
+
+**Level 1 — action parameter shape conformance** (`test_action_param_shapes.py`).
+Cross-checks every `<wrc>/.../extension.yaml` action parameter
+against the generated spec's request body. Catches the class of bug
+that drove v0.4.1: a parameter declared `array: true` in source must
+surface as `type: array` in the spec. Parametrised across all 5 specs.
+
+**Level 2 — sample provenance + schema conformance**
+(`test_sample_provenance.py` and `test_sample_schema.py`).
+- *Provenance* asserts every `x-weblogic-sample-source` /
+  `x-weblogic-sample-paths.path` file referenced from the spec
+  exists on disk and (for inlined examples) matches the embedded
+  value. Catches drift between live captures and embedded bytes.
+- *Schema conformance* validates every overflow sample on disk
+  against the operation's response schema using a minimal OAS 3.0
+  → JSON Schema 2020-12 adapter (handles `$ref`, `nullable: true`,
+  and `oneOf + discriminator`). Catches the harvested-vs-live
+  schema drifts that motivated the empirical nullability layer
+  (`overlays/nullability.yaml`).
+
+**Level 3 — live smoke** (`test_live_smoke.py`). Marker: `live`.
+Hits a curated set of read-only endpoints (root, AdminServer,
+JVMRuntime, ThreadPoolRuntime, edit changeManager) on a real WLS
+domain and asserts shape + invariants (e.g. `name == "AdminServer"`,
+`healthState.state` in the documented enum). Captures NO response
+bodies to disk — the lab VM IPs leak through `links` arrays and
+sanitisation is the user's responsibility before any commit.
+
+Skips cleanly when env vars are unset, so CI can run the full
+suite (`pytest tests/`) without a WLS instance.
+
 ## License attribution
 
 Schemas in the generated specifications are derived from

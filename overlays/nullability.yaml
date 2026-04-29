@@ -62,3 +62,45 @@ overrides:
     property: frontendHost
   - schema: Cluster
     property: remoteClusterAddress
+  # Discovered by Phase 4g level-2 schema-conformance test against
+  # the overflow sample corpus.
+  - schema: ApplicationRuntime
+    property: applicationVersion
+  - schema: JMSServerRuntime
+    property: pendingTransactions
+  - schema: JMSServerRuntime
+    property: transactions
+  - schema: JDBCConnectionPoolParamsBean
+    property: testTableName
+  - schema: JDBCDriverParamsBean
+    property: driverName
+  - schema: JDBCSystemResource
+    property: activeVersionId
+  - schema: JDBCSystemResource
+    property: compatibilityName
+  - schema: JDBCSystemResource
+    property: deploymentPrincipalName
+  - schema: JDBCSystemResource
+    property: notes
+  - schema: JDBCSystemResource
+    property: versionId
+  - schema: JDBCSystemResource
+    property: moduleType
+  - schema: ConnectorComponentRuntime
+    property: description
+  - schema: ConnectorComponentRuntime
+    property: jndiName
+  - schema: ConnectorComponentRuntime
+    property: linkref
+  - schema: ConnectorComponentRuntime
+    property: activeVersionId
+  - schema: ConnectorComponentRuntime
+    property: versionId
+  - schema: WebAppComponentRuntime
+    property: JSPCompileCommand
+  - schema: WebAppComponentRuntime
+    property: logFilename
+  - schema: WebAppComponentRuntime
+    property: sessionCookieComment
+  - schema: WebAppComponentRuntime
+    property: sessionCookieDomain
