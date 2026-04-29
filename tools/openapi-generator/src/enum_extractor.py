@@ -132,7 +132,11 @@ def _derive_enum_name(occs: list[EnumOccurrence]) -> str:
     # 2) Property-name based heuristics for common patterns.
     prop_names = [_last_property_name(o) for o in occs]
     schemas = [o.schema_name for o in occs]
-    common_prop = max(set(prop_names), key=prop_names.count)
+    # Deterministic tiebreak: sort first, so a count tie always
+    # picks the alphabetically earliest property name. Without
+    # this, `max(set(...), key=count)` depends on set-iteration
+    # order, which is not stable across Python runs.
+    common_prop = max(sorted(set(prop_names)), key=prop_names.count)
 
     # `pausedState` properties on JMS-prefixed schemas → JMSPausedState.
     if "PausedState" in common_prop or "pausedState" in common_prop:
