@@ -391,6 +391,14 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
 
     samples_stats = apply_samples(doc, wls_version)
 
+    # Phase 4d-9: transitive-closure drop of schemas that nothing
+    # references. Runs last so every other layer (paths, polymorphism,
+    # quirks, descriptions, nullability, samples) has already
+    # contributed its $refs into the reachable set.
+    from prune_unused import prune_unused_schemas
+
+    prune_stats = prune_unused_schemas(doc)
+
     return {
         "doc": doc,
         "stats": {
@@ -410,6 +418,7 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
             "descriptions": descriptions_stats,
             "nullability": nullability_stats,
             "samples": samples_stats,
+            "prune": prune_stats,
             "enum_extraction": {
                 "extracted": {
                     name: {

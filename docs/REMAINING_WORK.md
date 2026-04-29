@@ -47,6 +47,7 @@ sub-phases.
 | 4d-6 | Description merge policy — 21 overlays for the 22 curated schemas | 4d-6 |
 | 4d-7 | Live samples linking (hybrid `examples` + `x-weblogic-sample-paths`) | 4d-7 |
 | 4d-7 | Empirical nullability overlay (20 fields) — discovered by sample injection | 4d-7 |
+| 4d-9 | Path expansion / unused-component resolution — transitive-closure prune | 4d-9 |
 
 Validators currently green across all 5 versions:
 `openapi-spec-validator`, `openapi-generator-cli` Python smoke,
@@ -57,15 +58,6 @@ Validators currently green across all 5 versions:
 Decisions resolved by Alfredo on 2026-04-28 are noted inline. Each
 pending sub-phase has a detailed execution plan in its own document
 under `docs/`; this section is a high-level index.
-
-### Sub-phase 4d-9 — Path expansion to resolve unused components
-
-Detailed plan: `docs/PHASE4D9_PATH_EXPANSION.md`.
-
-256–286 unused-component warnings. Investigate which schemas are
-unreachable from tree roots and why. Two categories: missing
-traversal rules (extend path-builder) vs genuinely unreachable
-(exclude from emission). Investigative first, action second.
 
 ### Sub-phase 4e-2 — Editorial curation per subsystem
 
@@ -116,14 +108,14 @@ This sub-phase is the bridge to the second LinkedIn post.
 The pending sub-phases can be executed independently, but the
 recommended order is:
 
-1. 4d-9 (path expansion) — eliminates the only remaining warnings.
-2. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
-3. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
-4. 4f (merge) — bridge to main and second LinkedIn post.
+1. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
+2. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
+3. 4f (merge) — bridge to main and second LinkedIn post.
 
-If energy/context runs short, item 1 alone produces a defensibly
-complete branch. Items 2-3 are quality multipliers but not blocking.
-Item 4 is the strategic bridge regardless of how much of 2-3 lands.
+The branch is now defensibly complete: validators green, samples
+linked, descriptions migrated, warnings at zero. Items 1-2 are
+quality multipliers but not blocking. Item 3 is the strategic bridge
+regardless of how much of 1-2 lands.
 
 ## Notes on context preservation
 
