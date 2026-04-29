@@ -1,0 +1,11 @@
+schema: ConnectorComponentRuntime
+properties:
+  schema:
+    operational_note: |
+      Embedded XSD describing the adapter's configuration shape. Long
+      string; pass `excludeFields=schema` if you don't need it.
+  configuration:
+    operational_note: |
+      Embedded XML configuration tree of the adapter, parsed from
+      `weblogic-ra.xml`. Long string; pass
+      `excludeFields=configuration` if you don't need it.

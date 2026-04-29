@@ -1,0 +1,12 @@
+schema: JDBCDriverParamsBean
+properties:
+  url:
+    operational_note: |
+      Note the casing — sample responses use lowercase `url` even
+      though POST request bodies commonly use `URL`. WebLogic accepts
+      both at write time but standardises to `url` in GET responses.
+  password:
+    operational_note: |
+      Plaintext at write time. Always returned `null` on GET —
+      passwords are never echoed. Use `passwordEncrypted` with the
+      WebLogic encryption tool for production deployments.

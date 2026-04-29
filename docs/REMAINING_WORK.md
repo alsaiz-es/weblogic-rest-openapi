@@ -44,6 +44,7 @@ sub-phases.
 | 4d-4 | Overlay vocabulary triage (`required`, `dateAsLong`, `multiLineString` honored; rest ignored with rationale) | 4d-4 |
 | 4d-4 | SettableBean inheritance audit (premise disproved — SettableBean is a marker interface, chain walks correctly) | 4d-4 |
 | 4d-8 | Surface curation decision (Alfredo: keep full surface, no variants) | decided 2026-04-28 — no implementation needed |
+| 4d-6 | Description merge policy — 21 overlays for the 22 curated schemas | 4d-6 |
 
 Validators currently green across all 5 versions:
 `openapi-spec-validator`, `openapi-generator-cli` Python smoke,
@@ -54,15 +55,6 @@ Validators currently green across all 5 versions:
 Decisions resolved by Alfredo on 2026-04-28 are noted inline. Each
 pending sub-phase has a detailed execution plan in its own document
 under `docs/`; this section is a high-level index.
-
-### Sub-phase 4d-6 — Description merge policy
-
-Detailed plan: `docs/PHASE4D6_DESCRIPTIONS.md`.
-
-Define `overlays/descriptions/<schema>.yaml` format. When present,
-appends operational notes as `**Operational note:** {text}` after
-harvested description. Migrate notes from manual `specs/` for the
-22 curated schemas only.
 
 ### Sub-phase 4d-7 — Live samples linking
 
@@ -130,16 +122,15 @@ This sub-phase is the bridge to the second LinkedIn post.
 The pending sub-phases can be executed independently, but the
 recommended order is:
 
-1. 4d-6 (descriptions) — preserves manual layer's editorial value.
-2. 4d-7 (samples) — closes another original-plan loop.
-3. 4d-9 (path expansion) — eliminates the only remaining warnings.
-4. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
-5. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
-6. 4f (merge) — bridge to main and second LinkedIn post.
+1. 4d-7 (samples) — closes another original-plan loop.
+2. 4d-9 (path expansion) — eliminates the only remaining warnings.
+3. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
+4. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
+5. 4f (merge) — bridge to main and second LinkedIn post.
 
-If energy/context runs short, items 1-3 alone produce a defensibly
-complete branch. Items 4-5 are quality multipliers but not blocking.
-Item 6 is the strategic bridge regardless of how much of 4-5 lands.
+If energy/context runs short, items 1-2 alone produce a defensibly
+complete branch. Items 3-4 are quality multipliers but not blocking.
+Item 5 is the strategic bridge regardless of how much of 3-4 lands.
 
 ## Notes on context preservation
 

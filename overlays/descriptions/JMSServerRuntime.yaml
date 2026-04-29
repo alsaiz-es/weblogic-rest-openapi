@@ -1,0 +1,25 @@
+schema: JMSServerRuntime
+schema_level:
+  operational_note: |
+    Counters fall into four families:
+
+    - `messages*` / `bytes*` — message and byte volume
+      (current/high/pending/threshold/pageable).
+    - `destinations*` — counts of destinations targeted at this
+      server.
+    - `sessionPools*` — application-managed session pool counts.
+    - `paging*` — disk-paging buffer utilisation.
+
+    Three pause modes (`insertion`, `consumption`, `production`) are
+    reported both as booleans and as descriptive `*PausedState`
+    strings. Use the boolean form for programmatic checks.
+properties:
+  pendingTransactions:
+    operational_note: |
+      Observed null on idle servers; the inner shape is not modelled
+      because no pending-transaction sample is available. Treat as
+      opaque.
+  transactions:
+    operational_note: |
+      Same observation note as `pendingTransactions` — opaque shape;
+      verify against a live populated server before relying on it.

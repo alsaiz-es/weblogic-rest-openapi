@@ -368,6 +368,13 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
 
     quirks_stats = apply_quirks(doc, wls_version)
 
+    # Phase 4d-6: append operational-note description overlays from
+    # overlays/descriptions/*.yaml. Runs after quirks so the chain is
+    # harvested → quirk append → description overlay append.
+    from descriptions import apply_descriptions
+
+    descriptions_stats = apply_descriptions(doc)
+
     return {
         "doc": doc,
         "stats": {
@@ -384,6 +391,7 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
             "polymorphism": polymorphism_stats,
             "polymorphism_skipped": polymorphism_skipped,
             "quirks": quirks_stats,
+            "descriptions": descriptions_stats,
             "enum_extraction": {
                 "extracted": {
                     name: {

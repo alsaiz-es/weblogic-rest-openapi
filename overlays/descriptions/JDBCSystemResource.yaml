@@ -1,0 +1,7 @@
+schema: JDBCSystemResource
+properties:
+  targets:
+    operational_note: |
+      Each entry is a tuple `["servers"|"clusters", "<name>"]`. An
+      empty array means the datasource is undeployed (it exists in
+      config but is not bound to any server or cluster).

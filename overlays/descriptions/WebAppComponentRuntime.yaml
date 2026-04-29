@@ -1,0 +1,20 @@
+schema: WebAppComponentRuntime
+properties:
+  sessionMonitoringEnabled:
+    operational_note: |
+      When true, the runtime maintains the
+      `servletSessionsMonitoringIds` array of active session IDs.
+      Typically false in production for privacy and performance
+      reasons.
+  sessionCookieMaxAgeSecs:
+    operational_note: |
+      Max-Age attribute on the session cookie. `-1` means
+      session-only (cookie deleted on browser close).
+  servletReloadCheckSecs:
+    operational_note: |
+      Interval at which servlets are checked for redeployment. `-1`
+      disables reload checks entirely.
+  JSPPageCheckSecs:
+    operational_note: |
+      Interval at which the runtime recompiles changed JSPs. `-1`
+      disables recompilation.

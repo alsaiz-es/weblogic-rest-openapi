@@ -1,0 +1,15 @@
+schema: ApplicationRuntime
+properties:
+  internal:
+    operational_note: |
+      True for framework-shipped applications (e.g.
+      `bea_wls_internal`, `wls-management-services`, JMS adapters).
+      Use this to filter the collection client-side — there is no
+      separate endpoint for user-deployed apps only.
+  partitionName:
+    operational_note: |
+      Multi-Tenant partition this application is scoped to. Present
+      only on 12.2.1.4 (always null in non-partitioned domains, which
+      is most of them). The field disappears entirely from 14.1.2
+      following the Multi-Tenant feature removal — clients consuming
+      both versions should treat absence and null as equivalent.

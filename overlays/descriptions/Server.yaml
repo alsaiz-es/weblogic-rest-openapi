@@ -1,0 +1,6 @@
+schema: Server
+properties:
+  name:
+    operational_note: |
+      Required on creation, unique per domain. Cannot be changed once
+      set — to rename a server, recreate it.

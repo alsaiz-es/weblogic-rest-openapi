@@ -1,0 +1,7 @@
+schema: JDBCDataSourceParamsBean
+properties:
+  globalTransactionsProtocol:
+    operational_note: |
+      Verified values include `OnePhaseCommit`, `TwoPhaseCommit`,
+      `LoggingLastResource`, `EmulateTwoPhaseCommit`, `None`. Choose
+      based on whether the datasource participates in XA.

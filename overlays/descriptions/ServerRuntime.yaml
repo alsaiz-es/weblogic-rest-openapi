@@ -1,0 +1,33 @@
+schema: ServerRuntime
+schema_level:
+  operational_note: |
+    JVM details (`javaVersion`, heap, uptime) and listen-channel details
+    are **not** on this bean — they live under the `JVMRuntime` and
+    `serverChannelRuntimes` children respectively, reachable via the
+    `links` array. The REST projection of channel runtimes does not
+    expose `listenAddress`/`listenPort` either — only the concatenated
+    `publicURL`.
+properties:
+  serverClasspath:
+    operational_note: |
+      Often several kilobytes long. Pass
+      `excludeFields=serverClasspath` when listing collections to keep
+      response sizes manageable.
+  currentMachine:
+    operational_note: |
+      Empty string (not null) is common when Node Manager is not in use
+      — the field always exists but carries no name in that case.
+  adminServerListenPort:
+    operational_note: |
+      Present on every server, not only on the AdminServer — it
+      reflects the listen port of the domain Administration Server as
+      seen from this server.
+  administrationURL:
+    operational_note: |
+      When the administration port is disabled this falls back to the
+      default T3 URL rather than reporting null.
+  inSitConfigState:
+    operational_note: |
+      True when a situational-configuration override is currently
+      active on this server. Useful for catching config drift when
+      sit-config bundles are in play.

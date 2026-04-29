@@ -1,0 +1,31 @@
+schema: ThreadPoolRuntime
+schema_level:
+  operational_note: |
+    Counter naming convention: counters ending in `Count` are
+    cumulative since server start; counters ending in `Current` are
+    point-in-time; counters with `High` in the name are watermarks
+    (highest value seen since start).
+properties:
+  stuckThreadCount:
+    operational_note: |
+      A sustained non-zero count is usually a correctness signal (a
+      thread blocked beyond `StuckThreadMaxTime`), not a load signal.
+      Investigate the offending thread before adding capacity.
+  hoggingThreadCount:
+    operational_note: |
+      Precursor to `stuckThreadCount` — threads taking substantially
+      longer than the measured average. Watch for trend, not absolute
+      value.
+  pendingUserRequestCount:
+    operational_note: |
+      User-submitted requests waiting for an execute thread. Distinct
+      from `queueLength`, which also includes internal requests.
+  throughput:
+    operational_note: |
+      Requests completed per second over the most recent sampling
+      window. Basis for the self-tuning algorithm's pool-sizing
+      decisions.
+  sharedCapacityForWorkManagers:
+    operational_note: |
+      Total queue slots available across all work managers on this
+      server. Default `65536` on a stock domain.
