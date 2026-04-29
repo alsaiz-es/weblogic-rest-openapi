@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.4.1 — 2026-04-29
+
+Bug-fix release. Discovered empirically while integrating v0.4.0 into
+a deployment-lifecycle consumer.
+
+### Fixed
+
+- **`array: true` on action parameters was being dropped.** The
+  generator's `operations.py:_action_op` was building the request
+  body schema from `_java_to_oas(p["type"])` only, ignoring the
+  `array: true` flag declared in `extension.yaml`. Result: action
+  parameters like `AppDeploymentRuntime.start.targets` (and the
+  matching `stop`, `redeploy`, `update` shapes) emitted as
+  `targets: type: string` instead of `targets: type: array, items:
+  type: string`. WebLogic 14.1.2 returns HTTP 400 (`valid signatures
+  are: stop(targets: [string], deploymentOptions: {key: string})`)
+  when sent a scalar — the spec contradicted the live runtime.
+- **Affected MBeans (6):** `AppDeploymentRuntime`,
+  `LibDeploymentRuntime`, `DeploymentManager`,
+  `DeploymentProgressObject`, `DomainMBean`, `DomainRuntimeMBean`.
+  Affected actions cover deployment lifecycle (`start`, `stop`,
+  `redeploy`, `update`) and a handful of multi-target operations.
+  All 5 generated specs regenerated.
+
+### Added
+
+- **Phase 4g level-1 regression suite.** Every action parameter
+  declared in `<wrc>/resources/.../extension.yaml` is cross-checked
+  against the generated spec's request body schema. The new test
+  `tools/openapi-generator/tests/test_action_param_shapes.py` runs
+  parametrised across all 5 generated specs (245 cases pass on this
+  release; the rest skip because the action's parent MBean isn't
+  reachable on every version). Catches `array`-flag drift, the class
+  of bug that motivated this release.
+
+  Run with: `cd tools/openapi-generator && uv run pytest tests/`.
+
+### Notes for consumers
+
+- If your client carries a workaround that wraps `targets` in an
+  array on the consumer side (e.g. a TypeScript cast like
+  `targets: targetList as unknown as string`), it can be removed
+  once the v0.4.1 spec is consumed.
+
 ## 0.4.0 — 2026-04-29
 
 **The spec is now generated.** This release replaces the v0.3.x

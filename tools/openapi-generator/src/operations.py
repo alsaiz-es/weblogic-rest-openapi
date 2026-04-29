@@ -80,10 +80,17 @@ def _action_op(
         body_props: dict[str, Any] = {}
         required: list[str] = []
         for p in parameters:
-            schema = _java_to_oas(p["type"])
-            if "$ref" in schema:
-                refs.append(schema["$ref"].rsplit("/", 1)[-1])
-            body_props[p["name"]] = schema
+            inner = _java_to_oas(p["type"])
+            if "$ref" in inner:
+                refs.append(inner["$ref"].rsplit("/", 1)[-1])
+            # Honor `array: true` from extension.yaml. WLS rejects
+            # scalar values for these fields with HTTP 400 — verified
+            # empirically against 14.1.2 on `start`/`stop` of
+            # `AppDeploymentRuntime` (the `targets` parameter).
+            if p.get("array"):
+                body_props[p["name"]] = {"type": "array", "items": inner}
+            else:
+                body_props[p["name"]] = inner
             required.append(p["name"])
         request_schema: dict[str, Any] = {
             "type": "object",
@@ -136,7 +143,7 @@ def _action_op(
             "content": {
                 "application/json": {
                     "schema": request_schema,
-                    "example": {p["name"]: _example_for(p["type"]) for p in parameters} if parameters else {},
+                    "example": {p["name"]: _example_for_param(p) for p in parameters} if parameters else {},
                 },
             },
         },
@@ -148,6 +155,16 @@ def _action_op(
         },
     }
     return op_path, op, refs
+
+
+def _example_for_param(p: dict[str, Any]) -> Any:
+    """Example value for an action parameter, honoring `array: true`."""
+    base = _example_for(p["type"])
+    if p.get("array"):
+        # Empty array satisfies every `oas3-valid-media-example` check
+        # for `type: array` regardless of the inner item schema.
+        return []
+    return base
 
 
 def _example_for(java_type: str) -> Any:
