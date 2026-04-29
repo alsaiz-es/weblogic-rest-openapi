@@ -1,0 +1,10 @@
+schema: Capacity
+schema_level:
+  operational_note: |
+    Hard cap on enqueued requests across all work managers sharing
+    this constraint. When the queue reaches `count`, the server
+    rejects further submissions with HTTP 503 (or the protocol
+    equivalent). Independent of `MaxThreadsConstraint` — capacity
+    governs the queue, max-threads governs concurrency. Set
+    `count` equal to the steady-state expected backlog plus one
+    burst buffer.

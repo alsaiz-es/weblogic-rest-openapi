@@ -1,0 +1,9 @@
+schema: TransactionResourceRuntime
+schema_level:
+  operational_note: |
+    Per-XA-resource health. `transactionHeuristicCommitTotalCount`
+    and `transactionHeuristicRollbackTotalCount` are the keys to
+    watch — heuristics indicate the resource manager committed or
+    rolled back a branch independently of the coordinator's
+    decision, breaking ACID guarantees. Any non-zero value is a
+    correctness incident, not a performance signal.

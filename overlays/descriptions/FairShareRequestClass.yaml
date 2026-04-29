@@ -1,0 +1,8 @@
+schema: FairShareRequestClass
+schema_level:
+  operational_note: |
+    Relative-priority scheduler — requests in this class get a share
+    of total thread time proportional to `fairShare` divided by the
+    sum of all configured `fairShare` values. Default is 50; raise
+    or lower relative to other request classes, not in absolute
+    terms. Two classes both set to 50 each get 50% of thread time.

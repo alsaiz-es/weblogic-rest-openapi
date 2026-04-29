@@ -1,0 +1,11 @@
+schema: WLDFWatchNotificationRuntime
+schema_level:
+  operational_note: |
+    Per-server policy/action engine (formerly watch/notification —
+    the renamed terminology dates from WLS 12.2.1). Policies fire
+    actions when a metric or log condition matches; common actions
+    are JMX notifications, SMTP, SNMP, JMS, and image creation.
+    A spike in `watchEvaluationsTotalCount` without a corresponding
+    rise in `notificationsTotalCount` typically means policy
+    expressions match too eagerly — review the EL expressions
+    before raising thresholds.

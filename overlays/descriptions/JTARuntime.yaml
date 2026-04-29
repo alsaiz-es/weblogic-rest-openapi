@@ -1,0 +1,10 @@
+schema: JTARuntime
+schema_level:
+  operational_note: |
+    Per-server JTA runtime. The most operationally useful counters
+    are `transactionRolledBackTotalCount` (separate the
+    application-rollback from system-rollback subtotals) and
+    `secondsActiveTotalCount` (cumulative transaction time —
+    growing fast under low concurrency means transactions are
+    long-lived). For per-resource breakdown, drill into
+    `transactionResourceRuntimes`.

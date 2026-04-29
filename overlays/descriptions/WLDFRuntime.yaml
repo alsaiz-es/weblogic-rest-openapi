@@ -1,0 +1,9 @@
+schema: WLDFRuntime
+schema_level:
+  operational_note: |
+    Root of the WebLogic Diagnostics Framework subsystem on each
+    server. Children (`harvesterRuntime`, `accessRuntime`,
+    `watchNotificationRuntime`, `archiveRuntime`,
+    `instrumentationRuntime`, `imageRuntime`) cover collection,
+    query, alerting, persistence, instrumentation, and on-demand
+    diagnostic-image creation respectively.

@@ -48,6 +48,7 @@ sub-phases.
 | 4d-7 | Live samples linking (hybrid `examples` + `x-weblogic-sample-paths`) | 4d-7 |
 | 4d-7 | Empirical nullability overlay (20 fields) — discovered by sample injection | 4d-7 |
 | 4d-9 | Path expansion / unused-component resolution — transitive-closure prune | 4d-9 |
+| 4e-2 | Editorial curation per subsystem (Deployments + JMS detail + Work Managers + JTA + WLDF) — 29 new overlays | 4e-2 |
 
 Validators currently green across all 5 versions:
 `openapi-spec-validator`, `openapi-generator-cli` Python smoke,
@@ -58,17 +59,6 @@ Validators currently green across all 5 versions:
 Decisions resolved by Alfredo on 2026-04-28 are noted inline. Each
 pending sub-phase has a detailed execution plan in its own document
 under `docs/`; this section is a high-level index.
-
-### Sub-phase 4e-2 — Editorial curation per subsystem
-
-Detailed plan: `docs/PHASE4E2_CURATION.md`.
-
-**Alfredo's decision (2026-04-28):** four subsystems —
-**Deployments, JMS detail, Work Managers, plus JTA and WLDF
-optionally**. Plan acotar pragmatically: deployments and JMS as
-priority, work managers second, JTA and WLDF as opportunistic
-extensions. Per subsystem, description overlays for user-facing
-properties only; internal-only properties stay harvested.
 
 ### Sub-phase 4e-3 — Body fidelity for 12 polymorphic stubs
 
@@ -108,14 +98,14 @@ This sub-phase is the bridge to the second LinkedIn post.
 The pending sub-phases can be executed independently, but the
 recommended order is:
 
-1. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
-2. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
-3. 4f (merge) — bridge to main and second LinkedIn post.
+1. 4e-3 (12 stubs) — bonus polish; only remaining quality item.
+2. 4f (merge) — bridge to main and second LinkedIn post.
 
 The branch is now defensibly complete: validators green, samples
-linked, descriptions migrated, warnings at zero. Items 1-2 are
-quality multipliers but not blocking. Item 3 is the strategic bridge
-regardless of how much of 1-2 lands.
+linked, descriptions migrated and curated for the four high-demand
+subsystems, warnings at zero. Item 1 is a quality multiplier but
+not blocking. Item 2 is the strategic bridge regardless of whether
+4e-3 lands.
 
 ## Notes on context preservation
 

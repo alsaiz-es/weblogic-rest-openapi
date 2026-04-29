@@ -1,0 +1,10 @@
+schema: JTA
+schema_level:
+  operational_note: |
+    Domain-level JTA tunables — `timeoutSeconds`, `abandonTimeoutSeconds`,
+    `maxTransactions`, recovery / migration policy. Per-server overrides
+    live on `ServerMBean.JTAMigratableTarget` and on the JDBC datasource
+    (`globalTransactionsProtocol`). The defaults are conservative;
+    raise `timeoutSeconds` only if your application has a known
+    long-running transaction pattern, never to mask blocked
+    resources.

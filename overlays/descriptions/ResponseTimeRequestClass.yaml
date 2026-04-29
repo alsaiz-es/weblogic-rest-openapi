@@ -1,0 +1,9 @@
+schema: ResponseTimeRequestClass
+schema_level:
+  operational_note: |
+    SLO-based scheduler — sets a target `goalMs` for the average
+    response time across requests in this class. WLS schedules
+    against the goal, not against individual requests; sustained
+    misses indicate either insufficient throughput or
+    overly-aggressive goals. Pair with metrics on the parent
+    `ThreadPoolRuntime` for capacity-side decisions.

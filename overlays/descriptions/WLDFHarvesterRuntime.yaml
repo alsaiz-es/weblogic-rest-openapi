@@ -1,0 +1,9 @@
+schema: WLDFHarvesterRuntime
+schema_level:
+  operational_note: |
+    Harvester collects metric snapshots from configured MBean
+    attributes at a fixed sampling period. Cost scales with
+    `harvestedDataRecordCount` per period — keep the harvested set
+    focused on signals you query, not the whole bean tree, or the
+    archive grows quickly. Use `harvestableTypes` to discover what
+    can be harvested before adding new entries.
