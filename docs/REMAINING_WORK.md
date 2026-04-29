@@ -45,6 +45,8 @@ sub-phases.
 | 4d-4 | SettableBean inheritance audit (premise disproved — SettableBean is a marker interface, chain walks correctly) | 4d-4 |
 | 4d-8 | Surface curation decision (Alfredo: keep full surface, no variants) | decided 2026-04-28 — no implementation needed |
 | 4d-6 | Description merge policy — 21 overlays for the 22 curated schemas | 4d-6 |
+| 4d-7 | Live samples linking (hybrid `examples` + `x-weblogic-sample-paths`) | 4d-7 |
+| 4d-7 | Empirical nullability overlay (20 fields) — discovered by sample injection | 4d-7 |
 
 Validators currently green across all 5 versions:
 `openapi-spec-validator`, `openapi-generator-cli` Python smoke,
@@ -55,14 +57,6 @@ Validators currently green across all 5 versions:
 Decisions resolved by Alfredo on 2026-04-28 are noted inline. Each
 pending sub-phase has a detailed execution plan in its own document
 under `docs/`; this section is a high-level index.
-
-### Sub-phase 4d-7 — Live samples linking
-
-Detailed plan: `docs/PHASE4D7_SAMPLES.md`.
-
-Format: hybrid — OpenAPI native `examples` blocks for canonical
-samples, `x-weblogic-sample-paths` extension for the rest. Acotar
-to the 22 originally curated MBeans where samples exist.
 
 ### Sub-phase 4d-9 — Path expansion to resolve unused components
 
@@ -122,15 +116,14 @@ This sub-phase is the bridge to the second LinkedIn post.
 The pending sub-phases can be executed independently, but the
 recommended order is:
 
-1. 4d-7 (samples) — closes another original-plan loop.
-2. 4d-9 (path expansion) — eliminates the only remaining warnings.
-3. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
-4. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
-5. 4f (merge) — bridge to main and second LinkedIn post.
+1. 4d-9 (path expansion) — eliminates the only remaining warnings.
+2. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
+3. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
+4. 4f (merge) — bridge to main and second LinkedIn post.
 
-If energy/context runs short, items 1-2 alone produce a defensibly
-complete branch. Items 3-4 are quality multipliers but not blocking.
-Item 5 is the strategic bridge regardless of how much of 3-4 lands.
+If energy/context runs short, item 1 alone produces a defensibly
+complete branch. Items 2-3 are quality multipliers but not blocking.
+Item 4 is the strategic bridge regardless of how much of 2-3 lands.
 
 ## Notes on context preservation
 

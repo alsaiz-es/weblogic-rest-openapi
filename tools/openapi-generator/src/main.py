@@ -375,6 +375,22 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
 
     descriptions_stats = apply_descriptions(doc)
 
+    # Phase 4d-7: empirical nullability overrides for fields the
+    # harvested set declares as non-nullable but the live REST
+    # projection returns as null. Must run before sample injection so
+    # `oas3-valid-media-example` accepts the live null values.
+    from nullability import apply_nullability
+
+    nullability_stats = apply_nullability(doc)
+
+    # Phase 4d-7: link live JSON samples from samples/<version>/ onto
+    # operations. Canonical sample → native examples block on the
+    # appropriate response; overflow + unmatched-status samples →
+    # x-weblogic-sample-paths extension on the operation.
+    from sample_loader import apply_samples
+
+    samples_stats = apply_samples(doc, wls_version)
+
     return {
         "doc": doc,
         "stats": {
@@ -392,6 +408,8 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
             "polymorphism_skipped": polymorphism_skipped,
             "quirks": quirks_stats,
             "descriptions": descriptions_stats,
+            "nullability": nullability_stats,
+            "samples": samples_stats,
             "enum_extraction": {
                 "extracted": {
                     name: {
