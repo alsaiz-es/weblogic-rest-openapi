@@ -1,0 +1,248 @@
+# Pre-overlay minimal — schemas, parameters, headers, responses needed by
+# every generated path. Mirrors the equivalents in
+# specs/common/schemas.yaml and specs/edit/change-manager.yaml.
+#
+# This file is consumed by the generator orchestrator (main.py); it is not
+# a standalone OpenAPI document.
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        WebLogic administration user credentials. The user must have at least
+        the `Monitor` role for GET operations; `Operator`, `Deployer`, or
+        `Admin` are required for lifecycle and edit operations.
+
+  parameters:
+    VersionPathParam:
+      name: version
+      in: path
+      required: true
+      description: WebLogic REST API version segment.
+      schema:
+        type: string
+        enum:
+          - latest
+          - "15.1.1.0.0"
+          - "14.1.2.0.0"
+          - "14.1.1.0.0"
+          - "12.2.1.4.0"
+          - "12.2.1.3.0"
+        default: latest
+
+    FieldsParam:
+      name: fields
+      in: query
+      required: false
+      description: Comma-separated list of property names to include in the response.
+      schema:
+        type: string
+      example: name,state,healthState
+
+    ExcludeFieldsParam:
+      name: excludeFields
+      in: query
+      required: false
+      description: Comma-separated list of property names to omit from the response.
+      schema:
+        type: string
+
+    LinksParam:
+      name: links
+      in: query
+      required: false
+      description: |
+        Comma-separated list of `rel` names to include in the response `links`.
+        Use `none` to suppress all links.
+      schema:
+        type: string
+
+    ExcludeLinksParam:
+      name: excludeLinks
+      in: query
+      required: false
+      description: Comma-separated list of `rel` names to omit from the response `links`.
+      schema:
+        type: string
+
+    XRequestedByHeader:
+      name: X-Requested-By
+      in: header
+      required: true
+      description: |
+        CSRF guard. Any non-empty value is accepted. Without it, mutating
+        requests return `400 Bad Request`. The header is also conditionally
+        required on `GET /domainRuntime/serverRuntimes` when at least one
+        managed server is RUNNING (documented in the quirks overlay).
+      schema:
+        type: string
+        minLength: 1
+      example: openapi-generator
+
+  schemas:
+    Identity:
+      type: array
+      description: Canonical bean path expressed as ordered segments.
+      items:
+        type: string
+
+    Link:
+      type: object
+      required:
+        - rel
+        - href
+      properties:
+        rel:
+          type: string
+        href:
+          type: string
+          format: uri
+        title:
+          type: string
+
+    EnvelopeBase:
+      type: object
+      description: |
+        Mixin composed into every generated bean schema. Adds the standard
+        `identity` and `links` fields the WLS REST framework injects on
+        every singleton response.
+      properties:
+        identity:
+          $ref: '#/components/schemas/Identity'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+
+    ErrorResponse:
+      type: object
+      description: Standard error envelope for read-tree failures (RFC 7807-ish).
+      required:
+        - type
+        - title
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          type: integer
+          format: int32
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              severity:
+                type: string
+                enum: [SUCCESS, INFO, WARNING, ERROR, FAILURE]
+              message:
+                type: string
+
+    HealthSymptom:
+      type: object
+      description: |
+        A single symptom contributing to a subsystem's health state.
+        Field set inferred from the `weblogic.health.Symptom` Java
+        API; the REST serialization may downcase the `severity`
+        values to match the lowercase tokens used elsewhere on
+        `HealthState`.
+      properties:
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        cause:
+          type: string
+          description: Short description of the contributing cause.
+        mitigationMessages:
+          type: array
+          items:
+            type: string
+        panicMessage:
+          type: string
+          nullable: true
+
+    HealthState:
+      type: object
+      description: |
+        Composite health state reported by a subsystem or server. The
+        `state` field is the coarse roll-up; `symptoms` provides the
+        underlying contributing conditions when available.
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          enum: [ok, warning, critical, failed, overloaded, unknown]
+        subsystemName:
+          type: string
+          description: Name of the subsystem reporting this health state.
+          nullable: true
+        partitionName:
+          type: string
+          nullable: true
+        symptoms:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthSymptom'
+
+    EditErrorDetail:
+      type: object
+      required:
+        - type
+        - title
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        detail:
+          type: string
+
+    EditErrorResponse:
+      type: object
+      description: |
+        Edit-tree validation error envelope. Carries `wls:errorsDetails`
+        with one or more nested errors. Distinct from `ErrorResponse`.
+      required:
+        - status
+        - title
+      properties:
+        status:
+          type: integer
+          format: int32
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        "wls:errorsDetails":
+          type: array
+          items:
+            $ref: '#/components/schemas/EditErrorDetail'
+
+  responses:
+    Unauthorized:
+      description: Authentication failed or absent.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Bean not found at this path.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    EditError:
+      description: Edit-tree validation or precondition error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EditErrorResponse'

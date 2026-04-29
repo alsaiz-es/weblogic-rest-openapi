@@ -1,0 +1,92 @@
+EJBComponentRuntime:
+  type: object
+  description: This is the top level interface for all runtime information collected for an EJB module.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    deploymentState:
+      type: integer
+      format: int32
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      description: "The current deployment state of the module.\n\nA module can be in one and only one of the following states.
+        State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this module is
+        neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is prepared, but
+        not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED. State indicating at
+        this module is currently active.\n- \n- NEW. State indicating this module has just been created and is being initialized.\n\
+        -"
+      readOnly: true
+    moduleId:
+      type: string
+      description: "Returns the identifier for this Component. The identifier is unique within the application.\n\nTypical
+        modules will use the URI for their id. Web Modules will return their context-root since the web-uri may not be unique
+        within an EAR."
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Get the runtime mbeans for all work managers defined in this component
+      readOnly: true
+    managedExecutorServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedExecutorServiceRuntime'
+      description: Get the runtime mbeans for all ManagedExecutorServices defined in this component
+      readOnly: true
+    managedScheduledExecutorServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedScheduledExecutorServiceRuntime'
+      description: Get the runtime mbeans for all ManagedScheduledExecutorServices defined in this component
+      readOnly: true
+    managedThreadFactoryRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ManagedThreadFactoryRuntime'
+      description: Get the runtime mbeans for all ManagedThreadFactorys defined in this component
+      readOnly: true
+    coherenceClusterRuntime:
+      $ref: '#/components/schemas/CoherenceClusterRuntime'
+      description: Returns the Coherence Cluster related runtime mbean for this component
+    EJBRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/EJBRuntime'
+      description: Provides an array of EJBRuntimeMBean objects for this EJB module. The EJBRuntimeMBean instances can 
+        be cast to their appropriate subclass (EntityEJBRuntimeMBean, StatelessEJBRuntimeMBean, StatefulEJBRuntimeMBean 
+        or MessageDrivenEJBRuntimeMBean) to access additional runtime information for the particular EJB.
+      readOnly: true
+    springRuntimeMBean:
+      $ref: '#/components/schemas/SpringRuntime'
+    wseeClientConfigurationRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeClientConfigurationRuntime'
+      description: Returns the list of Web Service client reference configuration runtime instances that are contained 
+        in this EJB within an Enterprise application.
+      readOnly: true
+    wseeClientRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeClientRuntime'
+      description: Returns the list of Web Service client runtime instances that are contained in this Enterprise 
+        JavaBean component.
+      readOnly: true
+    wseeV2Runtimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WseeV2Runtime'
+      description: Returns the list of Web Service runtime instances that are contained in this EJB within an Enterprise
+        application.
+      readOnly: true

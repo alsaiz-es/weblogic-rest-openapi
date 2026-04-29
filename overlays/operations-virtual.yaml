@@ -1,0 +1,436 @@
+# Virtual operations — REST endpoints that have no MBean in harvested.
+# Currently only the change-manager surface lives here. The schemas
+# (ChangeManagerState, ChangeManagerLockOwner-like fields) are also
+# defined in this file because they have no harvested counterpart.
+#
+# Consumed by the generator orchestrator. The structure mirrors
+# OpenAPI 3.0 components/paths so the orchestrator can splice it in
+# directly under each tree's root.
+
+components:
+  schemas:
+    BulkSearchRequest:
+      type: object
+      description: |
+        Recursive description of a tree slice. Every node may carry
+        `fields`, `links`, and `children`. Inside `children.<X>`,
+        when `<X>` is a collection, `name` may filter to a subset.
+      properties:
+        fields:
+          type: array
+          description: Property names to read on this node. Unknown names are silently ignored.
+          items:
+            type: string
+          example: [name, state]
+        links:
+          type: array
+          description: |
+            Link relation names to keep in the `links` array of this
+            node's response. Pass `[]` to suppress all links on this
+            node. **Must be an array** even when empty — the string
+            `"none"` (valid on GET) is rejected here.
+          items:
+            type: string
+          example: []
+        children:
+          type: object
+          description: |
+            Map of child collection or singleton names to nested
+            `BulkSearchRequest` nodes. Recursive to arbitrary depth.
+          additionalProperties:
+            $ref: '#/components/schemas/BulkSearchRequest'
+        name:
+          type: array
+          description: |
+            Restricts a `children.<collection>` node to instances
+            with these names. Has no observed effect at the root
+            node — only inside a child collection.
+          items:
+            type: string
+
+    BulkSearchResponse:
+      type: object
+      description: |
+        Mirror of the request structure populated with values.
+        Each child collection appears as `{ "items": [...] }`;
+        each child singleton appears as a plain object. The shape
+        is structural — no fixed property set is enforced because
+        it depends entirely on which fields and children the
+        request asked for.
+      additionalProperties: true
+
+    ChangeManagerState:
+      type: object
+      description: |
+        Edit-session state. Returned by `GET /edit/changeManager`.
+      properties:
+        locked:
+          type: boolean
+          description: Whether someone currently holds the edit lock.
+        lockOwner:
+          type: string
+          description: "User holding the lock, when `locked: true`."
+        hasChanges:
+          type: boolean
+        mergeNeeded:
+          type: boolean
+          description: True when the global config has advanced under the session.
+        editSession:
+          type: string
+          example: default
+
+paths:
+  /edit/changeManager:
+    get:
+      operationId: getChangeManagerState
+      tags: [change-manager]
+      summary: Read current edit-session state.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+      responses:
+        '200':
+          description: Session state envelope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeManagerState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/startEdit:
+    post:
+      operationId: startEdit
+      tags: [change-manager]
+      summary: Acquire the edit lock.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Lock acquired or already held.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/cancelEdit:
+    post:
+      operationId: cancelEdit
+      tags: [change-manager]
+      summary: Discard pending changes and release the edit lock.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Pending changes discarded.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/activate:
+    post:
+      operationId: activate
+      tags: [change-manager]
+      summary: Activate pending changes.
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Changes activated.
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /edit/changeManager/safeResolve:
+    post:
+      operationId: safeResolve
+      tags: [change-manager]
+      summary: Reconcile session against global config (safe mode).
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Reconciliation succeeded.
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /domainRuntime/search:
+    post:
+      operationId: searchDomainRuntime
+      tags: [domainRuntime]
+      summary: Bulk-fetch a tree slice of runtime beans in one request.
+      description: |
+        Accepts a `BulkSearchRequest` body describing the desired tree
+        shape and answers with a JSON document that mirrors the request
+        structure, populated with the requested fields. Allows a single
+        request to harvest many runtime values that would otherwise
+        require N separate REST round-trips.
+
+        ### Body shape (verified)
+
+        - `fields` — array of property names to read on the current
+          node. Unknown property names are silently ignored.
+        - `links` — array of link relation names to keep in the response.
+          Pass `[]` to suppress the HATEOAS `links` array on this node
+          entirely. **Must be an array** — passing the string `"none"`
+          (which is valid as a query parameter on GET) returns `400`
+          with detail `The property 'links' must be an array.`
+        - `children` — object whose keys are child collection or
+          singleton names (e.g. `serverRuntimes`, `threadPoolRuntime`)
+          and whose values are themselves `BulkSearchRequest` nodes.
+          Recursive to arbitrary depth.
+        - `name` — when used inside a `children.<collection>` node,
+          restricts the collection to the listed instance names.
+
+        Top-level keys not listed above are silently ignored.
+
+        ### Response shape
+
+        Mirrors the request: each requested child appears as either a
+        single object (when targeting a singleton MBean such as
+        `threadPoolRuntime`) or an `{"items": [...]}` envelope (when
+        targeting a collection such as `serverRuntimes`). The fields
+        listed in `fields` populate each node, and any `links` array
+        requested is appended at the same level.
+
+        ### Failure modes (verified, WLS 14.1.2)
+
+        | Condition | HTTP | Body |
+        |---|---|---|
+        | No `X-Requested-By` header | 400 | `Bad Request` (text/html) |
+        | Wrong content type | 415 | `Unsupported Media Type` |
+        | GET instead of POST | 405 | RFC-7807-style JSON error |
+        | `/management/wls/latest/...` namespace | 404 | `Not Found` |
+        | Invalid JSON body | 400 | `Bad Request` (text/html) |
+        | `"links": "none"` (string) | 400 | RFC-7807 JSON: `must be an array` |
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkSearchRequest'
+            examples:
+              empty:
+                summary: Empty body — returns the full domainRuntime root with HATEOAS links.
+                value: {}
+              serversBasic:
+                summary: Names and states of every running server.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      fields: [name, state]
+                      links: []
+              serversWithThreadPool:
+                summary: Server state plus thread pool counters in one call.
+                value:
+                  fields: []
+                  links: []
+                  children:
+                    serverRuntimes:
+                      fields: [name, state]
+                      links: []
+                      children:
+                        threadPoolRuntime:
+                          fields:
+                            - executeThreadTotalCount
+                            - hoggingThreadCount
+                            - stuckThreadCount
+                          links: []
+      responses:
+        '200':
+          description: Tree slice mirroring the request structure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkSearchResponse'
+        '400':
+          description: |
+            Returned for two distinct reasons. **`text/html` body
+            containing `Bad Request`**: the CSRF check or JSON parser
+            rejected the request before it reached the DSL validator —
+            most commonly because the `X-Requested-By` header is
+            missing. **RFC-7807 JSON body**: the DSL validator rejected
+            a value (e.g. `links` was not an array).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+            text/html:
+              schema:
+                type: string
+                description: Plain `Bad Request` page; rejection happened before DSL validation.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '405':
+          description: Wrong HTTP method (only POST is accepted).
+        '415':
+          description: Unsupported `Content-Type` (only `application/json` is accepted).
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/startInAdmin:
+    parameters:
+      - $ref: '#/components/parameters/VersionPathParam'
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: startServerInAdmin
+      tags: [lifecycle]
+      summary: Start the server, halting in ADMIN state.
+      description: |
+        Boots the server through NodeManager but stops it in `ADMIN`
+        state — the server runs but accepts only administrative
+        traffic. This action is **not** declared in the WebLogic Remote
+        Console's `extension.yaml` overlay; it is recovered here
+        manually. See the Phase 4d-2 report for the decision rationale
+        (Java scraping was attempted; only `startInAdminMode` for
+        application deployments was found, distinct from this server-
+        lifecycle action).
+
+        Like the other lifecycle actions, the call returns a
+        populated `ServerLifeCycleTaskRuntime` envelope (see the
+        `lifecycle-async-task-shape` quirk). Failures surface via
+        `taskError` rather than HTTP status.
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: array
+                  description: Optional NodeManager start properties (server.start.* keys).
+                  items:
+                    type: string
+            example: {}
+      responses:
+        '200':
+          description: Lifecycle task descriptor (always populated, even on synchronous completion).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLifeCycleTaskRuntime'
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /domainRuntime/serverLifeCycleRuntimes/{serverName}/startInStandby:
+    parameters:
+      - $ref: '#/components/parameters/VersionPathParam'
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: startServerInStandby
+      tags: [lifecycle]
+      summary: Start the server, halting in STANDBY state.
+      description: |
+        Boots the server through NodeManager but stops it in `STANDBY`
+        state — listen ports closed, server initialized but not
+        accepting any traffic. Useful as a "warm spare" before
+        promoting the instance with a follow-up `resume`.
+
+        As with `startInAdmin`, this action is not declared in the
+        Remote Console `extension.yaml` overlay; recovered manually
+        for the generated spec. Same async-task envelope as the other
+        lifecycle actions (`lifecycle-async-task-shape` quirk).
+      parameters:
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: array
+                  description: Optional NodeManager start properties (server.start.* keys).
+                  items:
+                    type: string
+            example: {}
+      responses:
+        '200':
+          description: Lifecycle task descriptor (always populated, even on synchronous completion).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerLifeCycleTaskRuntime'
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /edit/changeManager/forceResolve:
+    post:
+      operationId: forceResolve
+      tags: [change-manager]
+      summary: Reconcile session against global config (force mode, your changes win).
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example: {}
+      responses:
+        '200':
+          description: Reconciliation succeeded.
+        '401':
+          $ref: '#/components/responses/Unauthorized'

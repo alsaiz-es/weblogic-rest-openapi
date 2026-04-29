@@ -1,0 +1,36 @@
+schema: JDBCDataSourceRuntimeBase
+schema_level:
+  operational_note: |
+    Every counter is cumulative since the datasource was last
+    deployed; "current" fields are point-in-time and "High" fields
+    are watermarks. The bean also exposes prepared-statement cache
+    counters and XA transaction outcome counters for XA-enabled
+    datasources.
+properties:
+  waitingForConnectionFailureTotal:
+    operational_note: |
+      Cumulative waiters that gave up before obtaining a connection.
+      A non-zero value here is the primary signal that the pool is
+      undersized for the workload.
+  leakedConnectionCount:
+    operational_note: |
+      Cumulative connections reclaimed because the application never
+      returned them. Non-zero values indicate an application bug —
+      typically a missing `close()` in a `finally`.
+  failuresToReconnectCount:
+    operational_note: |
+      Cumulative failures when the pool tried to replace a broken
+      connection. Sustained growth indicates DB-side instability.
+  unresolvedTotalCount:
+    operational_note: |
+      Cumulative XA branches whose outcome could not be determined.
+      Non-zero values usually indicate in-doubt transactions that
+      need DBA attention.
+  databaseProductVersion:
+    operational_note: |
+      Often multi-line (newline-separated banner from the JDBC
+      driver). Clients should not split on whitespace.
+  deploymentState:
+    operational_note: |
+      Inherited from the generic deployment framework; not identical
+      to `state`. Prefer `state` for human-readable lifecycle.

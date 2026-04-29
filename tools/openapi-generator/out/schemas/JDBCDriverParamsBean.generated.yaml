@@ -1,0 +1,58 @@
+JDBCDriverParamsBean:
+  type: object
+  description: "Contains the driver parameters of a data source.\n\nConfiguration parameters for the JDBC Driver used by a
+    data source are specified using a driver parameters bean."
+  properties:
+    driverName:
+      type: string
+      description: "The full package name of JDBC driver class used to create the physical database connections in the connection
+        pool in the data source.\n\nFor example: `oracle.jdbc.OracleDriver`\n\nThe driver must be the name of a class that
+        implements the `java.sql.Driver` interface. Check the driver documentation to find the full pathname.\n\nNote that
+        the driver class must be in the classpath of any server to which the data source is deployed."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    password:
+      type: string
+      description: "The password attribute passed to the JDBC driver when creating physical database connections.\n\nThe value
+        is stored in an encrypted form in the descriptor file and when displayed in an administration console."
+    passwordEncrypted:
+      type: array
+      items:
+        type: integer
+        format: int32
+      description: The encrypted database password as set with `setPassword()`, `setPasswordEncrypted(byte[] bytes)`, or
+        as a key=value pair in the list of JDBC driver properties.
+    properties:
+      $ref: '#/components/schemas/JDBCPropertiesBean'
+      description: "The list of properties passed to the JDBC driver when creating physical database connections.\n\nTo enable
+        driver-level features, add the driver property and its value to the Properties list. WebLogic Server sets driver-level
+        properties in the Properties list on the driver's `ConnectionPoolDataSource` object.\n\nNote: For Security reasons,
+        when WebLogic Server is running in Production mode, you cannot specify database passwords in this properties list.
+        Data source deployment will fail if a password is specified in the properties list. To override this security check,
+        use the command line argument `weblogic.management.allowClearTextPasswords` when starting the server."
+    url:
+      type: string
+      description: "The URL of the database to connect to. The format of the URL varies by JDBC driver.\n\nThe URL is passed
+        to the JDBC driver to create the physical database connections."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    usePasswordIndirection:
+      type: boolean
+      default:
+        value:
+          value: false
+      description: Specifies whether the database credentials are to be obtained from the credential mapper using the 
+        "user" property as the key. When true, the credentials are obtained from the credential mapper. When false, the 
+        database user name and password are obtained from the "user" property and Password element, respectively.
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true
+    useXaDataSourceInterface:
+      type: boolean
+      default:
+        value:
+          value: true
+      description: "Specifies that WebLogic Server should use the XA interface of the JDBC driver.\n\nIf the JDBC driver class
+        used to create database connections implements both XA and non-XA versions of a JDBC driver, you can set this attribute
+        to indicate that WebLogic Server should treat the JDBC driver as an XA driver or as a non-XA driver."
+      x-weblogic-restart-needed: true
+      x-weblogic-redeploy-needed: true

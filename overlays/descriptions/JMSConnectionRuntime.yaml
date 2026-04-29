@@ -1,0 +1,9 @@
+schema: JMSConnectionRuntime
+schema_level:
+  operational_note: |
+    Per-JMS-client-connection runtime view. The number of these on a
+    server is the same as the `connectionsCurrentCount` reported by
+    the parent `JMSRuntime`. A long-lived connection with growing
+    `sessionsCurrentCount` and zero turnover is a typical
+    connection-leak signature on the application side — the client
+    is creating sessions but not closing them.

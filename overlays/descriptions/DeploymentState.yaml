@@ -1,0 +1,10 @@
+schema: DeploymentState
+schema_level:
+  operational_note: |
+    Numeric module deployment state. Observed value `2` is the
+    common ACTIVE state on a healthy deployment. Other values
+    documented in the underlying
+    `weblogic.application.ApplicationConstants` Java API include
+    `0` UNPREPARED, `1` PREPARED, `3` NEW, `4` UPDATE_PENDING,
+    `5` ADMIN, `6` RETIRED. Treat as opaque and prefer `healthState`
+    (when present) for runtime decisions.

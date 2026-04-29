@@ -1,0 +1,8 @@
+schema: ServerChannelRuntime
+properties:
+  channelName:
+    operational_note: |
+      Names follow the pattern `Default[<protocol>]` for default
+      channels and `Default[<protocol>][<n>]` for protocol replicas
+      (multi-listener configurations). The bracket characters must
+      be percent-encoded (`%5B`, `%5D`) when used as a path segment.

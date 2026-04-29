@@ -1,0 +1,10 @@
+schema: MinThreadsConstraint
+schema_level:
+  operational_note: |
+    Reserves thread capacity for a request group — the self-tuning
+    pool will not starve this group below `count` even under
+    overload. Primary defense against priority-inversion / deadlock
+    when a high-priority thread waits for a low-priority one to
+    complete (e.g. JTA recovery, leasing services). Setting too
+    high reduces the slack the self-tuning algorithm has to balance
+    other workloads.

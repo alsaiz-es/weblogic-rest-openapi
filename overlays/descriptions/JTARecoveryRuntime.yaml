@@ -1,0 +1,10 @@
+schema: JTARecoveryRuntime
+schema_level:
+  operational_note: |
+    Recovery state for a Transaction Recovery Service. When a server
+    crashes mid-transaction, recovery runs on whichever server owns
+    the migratable target — `initialRecoveredTransactionTotalCount`
+    is the snapshot taken at recovery start; `recoveredTransactionTotalCount`
+    tracks how many of those have completed since. A persistent
+    delta indicates resource-side recovery is stuck (typically the
+    DB has in-doubt entries that need DBA intervention).

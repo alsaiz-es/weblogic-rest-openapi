@@ -1,0 +1,48 @@
+schema: NovellAuthenticator
+description: |
+  LDAP-based authentication provider tuned for Novell eDirectory.
+  Surface is the generic LDAP authenticator with Novell-specific
+  defaults for user/group attribute names.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (Novell authenticator)."
+  - "weblogic.security.providers.authentication.NovellAuthenticatorMBean reference."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  host:
+    type: string
+    nullable: true
+  port:
+    type: integer
+    format: int32
+  SSLEnabled:
+    type: boolean
+  principal:
+    type: string
+    nullable: true
+  credential:
+    type: string
+    nullable: true
+    description: Write-only — never echoed on GET.
+  userBaseDN:
+    type: string
+    nullable: true
+  userFromNameFilter:
+    type: string
+    nullable: true
+    description: Defaults use `cn` attribute, matching eDirectory conventions.
+  groupBaseDN:
+    type: string
+    nullable: true
+  groupFromNameFilter:
+    type: string
+    nullable: true
+  cacheEnabled:
+    type: boolean

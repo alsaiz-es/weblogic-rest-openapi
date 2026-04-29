@@ -1,0 +1,13 @@
+[project]
+name = "wls-openapi-generator"
+version = "0.1.0"
+description = "Transform WebLogic Remote Console harvested MBean YAMLs into OpenAPI 3.0 schemas."
+requires-python = ">=3.11"
+dependencies = [
+    "ruamel.yaml>=0.18",
+    "pyyaml>=6.0",
+    "openapi-spec-validator>=0.7",
+]
+
+[tool.uv]
+package = false

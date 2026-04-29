@@ -1,0 +1,7 @@
+schema: ChangeManagerState
+properties:
+  editSession:
+    operational_note: |
+      Always `"default"` in non-Multi-Tenant domains. The field is a
+      Multi-Tenant artifact retained on both 12.2.1.4 and 14.1.2
+      responses for shape compatibility.

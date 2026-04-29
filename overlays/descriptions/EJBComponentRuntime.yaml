@@ -1,0 +1,7 @@
+schema: EJBComponentRuntime
+schema_level:
+  operational_note: |
+    EJB jar wrapper — carries no instance-level data of its own. The
+    interesting metrics (instance pool sizes, invocation counts,
+    transaction counts) live one level deeper under the `EJBRuntimes`
+    child rel reachable via the response's `links` array.

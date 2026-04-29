@@ -1,0 +1,8 @@
+schema: JMSBridgeDestination
+schema_level:
+  operational_note: |
+    Endpoint definition for a messaging bridge. Both source and
+    target are required. Bridges run on the WebLogic side and pull
+    from source / push to target — they are not transport-level
+    routers, so transactional semantics on each leg follow the JCA
+    adapter selected (XA, local-transaction, or none).

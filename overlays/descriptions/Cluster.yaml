@@ -1,0 +1,14 @@
+schema: Cluster
+schema_level:
+  operational_note: |
+    `ClusterMBean` has roughly 73 properties on 14.1.2 and 69 on
+    12.2.1.4. The four 14.1.2-only fields are
+    `replicationTimeoutMillis`, `rebalanceDelayPeriods`,
+    `autoMigrationTableCreationDDLFile`, and
+    `autoMigrationTableCreationPolicy`. The 12.2.1.4 set is a strict
+    subset; nothing was removed in 14.1.2.
+
+    The legacy "Buzz" cluster transport (visible on 12.2.1.4
+    `ServerMBean` as `buzzEnabled`/`buzzAddress`/`buzzPort`) tied
+    into `clusterMessagingMode` when chosen and was removed from the
+    14.1.x cluster stack.

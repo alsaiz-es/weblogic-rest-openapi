@@ -1,0 +1,34 @@
+id: lifecycle-async-task-shape
+title: "Lifecycle action endpoints return a ServerLifeCycleTaskRuntime envelope, even synchronously"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: schema
+    schema: ServerLifeCycleTaskRuntime
+inject:
+  description_append: |
+    **Quirk — every lifecycle action returns this task envelope, even when
+    it completes synchronously.** `start`, `suspend`, `resume`,
+    `forceSuspend`, `shutdown`, `forceShutdown`, `startInAdmin`,
+    `startInStandby` all return a populated
+    `ServerLifeCycleTaskRuntime` JSON object describing the job — not
+    an empty `200`. Even ~35 ms operations follow the async-job
+    protocol; `taskStatus: "TASK COMPLETED"` and `completed: true`
+    appear synchronously in the response on success.
+
+    Failures are reported via `taskError` (non-null), **not via HTTP
+    status**. A misbehaving NodeManager returns `200` with a non-null
+    `taskError` carrying the wrapped exception. Clients should not
+    treat the HTTP code alone as success/failure for lifecycle calls;
+    inspect `taskStatus` / `taskError`.
+
+    `suspend` requests are internally recorded as `suspendWithTimeout`
+    regardless of whether the body included a timeout. The `tasks`
+    collection child of each lifecycle runtime accumulates the
+    history of all past invocations. Verified on WLS 12.2.1.4 and
+    14.1.2 with identical 18-field shape.
+external_doc: docs/QUIRKS.md#7-lifecycle-operations-return-an-async-task-descriptor

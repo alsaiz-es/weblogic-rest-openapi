@@ -1,0 +1,10 @@
+schema: JMSServer
+schema_level:
+  operational_note: |
+    Configuration bean — sibling to the runtime view in
+    `JMSServerRuntime`. The `targets` setting determines which
+    WebLogic servers host this JMS server; for high-availability,
+    target a migratable target (rather than a plain server) so the
+    JMS server moves with the configured migration policy. Persistent
+    store + paging directory must be reachable from every member of
+    a migratable target.

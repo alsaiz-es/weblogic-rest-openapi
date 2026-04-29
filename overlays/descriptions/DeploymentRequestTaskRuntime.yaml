@@ -1,0 +1,9 @@
+schema: DeploymentRequestTaskRuntime
+schema_level:
+  operational_note: |
+    Container task that aggregates the prepare-phase and commit-phase
+    subtasks of a single `DeploymentService` request. The deployment
+    is two-phase: prepare validates the request on every target
+    server (any failure aborts the entire request); commit applies
+    the change. Watch the subtask list to localise which target
+    failed in the prepare phase.

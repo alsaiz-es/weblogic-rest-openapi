@@ -1,0 +1,11 @@
+schema: JMSDestinationRuntimeBase
+schema_level:
+  operational_note: |
+    Per-destination (queue or topic) projection. The polymorphic
+    parent `JMSDestinationRuntime` selects the concrete subtype via
+    the `destinationType` discriminator. Counter naming follows the
+    same convention as `JMSServerRuntime`: cumulative counters end
+    in `Count`, point-in-time in `Current`, and watermarks contain
+    `High`. For deeper per-message inspection (peek, move, delete),
+    drill into `JMSMessageManagementTaskRuntime` via the destination's
+    `messageManagement` rel.

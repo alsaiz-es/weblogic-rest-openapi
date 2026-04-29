@@ -1,0 +1,64 @@
+# Property nullability overrides for fields that the harvested MBean
+# YAMLs declare as non-nullable but that the live REST projection
+# returns as `null` in real responses (verified empirically against
+# 12.2.1.4 and 14.1.2 captures under `samples/`).
+#
+# Without these overrides, native sample injection in 4d-7 trips
+# `oas3-valid-media-example` because the sample's `null` does not
+# satisfy `type: string`. The fix is to model the property as
+# `nullable: true` (OAS 3.0); this is a real schema correction, not a
+# sample workaround.
+#
+# Format: list of { schema, property } entries. The applier walks the
+# named property (using the same `_props_of` resolver as quirks /
+# descriptions overlays) and sets `nullable: true`.
+
+overrides:
+  - schema: JVMRuntime
+    property: javaVendorVersion
+  - schema: ServerChannelRuntime
+    property: associatedVirtualTargetName
+  - schema: JDBCDataSourceBean
+    property: datasourceType
+  - schema: JDBCConnectionPoolParamsBean
+    property: connectionLabelingCallback
+  - schema: JDBCDataSourceParamsBean
+    property: connectionPoolFailoverCallbackHandler
+  - schema: JDBCDriverParamsBean
+    property: password
+  - schema: Cluster
+    property: notes
+  - schema: Cluster
+    property: autoMigrationTableCreationDDLFile
+  - schema: JDBCConnectionPoolParamsBean
+    property: driverInterceptor
+  - schema: JDBCDataSourceParamsBean
+    property: dataSourceList
+  - schema: JDBCDriverParamsBean
+    property: url
+  - schema: JDBCConnectionPoolParamsBean
+    property: fatalErrorCodes
+  - schema: JDBCDataSourceParamsBean
+    property: proxySwitchingCallback
+  - schema: Cluster
+    property: clusterAddress
+  - schema: Cluster
+    property: clusterBroadcastChannel
+  - schema: JDBCConnectionPoolParamsBean
+    property: initSql
+  - schema: JDBCDataSourceParamsBean
+    property: proxySwitchingProperties
+  - schema: Cluster
+    property: coherenceClusterSystemResource
+  - schema: Cluster
+    property: dataSourceForAutomaticMigration
+  - schema: Cluster
+    property: dataSourceForJobScheduler
+  - schema: Cluster
+    property: dataSourceForSessionPersistence
+  - schema: Cluster
+    property: siteName
+  - schema: Cluster
+    property: frontendHost
+  - schema: Cluster
+    property: remoteClusterAddress

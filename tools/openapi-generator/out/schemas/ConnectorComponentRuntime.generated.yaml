@@ -1,0 +1,169 @@
+ConnectorComponentRuntime:
+  type: object
+  description: "Generates notifications about the deployment state of resource adapters. (Each resource adapter is represented
+    by an instance of weblogic.management.configuration.ConnectorComponentMBean.)\n\nIn 2-phase deployment, if a resource
+    adapter's state is `PREPARED` then it has achieved the first phase of deployment (everything is set up and all that remains
+    is to enable a reference to the adapter). When the resource adapter is in an `ACTIVATED` state, it has achieved the second
+    phase of deployment, in which applications can obtain a reference to the adapter.\n\nA server instance creates an instance
+    of this interface when it creates an instance of `weblogic.management.configuration.ConnectorComponentMBean`."
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    deploymentState:
+      type: integer
+      format: int32
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      description: "The current deployment state of the module.\n\nA module can be in one and only one of the following states.
+        State can be changed via deployment or administrator console.\n\n- UNPREPARED. State indicating at this module is
+        neither prepared or active.\n- \n- PREPARED. State indicating at this module of this application is prepared, but
+        not active. The classes have been loaded and the module has been validated.\n- \n- ACTIVATED. State indicating at
+        this module is currently active.\n- \n- NEW. State indicating this module has just been created and is being initialized.\n\
+        -"
+      readOnly: true
+    moduleId:
+      type: string
+      description: "Returns the identifier for this Component. The identifier is unique within the application.\n\nTypical
+        modules will use the URI for their id. Web Modules will return their context-root since the web-uri may not be unique
+        within an EAR."
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Get the runtime mbeans for all work managers defined in this component
+      readOnly: true
+    activeVersion:
+      type: boolean
+      description: Return true if this version is the active version. Returns true if this resource adapter is not 
+        versioned.
+      readOnly: true
+    activeVersionId:
+      type: string
+      description: Get the active version Id.
+      readOnly: true
+    componentName:
+      type: string
+      description: Get the name of the connector component.
+      readOnly: true
+    configuration:
+      type: string
+      description: Return the xml string representing the RA configuration. The xml corresponding to the latest schema 
+        is returned. The current supported version is "1.0"
+      readOnly: true
+    configurationVersion:
+      type: string
+      description: Return the latest configuration version.
+      readOnly: true
+    configuredProperties:
+      type: object
+      description: Gets a subset of the resource adapter descriptor information.
+      readOnly: true
+    connectionPoolCount:
+      type: integer
+      format: int32
+      description: The number of connection pools.
+      readOnly: true
+    connectionPools:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConnectorConnectionPoolRuntime'
+      description: An array of `ConnectorConnectionPoolRuntimeMBeans`, each of which represents the runtime data for a 
+        connection pool in the resource adapter.
+      readOnly: true
+    connectorServiceRuntime:
+      $ref: '#/components/schemas/ConnectorServiceRuntime'
+      description: Return the connector service runtime.
+    connectorWorkManagerRuntime:
+      $ref: '#/components/schemas/ConnectorWorkManagerRuntime'
+      description: Runtime information for adapter's work manager that beyond WebLogic's standard work manager. It 
+        provides addisional runtime information specific to Connector and not contained by WebLogic work manager.
+    description:
+      type: string
+      description: Get the Description for the resource adapter.
+      readOnly: true
+    descriptions:
+      type: array
+      items:
+        type: string
+      description: Get the Descriptions for the resource adapter.
+      readOnly: true
+    EISResourceId:
+      type: string
+      description: Returns the EISResourceId for the component.
+      readOnly: true
+    EISType:
+      type: string
+      description: Get the EIS type.
+      readOnly: true
+    healthState:
+      $ref: '#/components/schemas/HealthState'
+      description: The HealthState mbean for the application.
+    inboundConnections:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConnectorInboundRuntime'
+      description: An array of runtime information for all inbound connections for the resource adapter.
+      readOnly: true
+    inboundConnectionsCount:
+      type: integer
+      format: int32
+      description: The number of inbound connections for the resource adapter.
+      readOnly: true
+    jndiName:
+      type: string
+      description: Get the Jndi name of the resource adapter.
+      readOnly: true
+    linkref:
+      type: string
+      description: Get the linkref.
+      readOnly: true
+    schema:
+      type: string
+      description: Get the latest schema for RA configuration.
+      readOnly: true
+    specVersion:
+      type: string
+      description: Get the spec version.
+      readOnly: true
+    state:
+      type: string
+      description: Get the state of the resource adapter.
+      readOnly: true
+    suspendedState:
+      type: integer
+      format: int32
+      description: "Gets the suspended state information of the resource adapter.\n\nIf getState() returns SUSPENDED then
+        getSuspendedState() returns an integer describing which functions of the resource adapter are suspended: one or more
+        of INBOUND, OUTBOUND or WORK (or ALL) or 0 for nothing suspended"
+      readOnly: true
+    vendorName:
+      type: string
+      description: Get the vendor name.
+      readOnly: true
+    version:
+      type: string
+      description: Get the version.
+      readOnly: true
+    versionId:
+      type: string
+      description: Get the version Id.
+      readOnly: true
+    versioned:
+      type: boolean
+      description: Check if the resource adapter is versioned. Returns true if it is.
+      readOnly: true
+    workManagerRuntime:
+      $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Runtime information for WebLogic's work manager that serves the adapter. It provides general runtime 
+        information by WebLogic work manager.

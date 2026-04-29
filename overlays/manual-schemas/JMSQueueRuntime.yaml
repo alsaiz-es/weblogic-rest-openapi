@@ -1,0 +1,84 @@
+schema: JMSQueueRuntime
+description: |
+  Runtime metrics for a JMS queue destination. Inherits the message
+  / byte / consumer counters from `JMSDestinationRuntimeBase` and
+  selects the `Queue` discriminator value. Properties below cover
+  per-queue specifics not present on the base.
+sources:
+  - "Oracle MBean Reference for Oracle WebLogic Server: weblogic.management.runtime.JMSDestinationRuntimeMBean (Queue specialisation)."
+  - "Oracle Fusion Middleware Administering JMS Resources for Oracle WebLogic Server."
+  - "Empirical: live samples under samples/12.2.1.4/ and samples/14.1.2/ (jmsServer_individual_*)."
+properties:
+  consumersCurrentCount:
+    type: integer
+    format: int64
+    description: |
+      Active consumers currently registered on this queue. Sustained
+      zero with non-zero `messagesPendingCount` means the queue has
+      no listeners draining it.
+  consumersHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `consumersCurrentCount` since this destination was deployed.
+  consumersTotalCount:
+    type: integer
+    format: int64
+    description: Cumulative consumer registrations since deployment (registrations, not connections).
+  messagesReceivedCount:
+    type: integer
+    format: int64
+    description: |
+      Cumulative messages produced into this queue since deployment.
+      Pair with `messagesCurrentCount` (queue depth right now) and
+      `messagesPendingCount` (uncommitted) to spot consumer
+      starvation.
+  messagesCurrentCount:
+    type: integer
+    format: int64
+    description: Messages currently in the queue (not yet consumed).
+  messagesPendingCount:
+    type: integer
+    format: int64
+    description: |
+      Messages produced inside an in-flight transaction or a
+      scheduled-for-delivery window — visible to the destination but
+      not yet committed for consumption.
+  messagesHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `messagesCurrentCount` since deployment.
+  bytesReceivedCount:
+    type: integer
+    format: int64
+    description: Cumulative bytes produced into this queue.
+  bytesCurrentCount:
+    type: integer
+    format: int64
+    description: Bytes currently held by the queue.
+  bytesPendingCount:
+    type: integer
+    format: int64
+    description: Bytes belonging to in-flight or scheduled-for-delivery messages.
+  bytesHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `bytesCurrentCount` since deployment.
+  insertionPaused:
+    type: boolean
+    description: True when the queue is currently rejecting new producer messages.
+  productionPaused:
+    type: boolean
+    description: True when production has been paused (administratively or by quota).
+  consumptionPaused:
+    type: boolean
+    description: True when the queue currently rejects consumer reads.
+  pagedIn:
+    type: boolean
+    description: True when paged-out messages are currently being read back from the persistent store.
+  destinationInfo:
+    type: object
+    additionalProperties: true
+    description: |
+      Free-form descriptor with the queue's full identity (module
+      name, system resource name, sub-deployment). Treat as opaque;
+      structure varies across versions.

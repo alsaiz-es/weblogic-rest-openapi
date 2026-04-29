@@ -1,0 +1,9 @@
+schema: JMSPausedState
+schema_level:
+  operational_note: |
+    Tri-state pause indicator — despite being conceptually a boolean
+    toggle, the REST API returns these as descriptive strings
+    (`Insertion-Enabled` / `Insertion-Paused`, etc.). The boolean
+    form is offered separately as `insertionPaused` /
+    `consumptionPaused` / `productionPaused` for programmatic
+    checks.

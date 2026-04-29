@@ -1,0 +1,51 @@
+schema: OracleVirtualDirectoryAuthenticator
+description: |
+  Authentication provider that delegates LDAP queries to Oracle
+  Virtual Directory (OVD) — a virtual LDAP layer that aggregates
+  multiple physical directories. Surface is the generic LDAP
+  authenticator with OVD-specific behaviour around attribute
+  rewriting and join semantics.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (Oracle Virtual Directory authenticator)."
+  - "Oracle Virtual Directory Administrator's Guide."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  host:
+    type: string
+    nullable: true
+    description: OVD listener hostname or IP.
+  port:
+    type: integer
+    format: int32
+    description: OVD listener port (default `6501` for OVD-specific stack, or standard LDAP ports if reusing).
+  SSLEnabled:
+    type: boolean
+  principal:
+    type: string
+    nullable: true
+    description: Bind DN. Most OVD deployments use a dedicated proxy account.
+  credential:
+    type: string
+    nullable: true
+    description: Bind password — write-only.
+  userBaseDN:
+    type: string
+    nullable: true
+    description: |
+      Virtual base DN exposed by OVD. The actual underlying base may
+      differ — consult the OVD adapter mappings for the physical
+      tree.
+  groupBaseDN:
+    type: string
+    nullable: true
+  cacheEnabled:
+    type: boolean
+    description: When OVD itself is fronting cached data, leave this false to avoid double-caching.

@@ -1,355 +1,159 @@
 # WebLogic REST Management API — Unofficial OpenAPI Specification
 
-Oracle WebLogic Server exposes a comprehensive RESTful management interface for administration, monitoring, deployment, and configuration. Despite being a full CRUD REST API, **Oracle does not publish an OpenAPI (Swagger) specification** for it.
+Oracle WebLogic Server exposes a comprehensive RESTful management interface for administration, monitoring, deployment, and configuration. **Oracle does not publish an OpenAPI (Swagger) specification** for it.
 
-This project provides an **unofficial, community-driven OpenAPI 3.0 specification** for the WebLogic REST Management API, enabling:
+This project provides an **unofficial, community-driven OpenAPI 3.0 specification** for the WebLogic REST Management API across **five WebLogic versions** (12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1), enabling:
 
-- **API client generation** (Python, Java, Go, TypeScript, etc.) via OpenAPI tooling
-- **Interactive documentation** via Swagger UI or Redoc
-- **Request validation** in Postman, Insomnia, Bruno, and similar tools
-- **LLM tool integration** — use this spec to generate [ToolSpec](https://github.com/alsaiz-es/llm-toolspec) descriptors and let AI agents manage WebLogic domains via REST
-- **Automated testing** of WebLogic management endpoints
+- **API client generation** (Python, Java, Go, TypeScript, …) via OpenAPI tooling.
+- **Interactive documentation** via Swagger UI or Redoc.
+- **Request validation** in Postman, Insomnia, Bruno, and similar tools.
+- **LLM tool integration** — drive [ToolSpec](https://github.com/alsaiz-es/llm-toolspec) descriptors so AI agents can manage WebLogic domains via REST.
+- **Automated testing** of WebLogic management endpoints.
 
-## Important Caveats
+## How the spec is built (v0.4.0)
 
-The WebLogic REST Management API is **dynamically generated at runtime** from the server's MBean trees. This means:
-
-1. **Available resources depend on domain configuration.** A domain with 3 data sources exposes 3 JDBC runtime resources; a domain with none exposes zero. This spec documents the _structure_ and _operations_, not the specific instances.
-2. **The API is HATEOAS-driven.** Responses include `links` arrays for navigation between related resources. This spec documents the known link patterns but cannot capture the full dynamic graph.
-3. **Version-specific differences exist.** This spec targets **WebLogic Server 14.1.1.0 (14c)** and **14.1.2.0**. Earlier versions (12.2.1.x) share most of the structure but may differ in details.
-4. **Coverage is partial.** v0.3.x specifications cover monitoring and
-   administration of servers, clusters, and datasources, plus
-   lifecycle. Several large subsystems (deployments, full JMS
-   configuration, security, WLDF, JTA, work managers and others) are
-   not yet documented. See the [Project Status and Roadmap](#project-status-and-roadmap)
-   section below.
-
-## Project Status and Roadmap
-
-**Current coverage (v0.3.1).** This specification covers the most
-common monitoring and administration flows of a WebLogic domain:
-server runtimes, JVM, threading, JDBC datasources, applications and
-their components, server channels, JMS at server level, the bulk
-search DSL, the change session model, server/cluster/datasource CRUD,
-and server lifecycle operations. This is roughly the surface that the
-typical operator interacts with day-to-day, but it is not the whole
-WebLogic REST API.
-
-**What is not yet covered.** Several runtime and administration areas
-are intentionally absent from v0.3.x and are tracked as roadmap:
-
-- JTA runtime (transactions, recovery, retry counters)
-- WLDF — WebLogic Diagnostic Framework (harvesters, watches,
-  notifications, log filters, image generation)
-- Work managers, request classes, tuning constraints
-- Per-destination JMS drill-down (queues, topics with metrics)
-- JMS configuration (modules, queues, topics, connection factories,
-  distributed destinations, foreign servers, SAF agents, JMS bridges)
-- Application deployments (the multipart upload flow)
-- Security (realms, providers, users, groups, role mappers)
-- Mail sessions, foreign JNDI providers, file stores, JDBC stores
-- Coherence (clusters, caches, addresses)
-- Machines, NodeManager configuration
-- Self-tuning, server templates, dynamic clusters
-- Partitions (multi-tenant — only relevant on 12.2.1.x)
-- Path services, singleton services, migratable targets
-- WTC, mail, and other legacy subsystems
-
-Roughly speaking, the spec covers about 25–30% of the full REST API
-surface today. Reaching meaningful coverage of the rest manually
-would take a long time, and during early v0.3.x we identified a
-better path forward (see below).
-
-**Direction for the next major release.** Oracle's open-source
-WebLogic Remote Console
-([oracle/weblogic-remote-console](https://github.com/oracle/weblogic-remote-console))
-ships a directory of harvested MBean definitions in YAML — one set
-per WLS version, ~850 files each. These describe property names,
-types, descriptions, defaults, enums, deprecation flags and
-containment relationships. They are the same source of truth Oracle
-uses internally to drive the Remote Console UI.
-
-Upcoming work for v0.4.x will introduce a generator under
-`tools/openapi-generator/` that consumes those harvested YAMLs and
-produces OpenAPI schemas mechanically. The intent is to lift coverage
-dramatically while keeping what genuinely cannot be derived from the
-YAMLs as a manual layer:
-
-- Operations (`start`, `shutdown`, `suspend`, etc.) — captured from
-  the Remote Console's UI extension overlays and from its Java
-  `WebLogicRest*PageRepo` classes.
-- Response envelopes (`identity`, `links`, `items`, error envelopes
-  such as `wls:errorsDetails`).
-- Quirks documentation (the conditional CSRF gates, the JDBC
-  staged-create workflow, casing inconsistencies, and so on).
-- Live cross-version validation samples under `samples/`.
-
-Once that pipeline is in place, the spec is expected to cover most of
-the real REST surface across the supported WLS versions Oracle itself
-tracks (12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1).
-
-**What stays valuable from v0.3.x.** Everything in the current `specs/`
-directory has been verified against running WLS instances, not derived
-from documentation alone. The samples, the discovered quirks, and the
-empirical operations modelling will become the manual overlay layer
-that complements the generator.
-
-**A note on scope language.** Earlier wording in this README and in
-the v0.1.0 LinkedIn announcement framed the project as if it covered
-the whole API. It does not, and never did. The framing has been
-tightened in v0.3.1 to set realistic expectations for anyone arriving
-at the repository.
-
-## Spec Structure
-
-The specification is organized by bean tree, mirroring Oracle's own reference structure:
+Starting in v0.4.0 the specification is **generated mechanically** from Oracle's open-source [`weblogic-remote-console`](https://github.com/oracle/weblogic-remote-console) harvested MBean YAMLs (the same source of truth Oracle uses internally to drive the Remote Console UI), and refined with a small set of editorial overlays that capture knowledge no harvested catalog can produce on its own.
 
 ```
-specs/
-├── domain-runtime/     # /management/weblogic/{version}/domainRuntime/...
-│   ├── servers.yaml    # serverRuntimes (state, health, activation time)
-│   ├── jdbc.yaml       # JDBCServiceRuntime, datasource metrics
-│   ├── threading.yaml  # threadPoolRuntime
-│   ├── jvm.yaml        # JVMRuntime (heap, GC)
-│   └── deployments.yaml # appRuntimes
-├── edit/               # /management/weblogic/{version}/edit/...
-│   ├── servers.yaml    # server CRUD
-│   ├── clusters.yaml   # cluster CRUD
-│   ├── datasources.yaml # JDBC system resource CRUD
-│   └── deployments.yaml # application deployment
-├── server-runtime/     # /management/weblogic/{version}/serverRuntime/...
-├── lifecycle/          # /management/weblogic/{version}/domainRuntime/...
-│   └── lifecycle.yaml  # start, shutdown, suspend, resume
-└── common/
-    └── schemas.yaml    # shared component schemas
+Oracle weblogic-remote-console (UPL 1.0)        This project (Apache 2.0)
+─────────────────────────────────────────       ───────────────────────────
+harvested-yaml (~830 MBeans / version)  ──┐
+UI overlays (legalValues, read-only hints)  ├─►  generator pipeline
+extension.yaml (POST operations)          ──┘    └─► OpenAPI 3.0 spec / version
+                                                     + manual overlays
+                                                     + transitive prune
+                                                     ────────────────────────
+                                                     specs/generated/<v>.yaml
 ```
 
-## Coverage Status
+### What is generated mechanically
 
-| Bean Tree | Area | Status |
-|-----------|------|--------|
-| domainRuntime | Server state & health | ✅ Verified (12.2.1.4, 14.1.2) |
-| domainRuntime | JDBC runtime metrics | ✅ Verified (12.2.1.4, 14.1.2) |
-| domainRuntime | Thread pool runtime | ✅ Verified (12.2.1.4, 14.1.2) |
-| domainRuntime | JVM runtime | ✅ Verified (12.2.1.4, 14.1.2) |
-| domainRuntime | Application runtime | ✅ Verified (12.2.1.4, 14.1.2) — 12.2.1.4 has extra `partitionName` |
-| domainRuntime | Component runtime (web/EJB/appclient/connector) | ✅ Verified (12.2.1.4, 14.1.2) — 4 subtypes via `type` discriminator |
-| domainRuntime | Server channel runtime | ✅ Verified (12.2.1.4, 14.1.2) — identical 12-field set |
-| domainRuntime | Bulk search (`POST /search`) | ✅ Verified (12.2.1.4, 14.1.2) — DSL identical, CSRF header required on both |
-| domainRuntime | JMS runtime (container + per-`JMSServer`) | ✅ Container verified both versions; `JMSServer` detail (37 fields) verified on 12.2.1.4 OSB; per-destination drill-down deferred to v0.3.0 |
-| edit | Change session model | ✅ Verified (12.2.1.4, 14.1.2) — `wls:errorsDetails` envelope, FQCN-strip cross-version |
-| edit | Server CRUD | ✅ Verified (12.2.1.4, 14.1.2) — 136 fields, 5+5 cross-version delta |
-| edit | Cluster CRUD | ✅ Verified (12.2.1.4, 14.1.2) — 73/69 fields, 4 14.1.2-only |
-| edit | JDBC resource CRUD | ✅ Verified (12.2.1.4, 14.1.2) — staged-create workflow, partial-create quirk |
-| lifecycle | Server lifecycle ops | ✅ Verified (12.2.1.4, 14.1.2) — 8 actions, async-task response shape |
+- **Schemas.** ~600–660 schemas per version, derived from the harvested MBean YAMLs with `baseTypes` chain merging, name normalization, enum lifting via UI overlays, and `allOf`+EnvelopeBase wrapping. Polymorphic hierarchies are emitted with OAS 3.0 discriminators.
+- **Paths.** ~1100–2400 paths per version, computed from the harvested containment graph rooted at `DomainRuntimeMBean` / `DomainMBean`. The path-count delta between 12.2.1.x (~2400) and 14.1.x+ (~1150) reflects Multi-Tenant deprecation in 14.1.x — real WebLogic behaviour, not a generator artifact.
+- **Operations.** Declarative MBean actions (`start`, `shutdown`, `suspend`, `restartSSLChannels`, …) injected from `extension.yaml` per MBean.
+- **Cross-version diffs.** [`tools/openapi-generator/out/VERSION_DELTAS.md`](tools/openapi-generator/out/VERSION_DELTAS.md) lists per-pair deltas so a consumer can spot what differs between 12.2.1.4 and 14.1.2 (or any adjacent pair).
 
-The table above lists what is **in** the current spec. For an explicit
-list of what is **not** yet covered (deployments, security, WLDF, JTA,
-work managers, full JMS configuration, and several other subsystems),
-see the [Project Status and Roadmap](#project-status-and-roadmap)
-section.
+### The manual overlay layer
 
-"Verified" means the property set, field names, data types, and enum
-casings in the spec were cross-checked against the JSON emitted by a
-running WebLogic Server — not just inferred from the MBean reference.
+Five thin layers add knowledge no harvested catalog can produce:
 
-## Known API Quirks
+| Layer | Count (14.1.2) | Lives at | Purpose |
+|---|---:|---|---|
+| **Quirks** | 14 | `overlays/quirks/*.yaml` | Documented anomalies (CSRF gates, casing inconsistencies, JDBC partial-create, `OS` prefix on `JVMRuntime`, …). Each has a stable id + external doc reference. |
+| **Description overlays** | 50 | `overlays/descriptions/*.yaml` | Operational notes appended to harvested descriptions. 21 from the original curated set + 29 from per-subsystem editorial pass (Deployments, JMS detail, Work Managers, JTA, WLDF). |
+| **Live samples** | 33 ops linked | `samples/<version>/` ↔ `overlays/sample-loader` | Real JSON responses from running WebLogic captures. Canonical sample → native OpenAPI `examples`; overflow → `x-weblogic-sample-paths` extension. Two versions covered with samples (12.2.1.4, 14.1.2). |
+| **Empirical nullability** | 20 | `overlays/nullability.yaml` | Property-level `nullable: true` corrections discovered while validating samples — fields the harvested set declares as non-null but the live REST projection returns as `null`. |
+| **Manual subtype bodies** | 12 | `overlays/manual-schemas/*.yaml` | Polymorphic subtype bodies the Remote Console UI overlay declares but Oracle has no harvested YAML for (`OAMAuthenticator`, `JMSQueueRuntime`, `JMSTopicRuntime`, `JDBCProxyDataSourceRuntime`, …). Authored from Oracle Javadoc + public docs + samples; flagged with `x-weblogic-manual-schema: true` and `x-weblogic-source` for provenance. |
 
-The WebLogic REST API has several inconsistencies that are not documented
-in the Oracle reference and regularly surprise implementers. These were
-uncovered while verifying v0.1.0 against a live WLS 12.2.1.4 server and
-are modelled explicitly in the specs.
+The generator runs a final **transitive-closure prune** that drops any schema unreferenced from the path tree or other components — Oracle's catalog includes legacy / internal MBeans that the REST projection does not expose, and the prune keeps `components.schemas` honest.
 
-> **Consolidated reference.** Every quirk discovered across v0.1.x
-> through v0.3.0 — with version-of-observation, expected vs actual
-> behaviour, operational implication, and the spec file modelling each
-> one — is collected in [`docs/QUIRKS.md`](docs/QUIRKS.md). The list
-> below is a short summary; the consolidated doc is the reference.
+### Validation
 
-1. **`state` casing varies by subsystem.** `ServerRuntime.state` is
-   **UPPERCASE** (`RUNNING`, `SHUTDOWN`, ...), while
-   `JDBCDataSourceRuntime.state` is **Title Case** (`Running`,
-   `Suspended`, ...). Use separate enum types — do not assume a single
-   lifecycle enum across runtimes.
+Every generated spec passes three independent toolchains across all five versions:
 
-2. **`healthState.state` uses lowercase tokens.** The REST serialization
-   returns `ok`, `warning`, `critical`, `failed`, `overloaded` — **not**
-   the `HEALTH_OK`/`HEALTH_WARN` Java constants that most blog examples
-   show. Oracle's own `weblogic.health.HealthState` API documents the
-   uppercase names; the JSON output downcases them.
+- `openapi-spec-validator` strict (OAS 3.0).
+- `openapi-generator-cli generate -g python` (consumable end-to-end — produces ~850 model classes).
+- `@stoplight/spectral-cli lint` with `spectral:oas` ruleset — **0 errors, 0 warnings** on every version.
 
-3. **JVMRuntime uses `OSName`/`OSVersion` with uppercase `OS` prefix.**
-   Every other place in the API that exposes operating-system information
-   would use `osName`/`osVersion`. JVMRuntime is the exception — these
-   two fields start with an uppercase `OS`.
+## Important caveats
 
-4. **`name` has different semantics depending on the bean.**
-   - `ServerRuntime.name` → the configured server name (e.g. `AdminServer`).
-   - `ThreadPoolRuntime.name` → literally the string `ThreadPoolRuntime`.
-   - `JDBCServiceRuntime.name` / `JVMRuntime.name` → the hosting server
-     name (same as `ServerRuntime.name`, not a bean-specific identifier).
+The WebLogic REST Management API is **dynamically generated at runtime** from the server's MBean trees:
 
-   Do not assume `name` uniquely identifies a bean across runtimes; use
-   `identity` or the `self` link for a stable identifier.
+1. **Available resources depend on domain configuration.** A domain with 3 datasources exposes 3 JDBC runtime resources. This spec documents the *structure* and *operations*, not the specific instances.
+2. **The API is HATEOAS-driven.** Responses include `links` arrays for navigation. The spec documents the known link patterns; the dynamic graph is captured at runtime.
+3. **Quality is honest, not absolute.** Manually-authored polymorphic subtypes are flagged via `x-weblogic-manual-schema: true` so consumers can filter them out if they only want harvested-derived data.
 
-5. **`healthState.subsystemName` is often `null`.** Only certain beans
-   populate it (e.g. `ThreadPoolRuntime` sets it to `"threadpool"`,
-   lowercase). Most server-level `healthState` responses leave it
-   `null` even when the server is healthy. Do not rely on it being
-   present.
+## Generated specifications
 
-6. **`POST` requires `X-Requested-By` (CSRF guard).** Every state-changing
-   request — including `POST /domainRuntime/search` — is rejected with a
-   plain-text `HTTP 400 Bad Request` (no JSON body) when the
-   `X-Requested-By` header is missing. Any non-empty value is accepted.
-   The Oracle REST docs do not call this out, and the symptom is
-   indistinguishable from a malformed body. Verified on WLS 14.1.2;
-   `v0.1.1` of this repo originally documented `POST /search` as
-   universally broken — it wasn't, the CSRF header was missing.
+| File | WLS version | Schemas | Paths |
+|---|---|---:|---:|
+| [`specs/generated/12.2.1.3.0.yaml`](specs/generated/12.2.1.3.0.yaml) | 12.2.1.3.0 | 656 | 2 403 |
+| [`specs/generated/12.2.1.4.0.yaml`](specs/generated/12.2.1.4.0.yaml) | 12.2.1.4.0 | 661 | 2 415 |
+| [`specs/generated/14.1.1.0.0.yaml`](specs/generated/14.1.1.0.0.yaml) | 14.1.1.0.0 | 611 | 1 144 |
+| [`specs/generated/14.1.2.0.0.yaml`](specs/generated/14.1.2.0.0.yaml) | 14.1.2.0.0 | 608 | 1 180 |
+| [`specs/generated/15.1.1.0.0.yaml`](specs/generated/15.1.1.0.0.yaml) | 15.1.1.0.0 | 620 | 1 227 |
 
-7. **`ServerChannelRuntime` does not expose `listenAddress`/`listenPort`.**
-   Oracle's `ServerChannelRuntimeMBean` reference lists `listenAddress`,
-   `listenPort`, `protocol`, `publicAddress`, `publicPort` as readable
-   properties. The REST serialization returns none of them — even when
-   asked explicitly via `?fields=listenAddress,...`. The only network
-   address surfaced is the concatenated `publicURL`
-   (`<protocol>://<host>:<port>`). Parse it client-side if you need the
-   components separately.
+### Consuming the spec
 
-8. **`GET /domainRuntime/serverRuntimes` requires `X-Requested-By`
-   when managed servers are RUNNING.** This is the second endpoint
-   (alongside the POST /search of quirk 6) where Oracle's CSRF guard
-   shows up — but on a plain `GET`, contradicting Oracle's
-   documentation that limits the header to mutating methods. Without
-   the header the collection returns `HTTP 400 Bad Request` (JSON
-   envelope, no detail). With any non-empty value (`-H 'X-Requested-By:
-   anything'`) it returns 200. **The check is conditional on domain
-   state**: with only the AdminServer up and no managed servers
-   RUNNING, the same anonymous GET succeeds. **The check is also
-   selective**: of the eight `/domainRuntime/*` endpoints we probed,
-   only `serverRuntimes` enforces it; the seven siblings
-   (`migrationDataRuntimes`, `nodeManagerRuntimes`,
-   `serviceMigrationDataRuntimes`, `serverLifeCycleRuntimes`,
-   `systemComponentLifeCycleRuntimes`, plus the `/domainRuntime` root
-   and `JNDI` singleton) all accept anonymous GETs. Reproduced
-   identically on WLS 12.2.1.4 and 14.1.2. Earlier `v0.1.1` notes
-   attributed the symptom to an OSB-specific 12.2.1.4 serialization
-   bug; that attribution was wrong on all three counts (not OSB-
-   specific, not 12.2.1.4-specific, not silently fixed in 14.1.2). See
-   `CHANGELOG.md` v0.2.0 "Corrections from v0.1.x" for the full
-   retraction. Workarounds: send the header, fetch each server by
-   name, or use `POST /domainRuntime/search` with a `serverRuntimes`
-   child.
+```bash
+# Render the 14.1.2 spec in Swagger UI via Docker
+docker run -p 8080:8080 -e SWAGGER_JSON=/spec.yaml \
+  -v "$(pwd)/specs/generated/14.1.2.0.0.yaml:/spec.yaml" \
+  swaggerapi/swagger-ui
 
-## Version-specific differences: 12.2.1.4 vs 14.1.2
+# Generate a Python client for 14.1.2
+npx @openapitools/openapi-generator-cli generate \
+  -i specs/generated/14.1.2.0.0.yaml \
+  -g python -o ./client
 
-Verified by capturing the same bean set from both versions and diffing.
-The bean property sets are otherwise identical across versions — these
-are the only observed differences.
+# Generate against 12.2.1.x specs (~9 MB YAML)
+# Swagger Parser's default SnakeYAML codepoint limit is exceeded by
+# the 12.2.1.x specs (Multi-Tenant subtree doubles the path count);
+# convert to JSON first:
+python -c "import yaml, json; \
+  json.dump(yaml.safe_load(open('specs/generated/12.2.1.4.0.yaml')), \
+  open('/tmp/spec.json','w'))"
+npx @openapitools/openapi-generator-cli generate \
+  -i /tmp/spec.json -g python -o ./client
+```
 
-**JVMRuntime — new field in 14.1.2**
-- `javaVendorVersion` (string, nullable). Observed `null` on Oracle JDK 21
-  builds; field is absent entirely from 12.2.1.4 responses.
+### Regenerating the spec
 
-**Multi-Tenant removed in 14.1.2**
+```bash
+git clone https://github.com/oracle/weblogic-remote-console /tmp/wrc  # source data
+cd tools/openapi-generator
+uv sync
+uv run python -c "import sys; sys.path.insert(0,'src'); \
+  from multiversion import build_all_versions; build_all_versions(bulk=True)"
+# Outputs to tools/openapi-generator/out/spec-<version>.yaml
+```
 
-WebLogic Multi-Tenant partitioning was deprecated in 14.1.1 and the
-REST surface was fully removed in 14.1.2. These HATEOAS rels disappear:
+See [`tools/openapi-generator/README.md`](tools/openapi-generator/README.md) for the pipeline detail and validation commands.
 
-- `/domainRuntime` → `domainPartitionRuntimes`, `resourceGroupLifeCycleRuntimes`
-- `/domainRuntime/serverRuntimes/{name}` → `partitionRuntimes`
+## Known API quirks
 
-Clients that followed these rels must detect version and degrade.
+The WebLogic REST API has several inconsistencies that are not documented in the Oracle reference and regularly surprise implementers. Each is modelled as a quirk overlay in [`overlays/quirks/`](overlays/quirks/) with a stable id, attaches automatically to the affected schema / path / property at generation time, and is marked in the generated spec with `x-weblogic-quirks: [{id, doc}]`.
 
-**Renamed in 14.1.2**
-- `/domainRuntime` → `consoleRuntime` is now `consoleBackend`.
-  The underlying resource is similar; the rel name changed.
+> **Consolidated reference.** Every quirk discovered across v0.1.x through v0.4.0 — with version-of-observation, expected vs actual behaviour, operational implication, and the spec target — is collected in [`docs/QUIRKS.md`](docs/QUIRKS.md).
 
-**New in 14.1.2**
-- `/domainRuntime` → `JNDI` (tree-browser resource),
-  `consoleBackend`, `getServerHttpURL` (action).
-- `/domainRuntime/serverRuntimes/{name}` → `consoleBackend`.
-- `/domainRuntime/serverRuntimes/{name}/JVMRuntime` → `action: runGC`
-  (triggers an explicit `System.gc()` via REST).
+Highlights (full list in `docs/QUIRKS.md`):
 
-**Selective `X-Requested-By` enforcement on `GET /serverRuntimes`**
-(reclassified in v0.2.0; previously misattributed to an OSB-specific
-12.2.1.4 serialization bug — see Known API Quirk #8 above and the
-CHANGELOG retraction). Reproduces identically on both 12.2.1.4 and
-14.1.2 once at least one managed server is RUNNING; disappears on
-admin-only domains.
+1. **`state` casing varies by subsystem.** `ServerRuntime.state` is **UPPERCASE** (`RUNNING`, `SHUTDOWN`, …); `JDBCDataSourceRuntime.state` is **Title Case** (`Running`, `Suspended`, …). Use separate enums.
+2. **`healthState.state` uses lowercase tokens** (`ok`, `warning`, `critical`, …) — *not* the `HEALTH_OK`/`HEALTH_WARN` Java constants Oracle's API documents.
+3. **`JVMRuntime.OSName`/`OSVersion` keep an uppercase `OS` prefix.** Every other place in the API would use camelCase `osName`/`osVersion`.
+4. **`name` semantics differ across beans.** `ServerRuntime.name` is the server name; `ThreadPoolRuntime.name` is literally `"ThreadPoolRuntime"`; `JDBCServiceRuntime.name`/`JVMRuntime.name` mirror the hosting server name. Don't assume `name` is a stable identifier.
+5. **`POST` requires `X-Requested-By` (CSRF guard)** — including `POST /domainRuntime/search`. The plain-text 400 returned without the header is indistinguishable from a malformed body.
+6. **`GET /domainRuntime/serverRuntimes` requires `X-Requested-By` when at least one managed server is RUNNING** — selective CSRF on a read endpoint, contradicting Oracle's docs. Workarounds: send the header, fetch each server by name, or use `POST /search`.
+7. **`ServerChannelRuntime` does not expose `listenAddress`/`listenPort`/`protocol`** — only the concatenated `publicURL`. Parse client-side for components.
+8. **`POST /edit/JDBCSystemResources` returns 400 but registers the parent shell anyway** — the documented full-tree create does not propagate nested fields. Use the staged-create workflow (one POST per sub-resource).
+9. **Edit-tree errors use `wls:errorsDetails` envelope** — different from the standard `ErrorResponse`. 12.2.1.4 keeps the FQCN in `detail`; 14.1.2 strips it.
+10. **Lifecycle actions return a `ServerLifeCycleTaskRuntime` envelope, even synchronously** — same shape whether the operation completed in milliseconds or is still running.
 
-**`POST /domainRuntime/search` works in both versions** (reclassified
-in v0.2.0)
-- v0.1.1 reported the search endpoint as broken on every body shape.
-  Re-verification on 14.1.2 traced this to a missing `X-Requested-By`
-  header: WebLogic's CSRF guard rejects POSTs without it and answers
-  with a plain `Bad Request` page. Once the header is supplied, the
-  documented DSL (`fields`, `links`, `children`, `name`) works as
-  Oracle describes. See `specs/domain-runtime/search.yaml`.
+The remaining four are documented in `docs/QUIRKS.md`.
 
-**Platform note.** 14.1.2 requires JDK 17+ and commonly runs on JDK 21
-(the stock Oracle install we tested is on HotSpot 21.0.9). 12.2.1.4 is
-still on JDK 8. This does not affect the REST schema but matters for
-anyone re-verifying captures — the `javaVersion` field will look very
-different.
+## Cross-version differences
 
-## serverRuntime vs domainRuntime
+Five WebLogic versions are covered (12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1). Per-pair diffs (path additions/removals, schema-property deltas, Multi-Tenant deprecation in 14.1.x, JDK-21 / virtual-thread additions in 14.1.2 and 15.1.1) live in [`tools/openapi-generator/out/VERSION_DELTAS.md`](tools/openapi-generator/out/VERSION_DELTAS.md).
 
-WebLogic exposes the same runtime beans under two different URL prefixes:
-
-- **`/management/weblogic/{version}/domainRuntime/serverRuntimes/{serverName}/...`**
-  — served by the Administration Server, reachable for any managed
-  server in the domain.
-- **`/management/weblogic/{version}/serverRuntime/...`**
-  — served by each managed server directly, scoped to that server only.
-
-Verified on WLS 12.2.1.4 by diffing the same bean fetched both ways:
-the two responses contain **identical property sets and types**. The
-only drift observed is in transient counters that change between
-requests (for example `openSocketsCurrentCount` differed by 1 because
-the two curls were sampled moments apart).
-
-The specs under `specs/domain-runtime/` therefore also describe the
-`serverRuntime` tree — just change the path prefix when generating a
-client that talks directly to a managed server. A dedicated
-`specs/server-runtime/` folder will be added in a future release only
-if subsystem-specific differences surface; none have so far.
+The path-count delta (~2 400 on 12.2.1.x vs ~1 150 on 14.1.x+) is dominated by Multi-Tenant feature removal — partition / resource-group lifecycle endpoints disappear in 14.1.x. JDK-21 fields (`virtualThreadEnableOption`, `selfTuningThreadPoolSize{Min,Max}`) appear from 14.1.2. The harvested set itself is Oracle's source of truth for what each version exposes; the generator does not synthesise paths.
 
 ## Compatibility
 
-- **WebLogic Server**: 14.1.1.0 (14c), 14.1.2.0
-- **OpenAPI Specification**: 3.0.3
-- **Validated with**: Swagger Editor, Spectral, swagger-cli
+- **WebLogic Server**: 12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1.
+- **OpenAPI Specification**: 3.0.3.
+- **Validated with**: `openapi-spec-validator`, `@stoplight/spectral-cli`, `@openapitools/openapi-generator-cli`.
 
-## Usage
+## Compatibility note for v0.3.x consumers
 
-### Swagger UI (local)
-
-```bash
-docker run -p 8080:8080 \
-  -e SWAGGER_JSON=/specs/domain-runtime/servers.yaml \
-  -v $(pwd)/specs:/specs \
-  swaggerapi/swagger-ui
-```
-
-### Generate a Python client
+v0.4.0 **replaces** the hand-written `specs/{common,domain-runtime,edit,lifecycle}/` directories with `specs/generated/<version>.yaml`. The old directory layout is gone from `main`. If you depend on the v0.3.1 layout:
 
 ```bash
-openapi-generator-cli generate \
-  -i specs/domain-runtime/servers.yaml \
-  -g python \
-  -o clients/python
+git checkout v0.3.1     # historical snapshot stays accessible via tag
 ```
 
-### Generate a ToolSpec for LLM agents
+Migration: the generated specs cover everything the v0.3.x manual specs did and substantially more. Most consumers will just point at `specs/generated/14.1.2.0.0.yaml` (or whichever version they target). The endpoint paths are identical — only the spec file layout changed.
 
-```bash
-# Using llm-toolspec (https://github.com/alsaiz-es/llm-toolspec)
-toolspec-generator --input specs/domain-runtime/servers.yaml --output toolspec.json
-```
-
-## Oracle Documentation References
+## Oracle documentation references
 
 - [Administering WebLogic Server with RESTful Management Services (14.1.1.0)](https://docs.oracle.com/en/middleware/standalone/weblogic-server/14.1.1.0/wlrur/index.html)
 - [RESTful Edit Reference](https://docs.oracle.com/en/middleware/standalone/weblogic-server/14.1.1.0/wlrer/)
@@ -360,12 +164,18 @@ toolspec-generator --input specs/domain-runtime/servers.yaml --output toolspec.j
 
 ## Contributing
 
-This is an unofficial, community-maintained specification. Contributions, corrections, and extensions are welcome. If you have access to a running WebLogic domain and can validate endpoints, your input is especially valuable.
+Contributions, corrections, and extensions are welcome. The most valuable contributions are:
 
-## Disclaimer
-
-This project is not affiliated with, endorsed by, or supported by Oracle Corporation. "WebLogic" and "Oracle" are trademarks of Oracle Corporation. This specification is derived from publicly available Oracle documentation and empirical API testing.
+- **New live samples.** Run a real WebLogic instance, capture a response that disagrees with the spec, open an issue with the diff. The empirical layer (samples → nullability fixes) was built that way.
+- **Quirk reports.** A behaviour that contradicts harvested or Oracle docs is candidate for a new quirk overlay.
+- **Subsystem curation.** Description overlays in `overlays/descriptions/` add operational guidance beyond harvested. The pattern is documented in `docs/PHASE4D6_DESCRIPTIONS.md`.
 
 ## License
 
-Apache License 2.0
+This project's source code, manual overlays, generator, and reports are licensed under **Apache License 2.0**.
+
+The generated specifications include schemas derived from Oracle's [`weblogic-remote-console`](https://github.com/oracle/weblogic-remote-console) harvested MBean YAMLs, which are licensed under the **Universal Permissive License (UPL) 1.0**. Both licenses are permissive and compatible; the redistribution of the generated specs is governed by UPL 1.0 for the harvested-derived parts and Apache 2.0 for the manual-overlay parts.
+
+## Disclaimer
+
+This project is not affiliated with, endorsed by, or supported by Oracle Corporation. "WebLogic" and "Oracle" are trademarks of Oracle Corporation. The unofficial OpenAPI specifications in this repository are produced by mechanically transforming Oracle's publicly-available open-source catalog and refining the result with empirically-discovered overlays.

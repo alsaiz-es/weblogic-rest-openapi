@@ -1,0 +1,8 @@
+schema: AppDeploymentRuntime
+schema_level:
+  operational_note: |
+    Per-application bean exposing `start` and `stop` actions. Reach
+    it via the HATEOAS `action` rels on the bean's response.
+    Production-redeployment, partial-module redeployment, and
+    initial domain-level deployment do **not** flow through this
+    bean — use `DeploymentManager` for those.

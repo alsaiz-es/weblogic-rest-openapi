@@ -1,0 +1,10 @@
+schema: WorkManagerRuntime
+schema_level:
+  operational_note: |
+    Per-server-per-work-manager view of throughput. `pendingRequests`
+    sustained above zero signals the work manager is constraint-bound —
+    cross-reference with `MaxThreadsConstraintRuntime.executingRequests`
+    or `CapacityRuntime.requestsCompleted` to identify which
+    constraint is the bottleneck. Stuck-thread counts on the parent
+    `ThreadPoolRuntime` correlate with WMs whose request class has
+    no time bound.

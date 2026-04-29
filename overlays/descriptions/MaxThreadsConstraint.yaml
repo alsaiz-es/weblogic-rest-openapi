@@ -1,0 +1,10 @@
+schema: MaxThreadsConstraint
+schema_level:
+  operational_note: |
+    Caps the concurrent execute threads serving requests in this
+    constraint group. The typical use case is "this work depends on
+    a JDBC pool of size N — don't allocate more than N threads to
+    it." Setting `count` higher than the underlying resource limit
+    wastes execute threads on contention rather than useful work.
+    Can be tied to a JDBC datasource via `connectionPoolName` so
+    WLS auto-sizes against the pool's `maxCapacity`.

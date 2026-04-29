@@ -1,0 +1,17 @@
+schema: JVMRuntime
+schema_level:
+  operational_note: |
+    Values come from the WebLogic JVM's in-process JMX beans
+    (`java.lang.Runtime`, `java.lang.Memory`,
+    `java.lang.OperatingSystem`) and reflect the JVM that WebLogic
+    itself is running in — not Node Manager or any forked process.
+properties:
+  heapFreePercent:
+    operational_note: |
+      Computed against `heapSizeMax`, not `heapSizeCurrent`. Integer
+      in the REST serialization — sub-percent precision is lost.
+  javaVMVendor:
+    operational_note: |
+      On HotSpot JDKs this matches `javaVendor`; on OpenJ9 or
+      third-party VMs it will differ. Useful for distinguishing the
+      VM implementation from the JRE distributor.

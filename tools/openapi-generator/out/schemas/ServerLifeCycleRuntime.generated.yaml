@@ -1,0 +1,63 @@
+ServerLifeCycleRuntime:
+  type: object
+  description: "Provides methods that transition servers from one state to another. This class is instantiated only on the
+    Administration Server, but you can use it to transition the states of Managed Servers as well as Administration Servers.\n\
+    \nYou cannot use it to start an Administration Server, and if you want to use it to start Managed Servers, you must first
+    set up a Node Manager on each Managed Server's host machine.\n\nIf you want to use the methods that transition a server
+    into the `ADMIN` state, you must first set up an administration channel for that server."
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    middlewareHome:
+      type: string
+      description: The Oracle Middleware installation directory.
+      readOnly: true
+    nodeManagerRestartCount:
+      type: integer
+      format: int32
+      description: Number of times the server has been restarted using the NodeManager since creation. The first start 
+        does not count. The count is valid only if the NodeManager is used to start and restart the server everytime.
+      readOnly: true
+    state:
+      type: string
+      enum:
+      - ACTIVATE_LATER
+      - ADMIN
+      - DISCOVERED
+      - FAILED
+      - FAILED_MIGRATABLE
+      - FAILED_NOT_RESTARTABLE
+      - FAILED_RESTARTING
+      - FORCE_SHUTTING_DOWN
+      - FORCE_SUSPENDING
+      - RESTART_REQUIRED
+      - RESUMING
+      - RUNNING
+      - SHUTDOWN
+      - SHUTDOWN_IN_PROCESS
+      - SHUTDOWN_PENDING
+      - SHUTTING_DOWN
+      - STANDBY
+      - STARTING
+      - SUSPENDING
+      - UNKNOWN
+      description: The current state of the server.
+      readOnly: true
+    tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerLifeCycleTaskRuntime'
+      description: Get preexisting Server Lifecycle Tasks
+      readOnly: true
+    weblogicHome:
+      type: string
+      description: The directory where the WebLogic Server instance (server) is installed, without the trailing 
+        "/server".
+      readOnly: true

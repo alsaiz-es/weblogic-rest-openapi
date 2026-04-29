@@ -1,0 +1,12 @@
+schema: JDBCConnectionPoolParamsBean
+properties:
+  testTableName:
+    operational_note: |
+      WebLogic recognises two forms: `SQL <statement>` for a
+      free-form SQL probe (e.g. `SQL SELECT 1 FROM SYS.SYSTABLES`)
+      and a bare `<table>` for a table-existence test.
+  invokeBeginEndRequest:
+    operational_note: |
+      14.1.2 only. Wraps each connection reservation in begin/end
+      callbacks. Absent on 12.2.1.4 responses; sending it on
+      12.2.1.4 returns 400.

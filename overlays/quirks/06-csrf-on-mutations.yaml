@@ -1,0 +1,28 @@
+id: csrf-on-mutations
+title: "Every POST / PUT / DELETE under /edit/ requires X-Requested-By"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: global
+inject:
+  description_append: |
+    **Universal — `X-Requested-By` on mutations.** Every mutating
+    request to the WebLogic REST API (POST, PUT, DELETE on `/edit/*`,
+    POST to `/domainRuntime/serverLifeCycleRuntimes/<server>/<action>`,
+    POST to `/domainRuntime/search`) requires the `X-Requested-By`
+    request header. Any non-empty value is accepted; clients
+    typically send their product name or version
+    (`X-Requested-By: openapi-generator`, `X-Requested-By: ansible`,
+    etc.). Without the header, the server returns `400 Bad Request`
+    with a plain-text body and no JSON diagnostic.
+
+    The header is also conditionally required on a single GET endpoint
+    (`/domainRuntime/serverRuntimes` — see the `csrf-serverRuntimes`
+    quirk).
+  x_extensions:
+    x-weblogic-csrf-header: X-Requested-By
+external_doc: docs/QUIRKS.md

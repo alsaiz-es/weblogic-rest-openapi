@@ -1,0 +1,11 @@
+schema: JMSRuntime
+schema_level:
+  operational_note: |
+    Counter types are int32 — promote to int64 client-side if you
+    expect long-running domains with high JMS churn (the underlying
+    counters can wrap on multi-month uptimes under heavy load).
+properties:
+  name:
+    operational_note: |
+      Container name follows the convention `<serverName>.jms`. Not
+      configurable — derived automatically.

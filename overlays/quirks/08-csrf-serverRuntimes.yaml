@@ -1,0 +1,43 @@
+id: csrf-serverRuntimes
+title: "GET /domainRuntime/serverRuntimes selectively requires X-Requested-By when managed servers run"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: path
+    path: "/domainRuntime/serverRuntimes"
+    method: get
+inject:
+  description_append: |
+    **Quirk — selective CSRF gate on this read endpoint.** Oracle's
+    docs state that `X-Requested-By` is required only on mutating
+    methods. On this collection it is also required for GET — but
+    **only when at least one managed server is in `RUNNING` state**.
+    With only the AdminServer up and no managed servers running, the
+    same anonymous GET returns `200`. Once any managed server reaches
+    RUNNING, anonymous calls return `400 Bad Request` (JSON envelope
+    with no useful detail).
+
+    Of the eight `/domainRuntime/*` endpoints we probed
+    (`serverRuntimes`, `migrationDataRuntimes`, `nodeManagerRuntimes`,
+    `serviceMigrationDataRuntimes`, `serverLifeCycleRuntimes`,
+    `systemComponentLifeCycleRuntimes`, plus the `/domainRuntime`
+    root and the `JNDI` singleton), **only this one** enforces the
+    header. We have not found any Oracle documentation calling this
+    out.
+
+    Workarounds when the header cannot be sent: fetch each server by
+    name (`/domainRuntime/serverRuntimes/{serverName}` is unaffected),
+    or use `POST /domainRuntime/search` with a `serverRuntimes` child
+    (which always requires `X-Requested-By` per the standard CSRF
+    guard).
+  x_extensions:
+    x-weblogic-conditional-csrf:
+      header: X-Requested-By
+      condition: at-least-one-managed-server-in-RUNNING-state
+  parameters_add:
+    - $ref: '#/components/parameters/XRequestedByHeader'
+external_doc: docs/QUIRKS.md#2-selective-x-requested-by-enforcement-on-get-domainruntimeserverruntimes

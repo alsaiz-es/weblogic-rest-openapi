@@ -1,0 +1,9 @@
+schema: JMSDurableSubscriberRuntime
+schema_level:
+  operational_note: |
+    A durable subscription survives consumer disconnection — messages
+    accumulate on the topic for the subscriber until they reconnect.
+    Stale durable subscribers are the primary cause of slow-growing
+    `messagesCurrentCount` on a topic that "should be empty". Verify
+    `clientId` + `subscriptionName` against active consumers before
+    deleting a durable subscription.

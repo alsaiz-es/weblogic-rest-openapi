@@ -1,0 +1,333 @@
+ServerRuntime:
+  type: object
+  description: Provides methods for retrieving runtime information about a server instance and for transitioning a 
+    server from one state to another.
+  properties:
+    name:
+      type: string
+      description: The name of this configuration. WebLogic Server uses an MBean to implement and persist the 
+        configuration.
+      readOnly: true
+    type:
+      type: string
+      description: Returns the type of the MBean.
+      readOnly: true
+    activationTime:
+      type: integer
+      format: int64
+      description: The time when the server was started.
+      readOnly: true
+    adminServer:
+      type: boolean
+      description: Indicates whether the server is an Administration Server.
+      readOnly: true
+    adminServerHost:
+      type: string
+      description: 'The address on which the Administration Server is listening for connections. For example, this might return
+        the string: santiago'
+      readOnly: true
+    adminServerListenPort:
+      type: integer
+      format: int32
+      description: The port on which the Administration Server is listening for connections.
+      readOnly: true
+    adminServerListenPortSecure:
+      type: boolean
+      description: Indicates whether the port that the server uses for administrative traffic is configured to use a 
+        secure protocol.
+      readOnly: true
+    administrationPortEnabled:
+      type: boolean
+      description: Indicates whether the administration port is enabled on the server
+      readOnly: true
+    administrationURL:
+      type: string
+      description: "The URL that the server and its clients use for administrative connections.\n\nIf no administration channel
+        is enabled, then this method returns the URL for connections through the default channel. If the default channel is
+        de-activated, this method returns the URL for a secure channel. If no secure channel is enabled, the method returns
+        null.\n\nThe returned URL will be consistent with dynamic channel updates."
+      readOnly: true
+    applicationRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApplicationRuntime'
+      description: Returns the list of currently running Applications
+      readOnly: true
+    asyncReplicationRuntime:
+      $ref: '#/components/schemas/AsyncReplicationRuntime'
+      description: Return an MBean which represents this server's view of its AsyncReplicationRuntime, if any.
+    batchJobRepositoryRuntime:
+      $ref: '#/components/schemas/BatchJobRepositoryRuntime'
+      description: Gets the BatchJobRepositoryRuntimeMBean for this server.
+    classLoaderRuntime:
+      $ref: '#/components/schemas/ClassLoaderRuntime'
+      description: Get statistics for system-level class loading.
+    clusterRuntime:
+      $ref: '#/components/schemas/ClusterRuntime'
+      description: Return an MBean which represents this server's view of its cluster, if any.
+    concurrentManagedObjectsRuntime:
+      $ref: '#/components/schemas/ConcurrentManagedObjectsRuntime'
+      description: The ConcurrentManagedObjectsRuntimeMBean for this server.
+    connectorServiceRuntime:
+      $ref: '#/components/schemas/ConnectorServiceRuntime'
+      description: The access point for server wide control and monitoring of the Connector Container.
+    currentDirectory:
+      type: string
+      description: "The absolute path of the directory from which the server was started.\n\nThis may be used in conjunction
+        with other relative paths in ServerMBean to compute full paths."
+      readOnly: true
+    currentMachine:
+      type: string
+      description: Return the machine on which the server is running. This will be different from the configuration if 
+        the server gets migrated automatically.
+      readOnly: true
+      x-weblogic-restart-needed: true
+    defaultExecuteQueueRuntime:
+      $ref: '#/components/schemas/ExecuteQueueRuntime'
+      description: Return an MBean which exposes this server's default execute queue.
+    defaultURL:
+      type: string
+      description: "The URL that clients use to connect to this server's default network channel.\n\nThe returned value indicates
+        the default protocol, listen address and listen port:\n\nprotocol://listen-address:listen-port\n\nNote: The default
+        protocol, listen address and listen port are persisted in the domain's `config.xml` file, however when a server instance
+        is started, command-line options can override these persisted values. This `getDefaultURL` method returns the URL
+        values that are currently being used, not necessarily the values that are specified in `config.xml`.\n\nThe returned
+        URL will be consistent with dynamic channel updates."
+      readOnly: true
+    entityCacheCumulativeRuntime:
+      $ref: '#/components/schemas/EntityCacheCumulativeRuntime'
+      description: Return an MBean which represents Cumulative Status of the XML Cache.
+    entityCacheCurrentStateRuntime:
+      $ref: '#/components/schemas/EntityCacheCurrentStateRuntime'
+      description: Return an MBean which represents Current Status of the XML Cache.
+    entityCacheHistoricalRuntime:
+      $ref: '#/components/schemas/EntityCacheCumulativeRuntime'
+      description: Return an MBean which represents Historical Status of the XML Cache.
+    executeQueueRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExecuteQueueRuntime'
+      description: Returns an array of MBeans which exposes this server's active execute queues.
+      readOnly: true
+    healthState:
+      $ref: '#/components/schemas/HealthState'
+      description: "The health state of the server as reported by the server's self-health monitoring.\n\nFor example, the
+        server can report if it is overloaded by too many requests, if it needs more memory resources, or if it will soon
+        fail for other reasons."
+    healthStateJMX:
+      $ref: '#/components/schemas/CompositeData'
+      description: The HealthState object returned as a CompositeData type.
+    inSitConfigState:
+      type: boolean
+      description: Returns true if sitconfig is applied.
+      readOnly: true
+    JDBCServiceRuntime:
+      $ref: '#/components/schemas/JDBCServiceRuntime'
+      description: The JDBCServiceRuntimeMBean for this server.
+    JMSRuntime:
+      $ref: '#/components/schemas/JMSRuntime'
+      description: The JMSRuntimeMBean for this server.
+    JTARuntime:
+      $ref: '#/components/schemas/JTARuntime'
+      description: The transaction RuntimeMBean for this server.
+    JVMRuntime:
+      $ref: '#/components/schemas/JVMRuntime'
+      description: The JVMRuntimeMBean for this server.
+    joltRuntime:
+      $ref: '#/components/schemas/JoltConnectionServiceRuntime'
+      description: The JoltConnectionServiceRuntimeMBean for this server.
+    libraryRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/LibraryRuntime'
+      description: Returns all deployed Libraries
+      readOnly: true
+    listenPortEnabled:
+      type: boolean
+      description: Indicates whether the default listen port is enabled on the server.
+      readOnly: true
+    logBroadcasterRuntime:
+      $ref: '#/components/schemas/LogBroadcasterRuntime'
+      description: The object which generates notifications on behalf of the logging subystem.
+    MANAsyncReplicationRuntime:
+      $ref: '#/components/schemas/MANAsyncReplicationRuntime'
+      description: Return an MBean which represents this server's view of its MANAsyncReplicationRuntime, if any.
+    MANReplicationRuntime:
+      $ref: '#/components/schemas/MANReplicationRuntime'
+      description: Return an MBean which represents this server's view of its MANReplicationRuntime, if any.
+    mailSessionRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MailSessionRuntime'
+      description: Return the runtimeMBeans for JavaMail Mail Sessions
+      readOnly: true
+    maxThreadsConstraintRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MaxThreadsConstraintRuntime'
+      description: Returns an array of RuntimeMBeans which exposes this server's globally defined MaxThreadsConstraints.
+      readOnly: true
+    messagingBridgeRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MessagingBridgeRuntime'
+      description: The MessagingBridgeRuntimeMBeans for this server
+      readOnly: true
+    middlewareHome:
+      type: string
+      description: The Oracle Middleware installation directory.
+      readOnly: true
+    minThreadsConstraintRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/MinThreadsConstraintRuntime'
+      description: Returns an array of RuntimeMBeans which exposes this server's globally defined MinThreadsConstraints.
+      readOnly: true
+    openSocketsCurrentCount:
+      type: integer
+      format: int32
+      description: The current number of sockets registered for socket muxing on this server.
+      readOnly: true
+    overallHealthState:
+      $ref: '#/components/schemas/HealthState'
+      description: Determine the overall health state of this server, taking into account the health of each of its 
+        subsystems.
+    overallHealthStateJMX:
+      $ref: '#/components/schemas/CompositeData'
+      description: The overall health state of this server returned as a CompositeData type.
+    patchList:
+      type: array
+      items:
+        type: string
+      description: "Returns information about installed patches on the server as an array of Strings. Each element of the
+        array describes a patch, which is of the form: \n\nBugNumber;PatchID;DateApplied;Description"
+      readOnly: true
+    pathServiceRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/PathServiceRuntime'
+      description: Array of all PathServiceRuntimeMBean instances for Domain partition.
+      readOnly: true
+    persistentStoreRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/PersistentStoreRuntime'
+      description: Returns the mbeans that provides runtime information for each PersistentStore.
+      readOnly: true
+    requestClassRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequestClassRuntime'
+      description: Returns an array of RuntimeMBeans which exposes this server's globally defined Request Classes.
+      readOnly: true
+    restartRequired:
+      type: boolean
+      description: Indicates whether the server must be restarted in order to activate configuration changes.
+      readOnly: true
+    SAFRuntime:
+      $ref: '#/components/schemas/SAFRuntime'
+      description: The SAFRuntimeMBean for this server.
+    SNMPAgentRuntime:
+      $ref: '#/components/schemas/SNMPAgentRuntime'
+      description: Return the MBean which provides access to the monitoring statistics for WLS SNMP Agent.
+    SSLListenPortEnabled:
+      type: boolean
+      description: Indicates whether the default SSL listen port is enabled on the server
+      readOnly: true
+    serverChannelRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServerChannelRuntime'
+      description: The network channels that are currently configured on the server.
+      readOnly: true
+    serverClasspath:
+      type: string
+      description: Get the classpath for this server including domain/lib contents that are automatically picked up and 
+        appended to the classpath.
+      readOnly: true
+    serverLogRuntime:
+      $ref: '#/components/schemas/ServerLogRuntime'
+      description: Return the MBean which provides access to the control interface for WLS server logging.
+    serverSecurityRuntime:
+      $ref: '#/components/schemas/ServerSecurityRuntime'
+      description: Return the ServerSecurityRuntimeMBean for this server.
+    singleSignOnServicesRuntime:
+      $ref: '#/components/schemas/SingleSignOnServicesRuntime'
+      description: Get the runtime interface to publish single sign-on services information.
+    state:
+      type: string
+      enum:
+      - ACTIVATE_LATER
+      - ADMIN
+      - DISCOVERED
+      - FAILED
+      - FAILED_MIGRATABLE
+      - FAILED_NOT_RESTARTABLE
+      - FAILED_RESTARTING
+      - FORCE_SHUTTING_DOWN
+      - FORCE_SUSPENDING
+      - RESTART_REQUIRED
+      - RESUMING
+      - RUNNING
+      - SHUTDOWN
+      - SHUTDOWN_IN_PROCESS
+      - SHUTDOWN_PENDING
+      - SHUTTING_DOWN
+      - STANDBY
+      - STARTING
+      - SUSPENDING
+      - UNKNOWN
+      description: "The current life cycle state of this server.\n\nFor example, a server can be in a RUNNING state in which
+        it can receive and process requests or in an ADMIN state in which it can receive only administrative requests."
+      readOnly: true
+    stateVal:
+      type: integer
+      format: int32
+      description: Returns current state of the server as in integer. weblogic.management.runtime.ServerStates has more 
+        information about the available server states
+      readOnly: true
+    threadPoolRuntime:
+      $ref: '#/components/schemas/ThreadPoolRuntime'
+      description: Get the self-tuning thread pool's runtime information. This call will return `null` if the 
+        self-tuning implementation is not enabled.
+    timerRuntime:
+      $ref: '#/components/schemas/TimerRuntime'
+      description: Get the runtime information about the WebLogic timer implementation.
+    WANReplicationRuntime:
+      $ref: '#/components/schemas/WANReplicationRuntime'
+      description: Return an MBean which represents this server's view of its WANReplicationRuntime, if any.
+    WLDFRuntime:
+      $ref: '#/components/schemas/WLDFRuntime'
+      description: Return the MBean which provides access to all Diagnostic runtime MBeans.
+    WTCRuntime:
+      $ref: '#/components/schemas/WTCRuntime'
+      description: The WTCRuntimeMBean for this server.
+    webServerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WebServerRuntime'
+      description: Returns all the initialized webservers
+      readOnly: true
+    weblogicHome:
+      type: string
+      description: The directory where the WebLogic Server instance (server) is installed, without the trailing 
+        "/server".
+      readOnly: true
+    weblogicVersion:
+      type: string
+      description: The version of this WebLogic Server instance (server).
+      readOnly: true
+    workManagerRuntimes:
+      type: array
+      items:
+        $ref: '#/components/schemas/WorkManagerRuntime'
+      description: Returns an array of MBeans which exposes this server's active internal WorkManagers.
+      readOnly: true
+    wseeClusterFrontEndRuntime:
+      $ref: '#/components/schemas/WseeClusterFrontEndRuntime'
+      description: This is non-null only when this server is running as a host to a front-end proxy (HttpClusterServlet)
+        instance.
+    wseeWsrmRuntime:
+      $ref: '#/components/schemas/WseeWsrmRuntime'
+      description: Get statistics for web services reliable messaging across the entire server if any web service is 
+        deployed that employs reliable messaging. This MBean is null otherwise.

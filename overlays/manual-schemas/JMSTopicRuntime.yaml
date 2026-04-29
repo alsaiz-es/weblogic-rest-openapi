@@ -1,0 +1,93 @@
+schema: JMSTopicRuntime
+description: |
+  Runtime metrics for a JMS topic destination. Inherits the
+  base counters from `JMSDestinationRuntimeBase` and selects the
+  `Topic` discriminator value. Topic-specific surface centres on
+  durable / non-durable subscribers and per-subscription message
+  state.
+sources:
+  - "Oracle MBean Reference for Oracle WebLogic Server: weblogic.management.runtime.JMSDestinationRuntimeMBean (Topic specialisation)."
+  - "Oracle Fusion Middleware Administering JMS Resources for Oracle WebLogic Server (durable subscriber chapter)."
+properties:
+  consumersCurrentCount:
+    type: integer
+    format: int64
+    description: |
+      Active subscribers (durable + non-durable) registered on this
+      topic. Each durable subscription with a connected consumer
+      counts once; durable subscriptions with disconnected consumers
+      do not appear here — see `JMSDurableSubscriberRuntime`.
+  consumersHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `consumersCurrentCount` since deployment.
+  consumersTotalCount:
+    type: integer
+    format: int64
+    description: Cumulative subscriber registrations since deployment.
+  messagesReceivedCount:
+    type: integer
+    format: int64
+    description: Cumulative messages published to this topic.
+  messagesCurrentCount:
+    type: integer
+    format: int64
+    description: |
+      Messages currently held for delivery. On a topic this can
+      stay non-zero even with no active subscribers — durable
+      subscriptions retain messages for offline consumers.
+  messagesPendingCount:
+    type: integer
+    format: int64
+    description: Messages in-flight under uncommitted transactions or scheduled-for-delivery windows.
+  messagesHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `messagesCurrentCount` since deployment.
+  bytesReceivedCount:
+    type: integer
+    format: int64
+    description: Cumulative bytes published to this topic.
+  bytesCurrentCount:
+    type: integer
+    format: int64
+    description: Bytes currently held by the topic across all subscribers.
+  bytesPendingCount:
+    type: integer
+    format: int64
+    description: Bytes in-flight or scheduled-for-delivery.
+  bytesHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `bytesCurrentCount` since deployment.
+  durableSubscribersCurrentCount:
+    type: integer
+    format: int64
+    description: |
+      Currently registered durable subscriptions, regardless of
+      whether their consumer is connected. Match against the
+      subscription roster via `JMSDurableSubscriberRuntime` to
+      identify abandoned durables retaining messages.
+  durableSubscribersHighCount:
+    type: integer
+    format: int64
+    description: Watermark — peak `durableSubscribersCurrentCount` since deployment.
+  durableSubscribersTotalCount:
+    type: integer
+    format: int64
+    description: Cumulative durable subscriber registrations since deployment.
+  insertionPaused:
+    type: boolean
+    description: True when the topic is currently rejecting new publishers.
+  productionPaused:
+    type: boolean
+    description: True when production has been paused (administratively or by quota).
+  consumptionPaused:
+    type: boolean
+    description: True when consumption has been paused.
+  destinationInfo:
+    type: object
+    additionalProperties: true
+    description: |
+      Free-form descriptor with the topic's full identity (module,
+      system resource, sub-deployment). Treat as opaque.

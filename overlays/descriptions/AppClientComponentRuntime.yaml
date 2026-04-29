@@ -1,0 +1,6 @@
+schema: AppClientComponentRuntime
+schema_level:
+  operational_note: |
+    Application client jar wrapper. The REST projection carries no
+    component-specific properties beyond the base set — a marker that
+    the EAR includes a client jar, nothing more.

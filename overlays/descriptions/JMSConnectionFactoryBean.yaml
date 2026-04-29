@@ -1,0 +1,8 @@
+schema: JMSConnectionFactoryBean
+schema_level:
+  operational_note: |
+    Configures a connection factory. Targeting (`subDeploymentName`
+    + JMS module targets) determines which JMS server(s) host
+    sessions opened through the factory; mismatches between the
+    factory's targeted server set and the destination's server set
+    are a common cause of "destination not found" errors at runtime.

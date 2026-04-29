@@ -1,5 +1,122 @@
 # Changelog
 
+## 0.4.0 — 2026-04-29
+
+**The spec is now generated.** This release replaces the v0.3.x
+hand-written specs with output from a mechanical pipeline that
+consumes Oracle's open-source [`weblogic-remote-console`](https://github.com/oracle/weblogic-remote-console)
+harvested MBean YAMLs and refines them with a small set of editorial
+overlays that capture knowledge no harvested catalog can produce on
+its own.
+
+### Headline numbers
+
+- **5 WebLogic versions covered** (12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1) — up from 2 in v0.3.x.
+- **~600–660 schemas per version**, up from ~25 in v0.3.x. The harvested
+  catalog declares ~830 MBeans per version; the generator emits the
+  reachable subset and a transitive-closure prune drops what nothing
+  references.
+- **~1 100–2 400 paths per version**, up from ~50 in v0.3.x. The
+  12.2.1.x ↔ 14.1.x path-count delta reflects Multi-Tenant deprecation
+  in 14.1.x — real WebLogic behaviour, not a generator artifact.
+- **Validators green on every version**: `openapi-spec-validator`
+  strict PASS, `@stoplight/spectral-cli` 0 errors / 0 warnings,
+  `openapi-generator-cli` Python smoke PASS (~850 generated model
+  classes consumable end-to-end).
+
+### Pipeline shape
+
+The generator (`tools/openapi-generator/`) is data-driven:
+
+1. **Harvested loader** parses the Remote Console YAMLs and walks
+   `baseTypes` chains to merge inherited properties.
+2. **Schema builder** maps each MBean to an OpenAPI 3.0 component
+   schema, lifts UI-overlay enums (`legalValues`), normalises names,
+   and wraps in `allOf [EnvelopeBase]`.
+3. **Path builder** recursively walks the containment graph rooted at
+   `DomainRuntimeMBean` / `DomainMBean`, emitting collection + item
+   paths with cycle detection.
+4. **Operations injector** reads `extension.yaml` per MBean and adds
+   declarative actions (`start`, `shutdown`, `suspend`, …) as POST
+   endpoints with correct request/response schemas.
+5. **Polymorphism module** detects discriminator hierarchies from UI
+   overlays and emits OAS 3.0 `oneOf + discriminator + mapping`.
+6. **Enum extractor** lifts inline enums that recur in ≥2 places to
+   shared schemas.
+7. **Editorial overlay layer** (5 modules: quirks, descriptions,
+   manual-schemas, nullability, samples).
+8. **Transitive-closure prune** drops any schema unreferenced from
+   the path tree or other components.
+
+### Five overlay layers (the manual edge)
+
+| Layer | Count (14.1.2) | Lives at | Purpose |
+|---|---:|---|---|
+| Quirks | 14 | `overlays/quirks/` | Documented anomalies (CSRF gates, casing inconsistencies, JDBC partial-create, `OS` prefix, …). Stable id + external doc reference. |
+| Description overlays | 50 | `overlays/descriptions/` | Operational notes appended to harvested descriptions: 21 from the original curated set + 29 from a per-subsystem editorial pass (Deployments, JMS detail, Work Managers, JTA, WLDF). |
+| Live samples | 33 ops linked | `samples/<version>/` ↔ `sample_loader.py` | Real JSON responses from running WebLogic captures. Canonical sample → native `examples`; overflow → `x-weblogic-sample-paths` extension. |
+| Empirical nullability | 20 | `overlays/nullability.yaml` | `nullable: true` corrections discovered while validating samples — fields the harvested set declared as non-null but the live REST projection returns as `null`. |
+| Manual subtype bodies | 12 | `overlays/manual-schemas/` | Polymorphic subtype bodies the Remote Console UI overlay declares but Oracle has no harvested YAML for (`OAMAuthenticator`, `JMSQueueRuntime`, `JMSTopicRuntime`, `JDBCProxyDataSourceRuntime`, …). Authored from Oracle Javadoc + public docs + samples; flagged with `x-weblogic-manual-schema: true` and `x-weblogic-source` for provenance. |
+
+### Repository changes
+
+- **Removed**: `specs/{common,domain-runtime,edit,lifecycle,server-runtime}/`
+  — the v0.3.x hand-written tree. v0.3.1 stays accessible via the
+  `v0.3.1` git tag for anyone needing the historical layout.
+- **Added**: `specs/generated/<version>.yaml` — one OpenAPI 3.0 spec per
+  WLS version.
+- **Added**: `tools/openapi-generator/` — the Python+uv generator with
+  its own README and pipeline documentation.
+- **Added**: `overlays/{quirks,descriptions,manual-schemas,nullability.yaml}`
+  + `samples/{12.2.1.4,14.1.2}/` — the editorial layer.
+- **Added**: `tools/openapi-generator/out/VERSION_DELTAS.md` — adjacent-pair
+  cross-version diffs.
+- **Added**: per-phase reports under `tools/openapi-generator/out/`
+  (PHASE4B through PHASE4E3) — auditable record of the transformation.
+
+### What this means for v0.3.x consumers
+
+The endpoint paths are unchanged — they're WebLogic's, not ours. Only
+the *spec file layout* changed. Most consumers replace one path:
+
+```diff
+- specs/domain-runtime/servers.yaml
++ specs/generated/14.1.2.0.0.yaml      # contains every endpoint
+```
+
+The generated spec is much larger (~1 180 paths vs ~50 in v0.3.x) but
+covers the same endpoints v0.3.x did, plus the ~95% of the WebLogic
+REST surface v0.3.x didn't.
+
+If you specifically need the v0.3.x layout (typed subdirectory by bean
+tree), `git checkout v0.3.1` is the right answer.
+
+### Honesty notes
+
+- **Manual subtype bodies are below harvested quality by design.** The
+  12 manually-authored polymorphic subtypes carry
+  `x-weblogic-manual-schema: true` and `x-weblogic-source: [...]` so
+  consumers can filter them out if they only want harvested-derived
+  data.
+- **Some MBeans are still stubs on some versions.** When a subtype is
+  harvested on 12.2.1.x but stubbed on 14.1.2 (`IPlanetAuthenticator`,
+  `NovellAuthenticator`, `OracleVirtualDirectoryAuthenticator`,
+  `JDBCProxyDataSourceRuntime`), the manual overlay fills the stub
+  while never overwriting harvested. The stat is reported per version
+  in the PHASE4E3 report.
+- **The empirical layer is built from samples, not speculation.** The
+  20 nullability fixes are real schema corrections — every one was
+  discovered because a captured sample failed `oas3-valid-media-example`
+  against the harvested type.
+
+### Acknowledgements
+
+The harvested MBean YAMLs that drive the generator are produced by
+Oracle's open-source [`weblogic-remote-console`](https://github.com/oracle/weblogic-remote-console)
+project under the Universal Permissive License (UPL) 1.0. Without
+that catalog this transformation would not have been possible. The
+generator code, manual overlays, and reports are Apache 2.0 licensed.
+
 ## 0.3.0 — 2026-04-27
 
 Phase 2 — domain administration. Adds the entire edit-tree CRUD

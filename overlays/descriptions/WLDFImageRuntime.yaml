@@ -1,0 +1,10 @@
+schema: WLDFImageRuntime
+schema_level:
+  operational_note: |
+    Captures a server-side diagnostic image — a snapshot of JVM
+    state (heap stats, thread dump, JTA, JMS, JDBC, work managers)
+    written to the diagnostic archive. Trigger via the `captureImage`
+    action when a server is misbehaving but still reachable; pair
+    with a thread dump for the standard "what is this server doing?"
+    triage pack. Capture frequency should be limited — repeated
+    captures within seconds of each other are typically not useful.

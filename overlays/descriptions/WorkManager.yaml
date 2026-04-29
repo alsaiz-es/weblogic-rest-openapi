@@ -1,0 +1,11 @@
+schema: WorkManager
+schema_level:
+  operational_note: |
+    Container for the request-class + constraint set that governs
+    how a slice of server work competes for execute threads. A
+    work manager combines at most one `RequestClass`
+    (`FairShare`, `ResponseTime`, or `Context`), zero or one
+    `MinThreadsConstraint`, zero or one `MaxThreadsConstraint`, and
+    zero or one `Capacity`. Multiple work managers can share the
+    same constraint by referencing it. The default work manager (no
+    custom config) inherits the server's self-tuning defaults.

@@ -1,0 +1,24 @@
+schema: CrossTenantAuthenticator
+description: |
+  Authentication provider used in Multi-Tenant WLS deployments
+  (12.2.1.x) to allow a partition to authenticate against an
+  identity store hosted by a different partition. Largely deprecated
+  alongside Multi-Tenant in 14.1.2+ but the bean still ships in the
+  catalog. Body authored from public docs only — no live samples
+  available.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (Multi-Tenant authentication, 12.2.1.x)."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  partitionName:
+    type: string
+    nullable: true
+    description: Name of the partition whose identity store this provider delegates to.

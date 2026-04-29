@@ -1,0 +1,26 @@
+id: channel-missing-listenAddress-listenPort
+title: "ServerChannelRuntime does not expose listenAddress / listenPort / protocol"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: schema
+    schema: ServerChannelRuntime
+inject:
+  description_append: |
+    **Quirk — REST projection does not expose channel network triplet.**
+    The underlying `ServerChannelRuntimeMBean` declares
+    `listenAddress`, `listenPort`, `protocol`, `publicAddress`, and
+    `publicPort` as readable Java properties. The REST projection
+    returns **none** of them — even when explicitly requested via
+    `?fields=listenAddress,listenPort,protocol,publicAddress,publicPort`.
+    Only the concatenated `publicURL` string
+    (`<protocol>://<host>:<port>`) is surfaced.
+
+    Clients needing the components separately must parse `publicURL`.
+    No other REST path obtains them. Verified on WLS 12.2.1.4 and
+    14.1.2.
+external_doc: docs/QUIRKS.md#10-serverchannelruntime-does-not-expose-listenaddress-listenport-or-protocol
