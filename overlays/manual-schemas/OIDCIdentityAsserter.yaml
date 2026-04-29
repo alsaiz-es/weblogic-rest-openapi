@@ -1,0 +1,47 @@
+schema: OIDCIdentityAsserter
+description: |
+  Identity asserter that consumes OpenID Connect ID tokens. The
+  asserter validates the JWT signature against the configured JWKS
+  endpoint, checks the issuer + audience claims, and binds the
+  `sub` (or another configured claim) as the WLS principal name.
+  Available on 12.2.1.x; superseded on 14.1.2+ by the broader
+  identity-assertion framework.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (OpenID Connect identity asserter, 12.2.1.x)."
+  - "OpenID Connect Core 1.0 specification."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  activeTypes:
+    type: array
+    items:
+      type: string
+    description: Active token type — typically `OIDC_ID_TOKEN`.
+  issuer:
+    type: string
+    nullable: true
+    description: Expected `iss` claim of inbound tokens. Tokens with a different issuer are rejected.
+  audience:
+    type: string
+    nullable: true
+    description: Expected `aud` claim. Set to the WLS-side client ID registered with the OIDC provider.
+  jwksURI:
+    type: string
+    format: uri
+    nullable: true
+    description: |
+      JSON Web Key Set endpoint for fetching the OIDC provider's
+      signing keys. WLS caches the response and rotates on `kid`
+      mismatch.
+  trustedHostNames:
+    type: array
+    items:
+      type: string
+    description: Hostnames trusted to forward OIDC tokens to WLS.

@@ -1,0 +1,34 @@
+schema: TrustServiceIdentityAsserter
+description: |
+  Identity asserter that consumes trust tokens issued by Oracle
+  Identity Cloud Service or Oracle Trust Service. Validates the
+  token signature and issuer, binds the asserted user as the WLS
+  principal. Used in cloud-native deployments where the IdP is
+  Oracle-hosted.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (trust-service identity asserter)."
+  - "Oracle Identity Cloud Service Administration Guide."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  activeTypes:
+    type: array
+    items:
+      type: string
+    description: Active token type — typically `TRUST_TOKEN`.
+  issuer:
+    type: string
+    nullable: true
+    description: Expected token issuer (Oracle IDCS / Trust Service URL).
+  trustServiceURL:
+    type: string
+    format: uri
+    nullable: true
+    description: URL of the trust-service introspection / validation endpoint.

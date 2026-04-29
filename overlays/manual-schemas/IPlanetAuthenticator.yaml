@@ -1,0 +1,57 @@
+schema: IPlanetAuthenticator
+description: |
+  LDAP-based authentication provider tuned for Sun Java System
+  Directory Server (formerly iPlanet) directories. Inherits the
+  generic LDAP authenticator surface with iPlanet-specific
+  defaults for user/group filter expressions.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (configuring iPlanet authenticator)."
+  - "weblogic.security.providers.authentication.IPlanetAuthenticatorMBean reference (LDAP authenticator base)."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  host:
+    type: string
+    nullable: true
+    description: LDAP server hostname or IP.
+  port:
+    type: integer
+    format: int32
+    description: LDAP port. Default `389` for plaintext, `636` for LDAPS.
+  SSLEnabled:
+    type: boolean
+    description: When true, connect over LDAPS.
+  principal:
+    type: string
+    nullable: true
+    description: Bind DN for authenticated lookups (typically a service account).
+  credential:
+    type: string
+    nullable: true
+    description: Bind password — write-only at the API level; never echoed on GET.
+  userBaseDN:
+    type: string
+    nullable: true
+    description: Search base for user entries (e.g. `ou=People,dc=example,dc=com`).
+  userFromNameFilter:
+    type: string
+    nullable: true
+    description: LDAP filter to look up a user by submitted name. Defaults to iPlanet conventions (`uid` attribute).
+  groupBaseDN:
+    type: string
+    nullable: true
+    description: Search base for group entries.
+  groupFromNameFilter:
+    type: string
+    nullable: true
+    description: LDAP filter to look up a group by name.
+  cacheEnabled:
+    type: boolean
+    description: When true, the provider caches positive lookups; flip to false during troubleshooting to bypass stale entries.

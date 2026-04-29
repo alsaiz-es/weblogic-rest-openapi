@@ -1,0 +1,42 @@
+schema: OAMIdentityAsserter
+description: |
+  Identity asserter that consumes OAM-issued tokens — typically the
+  `OAM_REMOTE_USER` HTTP header set by an OAM WebGate front-ending
+  WebLogic. Used to bind the OAM-authenticated identity to a WLS
+  subject without requiring WLS to re-authenticate. Pair with
+  `OAMAuthenticator` only when WLS also needs direct OAM auth in
+  addition to header-based SSO.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (OAM identity asserter)."
+  - "Oracle Access Manager: Integrating with WebLogic Server."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+    description: |
+      Default `REQUIRED`. Identity asserters typically run before
+      authenticators; their outcome should not be skipped.
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  activeTypes:
+    type: array
+    description: |
+      Token types this asserter will consume — typically
+      `OAM_REMOTE_USER` for WebGate-fronted deployments and
+      `OAM_IDENTITY_ASSERTION` for direct token assertion.
+    items:
+      type: string
+  supportedTypes:
+    type: array
+    description: All token types this asserter is capable of handling.
+    items:
+      type: string
+  trustedHostNames:
+    type: array
+    description: Hostnames trusted to forward OAM headers into WLS. Empty means trust all (insecure — set explicitly).
+    items:
+      type: string

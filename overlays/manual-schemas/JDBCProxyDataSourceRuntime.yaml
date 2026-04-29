@@ -1,0 +1,52 @@
+schema: JDBCProxyDataSourceRuntime
+description: |
+  Runtime view of a proxy datasource — a virtual datasource that
+  switches between a primary list and a backup list based on
+  user-defined criteria, exposing a single JNDI binding to the
+  application. Most pool counters reported here are 0 because the
+  proxy itself owns no physical connections; consult the underlying
+  `JDBCDataSourceRuntime` instances reachable via `dataSourceList`
+  for real pool metrics.
+sources:
+  - "Oracle MBean Reference for Oracle WebLogic Server: weblogic.management.runtime.JDBCDataSourceRuntimeMBean (proxy specialisation)."
+  - "Oracle Fusion Middleware Administering JDBC Data Sources for Oracle WebLogic Server (proxy datasource chapter, 14c)."
+properties:
+  databaseProductName:
+    type: string
+    nullable: true
+    description: Always null on the proxy — defer to the underlying delegate's value.
+  driverName:
+    type: string
+    nullable: true
+    description: Always null on the proxy.
+  versionJDBCDriver:
+    type: string
+    nullable: true
+    description: Always null on the proxy.
+  proxyTargetName:
+    type: string
+    nullable: true
+    description: Name of the underlying datasource currently selected by the proxy switching policy.
+  switchedDatasource:
+    type: string
+    nullable: true
+    description: |
+      Same as `proxyTargetName` for compatibility with older clients.
+      Points at the active member of `dataSourceList` after the most
+      recent switch.
+  dataSourceList:
+    type: array
+    nullable: true
+    description: |
+      Configured ordered list of underlying datasource names the
+      proxy can route to. Each entry is the simple name of a
+      JDBCSystemResource present in the same domain.
+    items:
+      type: string
+  switchCount:
+    type: integer
+    format: int64
+    description: Cumulative target switches since deployment. A high value indicates frequent failover or manual switching.
+  enabled:
+    type: boolean
+    description: True when the proxy is enabled and routing application traffic.

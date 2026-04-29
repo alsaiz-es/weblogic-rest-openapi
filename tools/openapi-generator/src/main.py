@@ -361,6 +361,15 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
         "components": components,
     }
 
+    # Phase 4e-3: merge manually-authored bodies into polymorphic-stub
+    # subtypes (the ~12 subtypes the Remote Console UI overlay declares
+    # without harvested YAMLs). Runs after polymorphism (which emits
+    # the stubs with discriminator constraints) and before quirks (so
+    # quirks targeting these subtypes land on the now-rich body).
+    from manual_schemas import apply_manual_schemas
+
+    manual_schemas_stats = apply_manual_schemas(doc)
+
     # Phase 4d-2: apply editorial quirk overlays. Runs after the document is
     # fully assembled so it can target schemas, paths, properties, or the
     # global info block.
@@ -414,6 +423,7 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
             "warnings": pb.warnings,
             "polymorphism": polymorphism_stats,
             "polymorphism_skipped": polymorphism_skipped,
+            "manual_schemas": manual_schemas_stats,
             "quirks": quirks_stats,
             "descriptions": descriptions_stats,
             "nullability": nullability_stats,

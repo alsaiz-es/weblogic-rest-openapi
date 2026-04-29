@@ -1,0 +1,31 @@
+schema: CloudSecurityAgentAsserter
+description: |
+  Identity asserter for tokens issued by an Oracle Cloud Security
+  Agent (CSA) — used in OCI / IDCS-fronted deployments where the
+  agent terminates user authentication and forwards an asserted
+  identity to WLS. Body authored conservatively from public Oracle
+  documentation; the surface is sparse because most CSA
+  configuration lives outside WLS in the agent itself.
+sources:
+  - "Oracle Identity Cloud Service Administrator's Guide (Cloud Security Agent integration)."
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (cloud asserter chapter)."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+  description:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  activeTypes:
+    type: array
+    items:
+      type: string
+    description: Token types this asserter handles — typically `CSA_TOKEN`.
+  trustedHostNames:
+    type: array
+    items:
+      type: string
+    description: Hostnames the asserter accepts as token forwarders.

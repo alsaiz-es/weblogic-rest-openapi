@@ -1,0 +1,53 @@
+schema: OAMAuthenticator
+description: |
+  Authentication provider that delegates user authentication to
+  Oracle Access Manager (OAM). Used in deployments where OAM owns
+  the identity store and WLS trusts OAM-issued credentials. Pair
+  with `OAMIdentityAsserter` for header-based SSO scenarios.
+sources:
+  - "Oracle Fusion Middleware Securing Oracle WebLogic Server (configuring OAM authenticator chapter)."
+  - "Oracle Access Manager Administrator's Guide."
+properties:
+  controlFlag:
+    type: string
+    enum: [REQUIRED, REQUISITE, SUFFICIENT, OPTIONAL]
+    description: |
+      JAAS control flag governing how authentication outcome
+      participates in the provider chain. Default `OPTIONAL`. Set
+      to `SUFFICIENT` when OAM is the primary authority and you
+      want successful OAM auth to short-circuit subsequent providers.
+  description:
+    type: string
+    nullable: true
+    description: Human-readable description.
+  version:
+    type: string
+    nullable: true
+    description: Provider implementation version.
+  OAMServerHost:
+    type: string
+    nullable: true
+    description: Hostname or IP of the OAM authentication server.
+  OAMServerPort:
+    type: integer
+    format: int32
+    description: TCP port of the OAM authentication server. Default `5575` for OAP.
+  applicationDomain:
+    type: string
+    nullable: true
+    description: |
+      OAM application domain name covering the protected resources.
+      Must match the domain configured in OAM that knows about the
+      WLS-fronted URLs.
+  transportSecurity:
+    type: string
+    enum: [open, simple, cert]
+    description: OAP transport mode. Most production deployments use `cert` (mutual TLS).
+  trustStore:
+    type: string
+    nullable: true
+    description: Filesystem path to the trust store containing the OAM CA, when `transportSecurity` is `simple`/`cert`.
+  keyStore:
+    type: string
+    nullable: true
+    description: Filesystem path to the keystore containing this WLS instance's client certificate.
