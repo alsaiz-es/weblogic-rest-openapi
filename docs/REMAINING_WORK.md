@@ -5,7 +5,8 @@ Phase 4 plan completely. It exists because over many sub-phases the
 backlog has been spread across multiple plans and reports, and items
 risk being forgotten.
 
-Last updated: post-Phase 4d-4 (audit and overdue decisions).
+Last updated: post-Phase 4d-4 + Alfredo's decisions on pending
+sub-phases.
 
 ## What is closed (do not re-open)
 
@@ -42,6 +43,7 @@ Last updated: post-Phase 4d-4 (audit and overdue decisions).
 | 4d-4 | `x-weblogic-restart-needed` filter on read-only properties | 4d-4 |
 | 4d-4 | Overlay vocabulary triage (`required`, `dateAsLong`, `multiLineString` honored; rest ignored with rationale) | 4d-4 |
 | 4d-4 | SettableBean inheritance audit (premise disproved — SettableBean is a marker interface, chain walks correctly) | 4d-4 |
+| 4d-8 | Surface curation decision (Alfredo: keep full surface, no variants) | decided 2026-04-28 — no implementation needed |
 
 Validators currently green across all 5 versions:
 `openapi-spec-validator`, `openapi-generator-cli` Python smoke,
@@ -49,7 +51,13 @@ Validators currently green across all 5 versions:
 
 ## What remains pending
 
+Decisions resolved by Alfredo on 2026-04-28 are noted inline. Each
+pending sub-phase has a detailed execution plan in its own document
+under `docs/`; this section is a high-level index.
+
 ### Sub-phase 4d-6 — Description merge policy
+
+Detailed plan: `docs/PHASE4D6_DESCRIPTIONS.md`.
 
 Define `overlays/descriptions/<schema>.yaml` format. When present,
 appends operational notes as `**Operational note:** {text}` after
@@ -58,61 +66,85 @@ harvested description. Migrate notes from manual `specs/` for the
 
 ### Sub-phase 4d-7 — Live samples linking
 
-Format decision: native OpenAPI `examples` blocks vs
-`x-weblogic-sample-paths` extension. Recommendation: hybrid (native
-for canonical, extension for the rest). Acotar: 22 originally
-curated MBeans only.
+Detailed plan: `docs/PHASE4D7_SAMPLES.md`.
 
-### Sub-phase 4d-8 — Server / Cluster surface curation
-
-Server has 165 props vs 27 in manual. Cluster 77 vs 11. Decide:
-keep full / two-variant (Server + ServerCommon) / tag-and-filter.
-**Alfredo decision required.**
+Format: hybrid — OpenAPI native `examples` blocks for canonical
+samples, `x-weblogic-sample-paths` extension for the rest. Acotar
+to the 22 originally curated MBeans where samples exist.
 
 ### Sub-phase 4d-9 — Path expansion to resolve unused components
 
-256–286 unused-component warnings. Investigate: which schemas are
-unused and why. Two categories expected: missing traversal rules
-(extend path-builder) vs genuinely unreachable (exclude from
-emission).
+Detailed plan: `docs/PHASE4D9_PATH_EXPANSION.md`.
+
+256–286 unused-component warnings. Investigate which schemas are
+unreachable from tree roots and why. Two categories: missing
+traversal rules (extend path-builder) vs genuinely unreachable
+(exclude from emission). Investigative first, action second.
 
 ### Sub-phase 4e-2 — Editorial curation per subsystem
 
-Pick **at most 3** subsystems for curation. Candidates: JTA, WLDF,
-work managers, JMS detail, security, deployments. **Alfredo decision
-required.** Recommendation given background: JTA, WLDF, plus one of
-work managers or deployments.
+Detailed plan: `docs/PHASE4E2_CURATION.md`.
+
+**Alfredo's decision (2026-04-28):** four subsystems —
+**Deployments, JMS detail, Work Managers, plus JTA and WLDF
+optionally**. Plan acotar pragmatically: deployments and JMS as
+priority, work managers second, JTA and WLDF as opportunistic
+extensions. Per subsystem, description overlays for user-facing
+properties only; internal-only properties stay harvested.
 
 ### Sub-phase 4e-3 — Body fidelity for 12 polymorphic stubs
 
-OAMAuthenticator, JMSQueueRuntime, JDBCProxyDataSourceRuntime, etc.
-Options: accept stubs / selective manual (JMS first) / full manual.
-**Alfredo decision required.** Bonus work, core spec functions
-correctly with stubs.
+Detailed plan: `docs/PHASE4E3_STUBS.md`.
+
+**Alfredo's decision (2026-04-28):** option C — full manual authoring
+of all 12 subtypes (OAMAuthenticator, JMSQueueRuntime,
+JDBCProxyDataSourceRuntime, etc.). Sources: Oracle MBean Reference
+Javadoc, public docs, empirical observation where available. Quality
+will be inferior to harvested but bodies become non-empty for
+deserialization.
 
 ### Sub-phase 4f — Manual specs/ replacement and merge to main
 
-Strategic. Decide: replace specs/ or coexist. Tag v0.4.0. PR + merge.
-Bridge to second LinkedIn post.
+Detailed plan: `docs/PHASE4F_MERGE.md`.
+
+**Alfredo's decision (2026-04-28):** option C — replace `specs/`
+in main with the generated equivalent. v0.3.1 remains accessible
+via git tag. README explains the transition. Tag v0.4.0 on the
+branch, open PR, merge.
+
+This sub-phase is the bridge to the second LinkedIn post.
 
 ## Items removed from scope
 
 - Java scraping beyond startIn*: structurally limited.
 - Discriminator nesting for JDBCSystemResource: OAS 3.0 forbids.
 - Cross-hierarchy nested polymorphism: OAS 3.0 limitation.
+- Surface curation (4d-8): Alfredo decided to keep full surface;
+  no overlay layer for "common" subset. Consumers use `fields=...`
+  query parameter for filtering.
+- SettableBean partial inheritance: dissolved by audit in 4d-4
+  (premise was incorrect; chain walks correctly).
 
-## Decisions Alfredo needs to make before some sub-phases start
+## Recommended execution order
 
-| Sub-phase | Decision |
-|---|---|
-| 4d-8 | Surface curation: full / two-variant / tag-and-filter |
-| 4e-2 | Which ≤3 subsystems to curate |
-| 4e-3 | 12 stubs: accept / selective / full |
-| 4f | Replace specs/ or coexist |
+The pending sub-phases can be executed independently, but the
+recommended order is:
+
+1. 4d-6 (descriptions) — preserves manual layer's editorial value.
+2. 4d-7 (samples) — closes another original-plan loop.
+3. 4d-9 (path expansion) — eliminates the only remaining warnings.
+4. 4e-2 (subsystem curation) — biggest scope, can be split if needed.
+5. 4e-3 (12 stubs) — bonus polish, can ship before or after 4e-2.
+6. 4f (merge) — bridge to main and second LinkedIn post.
+
+If energy/context runs short, items 1-3 alone produce a defensibly
+complete branch. Items 4-5 are quality multipliers but not blocking.
+Item 6 is the strategic bridge regardless of how much of 4-5 lands.
 
 ## Notes on context preservation
 
 This document is the authoritative checklist. **Start every new
-sub-phase by re-reading this document** to re-anchor on what is
-closed and what remains. Each completed sub-phase updates the
-"What is closed" section.
+sub-phase by re-reading this document and the corresponding
+`docs/PHASE<id>_*.md` plan** to re-anchor on what is closed and what
+remains. Each completed sub-phase updates the "What is closed"
+section above and removes its line from "What remains pending".
