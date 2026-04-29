@@ -1,5 +1,62 @@
 # Changelog
 
+## 0.4.2 — 2026-04-29
+
+Test infrastructure release: ships levels 2 and 3 of the regression
+battery, plus the empirical-nullability + healthState-enum
+corrections those tests surfaced.
+
+### Added
+
+- **Phase 4g level-2 regression suite** —
+  `tools/openapi-generator/tests/test_sample_provenance.py` and
+  `test_sample_schema.py`. Every sample referenced from a generated
+  spec is checked for existence on disk; every overflow sample
+  validates against its operation's response schema via a minimal
+  OAS 3.0 → JSON Schema 2020-12 adapter (handles `$ref`, `nullable:
+  true`, and `oneOf + discriminator` polymorphism). 41 schema
+  cross-checks pass on this release.
+- **Phase 4g level-3 live smoke** —
+  `tools/openapi-generator/tests/test_live_smoke.py`. Opt-in via
+  `pytest -m live` plus env vars (`WLS_HOST`, `WLS_USER`,
+  `WLS_PASS`, `WLS_VERSION`). Hits 5 read-only endpoints on a real
+  WLS domain and asserts shape + documented quirk invariants. Skips
+  cleanly without env, so CI's default `pytest tests/` runs only
+  the offline suite.
+
+### Fixed (discovered by level-2)
+
+- **`HealthState.state` enum was incomplete.** Live captures from
+  12.2.1.4 return `warn` on `overallHealthState` roll-ups, while
+  14.1.2 returns `warning`. Both are now in the enum. Quirk 02 still
+  documents the lowercase pattern; this enum widening just makes it
+  honest about cross-version variation.
+- **17 additional empirical nullability overrides** for fields the
+  harvested catalog declared as `string`/`array` but live REST
+  returns as `null`:
+  - `ApplicationRuntime.applicationVersion`
+  - `JMSServerRuntime.pendingTransactions`, `transactions`
+  - `JDBCConnectionPoolParamsBean.testTableName`
+  - `JDBCDriverParamsBean.driverName`
+  - `JDBCSystemResource.{activeVersionId, compatibilityName,
+    deploymentPrincipalName, notes, versionId, moduleType}`
+  - `ConnectorComponentRuntime.{description, jndiName, linkref,
+    activeVersionId, versionId}`
+  - `WebAppComponentRuntime.{JSPCompileCommand, logFilename,
+    sessionCookieComment, sessionCookieDomain}`
+
+### Notes
+
+- Spec content changes are minimal (the nullability + enum widening).
+  No schema or path was added or removed; consumers don't need to
+  regenerate clients unless they want the stricter null typing.
+- The `EXPECTED_MISMATCH_OPS` set in `test_sample_schema.py` matches
+  `extension_only_ops` in `sample_loader.py`: 4 operations whose
+  canonical sample is intentionally routed through the extension
+  because of structural shape mismatches. Spec-side fixes for these
+  are deferred — they need schema-level changes deeper than
+  nullability can express.
+
 ## 0.4.1 — 2026-04-29
 
 Bug-fix release. Discovered empirically while integrating v0.4.0 into
