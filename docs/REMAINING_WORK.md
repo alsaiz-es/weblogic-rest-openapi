@@ -5,8 +5,8 @@ Phase 4 plan completely. It exists because over many sub-phases the
 backlog has been spread across multiple plans and reports, and items
 risk being forgotten.
 
-Last updated: post-Phase 4d-4 + Alfredo's decisions on pending
-sub-phases.
+Last updated: 2026-04-29, after closing 4f. The Phase 4 plan is
+fully closed; this document is preserved as a historical record.
 
 ## What is closed (do not re-open)
 
@@ -50,27 +50,21 @@ sub-phases.
 | 4d-9 | Path expansion / unused-component resolution — transitive-closure prune | 4d-9 |
 | 4e-2 | Editorial curation per subsystem (Deployments + JMS detail + Work Managers + JTA + WLDF) — 29 new overlays | 4e-2 |
 | 4e-3 | Manual bodies for the 12 polymorphic stubs (option C, hybrid harvested+manual) | 4e-3 |
+| 4f | `specs/` replacement (`specs/generated/<v>.yaml`) + README/CHANGELOG rewrite + tag v0.4.0 + merge to main | 4f |
 
 Validators currently green across all 5 versions:
 `openapi-spec-validator`, `openapi-generator-cli` Python smoke,
-`spectral lint` (0 errors, 256–286 unused-component warnings only).
+`spectral lint` (0 errors, 0 warnings).
 
 ## What remains pending
 
-Decisions resolved by Alfredo on 2026-04-28 are noted inline. Each
-pending sub-phase has a detailed execution plan in its own document
-under `docs/`; this section is a high-level index.
+Nothing. The Phase 4 plan is closed.
 
-### Sub-phase 4f — Manual specs/ replacement and merge to main
+Post-merge follow-ups (out of scope for Phase 4, tracked separately):
 
-Detailed plan: `docs/PHASE4F_MERGE.md`.
-
-**Alfredo's decision (2026-04-28):** option C — replace `specs/`
-in main with the generated equivalent. v0.3.1 remains accessible
-via git tag. README explains the transition. Tag v0.4.0 on the
-branch, open PR, merge.
-
-This sub-phase is the bridge to the second LinkedIn post.
+- Second LinkedIn post anchored on v0.4.0 — material is in `CHANGELOG.md`.
+- Phase 5 — ToolSpec / MCP integration (separate plan when ready).
+- Coverage expansion when Oracle ships harvested data for new WLS versions.
 
 ## Items removed from scope
 
@@ -83,22 +77,11 @@ This sub-phase is the bridge to the second LinkedIn post.
 - SettableBean partial inheritance: dissolved by audit in 4d-4
   (premise was incorrect; chain walks correctly).
 
-## Recommended execution order
-
-The pending sub-phases can be executed independently, but the
-recommended order is:
-
-1. 4f (merge) — bridge to main and second LinkedIn post.
-
-The branch is now feature-complete on the Phase 4 plan: validators
-green, samples linked, descriptions migrated and curated for the
-four high-demand subsystems, polymorphic-stub bodies authored,
-warnings at zero. Item 1 is the strategic bridge.
-
 ## Notes on context preservation
 
-This document is the authoritative checklist. **Start every new
-sub-phase by re-reading this document and the corresponding
-`docs/PHASE<id>_*.md` plan** to re-anchor on what is closed and what
-remains. Each completed sub-phase updates the "What is closed"
-section above and removes its line from "What remains pending".
+This document is the authoritative checklist. It served as the
+re-anchor point at the start of every sub-phase. Every line item in
+"What is closed" links back to the corresponding `docs/PHASE<id>_*.md`
+plan and the per-phase report under `tools/openapi-generator/out/`.
+
+Phase 4 is closed; v0.4.0 was merged to `main` and tagged.
