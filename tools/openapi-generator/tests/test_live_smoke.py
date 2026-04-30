@@ -18,31 +18,35 @@ Run with:
 Without these vars (or without the `-m live` marker) the live tests
 skip cleanly. Default `pytest tests/` runs only the offline suites.
 
-What it covers (read-only):
+What it covers:
 
-1. **Domain root** `/management/weblogic/<api>/domainRuntime` — must
-   return 200 with the expected envelope.
-2. **AdminServer runtime** — name + state populated.
-3. **JVMRuntime** — JDK identity strings present.
-4. **ThreadPoolRuntime** — `executeThreadTotalCount` numeric.
-5. **Edit changeManager idle** — `locked: false`.
-
-These are the cheapest signals that the spec lines up with reality.
-None of them mutate state; lifecycle and edit mutations stay out of
-scope here (they belong in a separate, opt-in destructive suite).
+- Tier 1 — basic invariants (root + AdminServer + JVM + threads +
+  changeManager idle).
+- Tier 2 — polymorphism + quirky-by-design surfaces with real
+  schema validation against the response body, not just status:
+  applicationRuntimes / componentRuntimes (discriminator routing),
+  JDBCServiceRuntime + datasource collection, serverChannelRuntimes
+  (quirk 07: `listenAddress`/`listenPort` deliberately absent),
+  serverRuntimes collection (quirk 08: selective CSRF).
 
 Captured response bodies are NEVER persisted. The lab VM hostnames /
 IPs leak through `links` arrays — the test checks shapes, not values,
-and asserts no captured response is written to disk. If you need to
-add new live tests that capture data, scrub via the project pattern
-(`wls-admin.example.com`) before any commit.
+and writes nothing to disk.
 """
 from __future__ import annotations
 
 import os
+import urllib.parse
+from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
+
+from _oas_jsonschema import get_response_schema, validate_instance
+
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _env_set() -> bool:
@@ -55,7 +59,8 @@ pytestmark = [
 ]
 
 
-def _client():
+@pytest.fixture(scope="session")
+def client():
     requests = pytest.importorskip("requests")
     host = os.environ["WLS_HOST"]
     port = os.environ.get("WLS_PORT", "7001")
@@ -69,9 +74,6 @@ def _client():
     sess.headers.update(
         {
             "Accept": "application/json",
-            # Always set X-Requested-By — quirk 06 + quirk 08 both
-            # require it on multiple read endpoints, and sending it on
-            # endpoints that don't strictly need it is harmless.
             "X-Requested-By": "weblogic-rest-openapi-tests",
         }
     )
@@ -79,78 +81,283 @@ def _client():
     return sess, base
 
 
-def _get(path: str) -> Any:
-    sess, base = _client()
+@pytest.fixture(scope="session")
+def spec() -> dict[str, Any]:
+    version = os.environ["WLS_VERSION"]
+    spec_path = REPO_ROOT / "specs" / "generated" / f"{version}.yaml"
+    if not spec_path.is_file():
+        pytest.skip(f"no spec at {spec_path} for WLS_VERSION={version}")
+    with spec_path.open() as fh:
+        return yaml.safe_load(fh)
+
+
+@pytest.fixture(scope="session")
+def components(spec: dict[str, Any]) -> dict[str, Any]:
+    return (spec.get("components") or {}).get("schemas") or {}
+
+
+def _get(client_, path: str, expected_status: int = 200) -> Any:
+    sess, base = client_
     url = f"{base}{path}"
     resp = sess.get(url, timeout=30)
-    assert resp.status_code == 200, (
-        f"GET {path}: expected 200, got {resp.status_code}: {resp.text[:300]}"
+    assert resp.status_code == expected_status, (
+        f"GET {path}: expected {expected_status}, got {resp.status_code}: {resp.text[:300]}"
     )
-    return resp.json()
+    if resp.status_code == 200:
+        return resp.json()
+    return resp
 
 
-def test_domain_runtime_root() -> None:
-    body = _get("/domainRuntime")
+def _op_for(spec: dict[str, Any], path_template: str, method: str = "get") -> dict[str, Any] | None:
+    """Look up a path operation by its unprefixed template."""
+    full = f"/management/weblogic/{{version}}{path_template}"
+    item = (spec.get("paths") or {}).get(full)
+    if not isinstance(item, dict):
+        return None
+    op = item.get(method)
+    return op if isinstance(op, dict) else None
+
+
+def _validate(
+    instance: Any,
+    spec: dict[str, Any],
+    components: dict[str, Any],
+    path_template: str,
+    method: str = "get",
+    status: str = "200",
+) -> None:
+    op = _op_for(spec, path_template, method)
+    assert op is not None, f"spec has no {method.upper()} {path_template}"
+    raw = get_response_schema(op, status, components)
+    assert raw is not None, f"no concrete {status} schema on {method.upper()} {path_template}"
+    errors = validate_instance(raw, instance, components)
+    if errors:
+        msg = "\n".join(f"  - {m}" for m in errors[:8])
+        pytest.fail(
+            f"live response from {method.upper()} {path_template} fails to validate against "
+            f"the {status} schema ({len(errors)} error{'s' if len(errors) != 1 else ''}):\n{msg}"
+        )
+
+
+# --- Tier 1: basic invariants -------------------------------------------
+
+
+def test_domain_runtime_root(client) -> None:
+    body = _get(client, "/domainRuntime")
     assert isinstance(body, dict)
-    # Root carries `name` (the domain name) and `links` to children.
     assert "name" in body or "links" in body, body
 
 
-def test_admin_server_runtime() -> None:
-    body = _get("/domainRuntime/serverRuntimes/AdminServer")
+def test_admin_server_runtime(client) -> None:
+    body = _get(client, "/domainRuntime/serverRuntimes/AdminServer")
     assert body.get("name") == "AdminServer"
     assert body.get("state") in (
-        "STARTING",
-        "STANDBY",
-        "ADMIN",
-        "RESUMING",
-        "RUNNING",
-        "SUSPENDING",
-        "FORCE_SUSPENDING",
-        "SHUTTING_DOWN",
-        "FORCE_SHUTTING_DOWN",
-        "SHUTDOWN",
-        "FAILED",
-        "FAILED_NOT_RESTARTABLE",
-        "FAILED_RESTARTING",
-        "UNKNOWN",
+        "STARTING", "STANDBY", "ADMIN", "RESUMING", "RUNNING",
+        "SUSPENDING", "FORCE_SUSPENDING", "SHUTTING_DOWN",
+        "FORCE_SHUTTING_DOWN", "SHUTDOWN", "FAILED",
+        "FAILED_NOT_RESTARTABLE", "FAILED_RESTARTING", "UNKNOWN",
     ), body.get("state")
-    # healthState is documented (quirk 02) as lowercase tokens.
     hs = body.get("healthState") or {}
     assert hs.get("state") in (
-        "ok",
-        "warn",
-        "warning",
-        "critical",
-        "failed",
-        "overloaded",
-        "unknown",
+        "ok", "warn", "warning", "critical", "failed", "overloaded", "unknown",
     ), hs
 
 
-def test_admin_jvm_runtime() -> None:
-    body = _get("/domainRuntime/serverRuntimes/AdminServer/JVMRuntime")
-    # JVM identity strings — exact values vary by install but presence
-    # is invariant.
+def test_admin_jvm_runtime(client) -> None:
+    body = _get(client, "/domainRuntime/serverRuntimes/AdminServer/JVMRuntime")
     for key in ("javaVersion", "javaVendor", "javaVMVendor", "OSName"):
-        assert key in body, f"missing {key} in JVMRuntime: {body}"
-    # Heap counters are int64; presence + non-negative.
+        assert key in body, f"missing {key}"
     for key in ("heapSizeCurrent", "heapSizeMax", "heapFreeCurrent"):
         v = body.get(key)
         assert isinstance(v, int) and v >= 0, f"{key}={v!r}"
 
 
-def test_admin_thread_pool_runtime() -> None:
-    body = _get("/domainRuntime/serverRuntimes/AdminServer/threadPoolRuntime")
+def test_admin_thread_pool_runtime(client) -> None:
+    body = _get(client, "/domainRuntime/serverRuntimes/AdminServer/threadPoolRuntime")
     assert isinstance(body.get("executeThreadTotalCount"), int)
-    # `name` quirk: ThreadPoolRuntime's name is literally
-    # "ThreadPoolRuntime", not the server name (quirk 04).
+    # Quirk 04: name is the bean type, not the server name.
     assert body.get("name") == "ThreadPoolRuntime", body.get("name")
 
 
-def test_edit_change_manager_idle() -> None:
-    body = _get("/edit/changeManager")
-    # Idle session: `locked` false; `editSession` always "default" in
-    # non-Multi-Tenant domains (description overlay covers this).
+def test_edit_change_manager_idle(client) -> None:
+    body = _get(client, "/edit/changeManager")
     assert body.get("locked") is False, body
     assert body.get("editSession") == "default", body
+
+
+# --- Tier 2: polymorphism with schema validation ------------------------
+
+
+def test_application_runtimes_collection(client, spec, components) -> None:
+    body = _get(client, "/domainRuntime/serverRuntimes/AdminServer/applicationRuntimes")
+    items = body.get("items") or []
+    assert items, "expected at least one ApplicationRuntime"
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/applicationRuntimes",
+    )
+
+
+def test_application_runtime_individual(client, spec, components) -> None:
+    coll = _get(client, "/domainRuntime/serverRuntimes/AdminServer/applicationRuntimes")
+    items = coll.get("items") or []
+    if not items:
+        pytest.skip("no applications deployed")
+    name = items[0]["name"]
+    encoded = urllib.parse.quote(name, safe="")
+    body = _get(client, f"/domainRuntime/serverRuntimes/AdminServer/applicationRuntimes/{encoded}")
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}",
+    )
+
+
+def test_component_runtimes_polymorphic(client, spec, components) -> None:
+    """Polymorphic collection — each item carries a `type` discriminator
+    that must route to one of WebApp/EJB/AppClient/Connector
+    ComponentRuntime."""
+    coll = _get(client, "/domainRuntime/serverRuntimes/AdminServer/applicationRuntimes")
+    apps = coll.get("items") or []
+    if not apps:
+        pytest.skip("no applications deployed")
+    # Walk apps until we find one with components. Internal apps like
+    # `wls-management-services` always have at least a webapp module.
+    selected_app = None
+    selected_components: list[Any] = []
+    for app in apps:
+        encoded = urllib.parse.quote(app["name"], safe="")
+        comp_body = _get(
+            client,
+            f"/domainRuntime/serverRuntimes/AdminServer/applicationRuntimes/{encoded}/componentRuntimes",
+        )
+        items = comp_body.get("items") or []
+        if items:
+            selected_app = app["name"]
+            selected_components = items
+            break
+    if not selected_app:
+        pytest.skip("no application has component runtimes (vanilla domain?)")
+
+    coll_body = {"items": selected_components}
+    if "links" in {**({"links": []} if False else {})}:  # noqa: keep shape
+        pass
+    # Validate the components collection shape via discriminator routing.
+    _validate(
+        {"items": selected_components},
+        spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/"
+        "{applicationName}/componentRuntimes",
+    )
+
+    # Sanity: at least one item carries a known discriminator value.
+    known = {
+        "WebAppComponentRuntime",
+        "EJBComponentRuntime",
+        "AppClientComponentRuntime",
+        "ConnectorComponentRuntime",
+    }
+    types = {c.get("type") for c in selected_components}
+    assert types & known, f"no recognised component type in {types}"
+
+
+def test_jdbc_service_runtime(client, spec, components) -> None:
+    body = _get(client, "/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime")
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/JDBCServiceRuntime",
+    )
+
+
+def test_jdbc_datasource_collection(client, spec, components) -> None:
+    body = _get(
+        client,
+        "/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans",
+    )
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/JDBCServiceRuntime/"
+        "JDBCDataSourceRuntimeMBeans",
+    )
+
+
+def test_jdbc_datasource_individual_polymorphic(client, spec, components) -> None:
+    """JDBCDataSourceRuntime has 4 polymorphic subtypes (Default,
+    Oracle, UCP, Abstract). Discriminator routes by `type`."""
+    coll = _get(
+        client,
+        "/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime/JDBCDataSourceRuntimeMBeans",
+    )
+    items = coll.get("items") or []
+    if not items:
+        pytest.skip("no JDBC datasources configured")
+    name = items[0]["name"]
+    encoded = urllib.parse.quote(name, safe="")
+    body = _get(
+        client,
+        f"/domainRuntime/serverRuntimes/AdminServer/JDBCServiceRuntime/"
+        f"JDBCDataSourceRuntimeMBeans/{encoded}",
+    )
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/JDBCServiceRuntime/"
+        "JDBCDataSourceRuntimeMBeans/{dataSourceName}",
+    )
+
+
+# --- Tier 2: quirks confirmed live --------------------------------------
+
+
+def test_server_channel_runtimes_quirk_07(client, spec, components) -> None:
+    """Quirk 07: `listenAddress`, `listenPort`, `protocol`,
+    `publicAddress`, `publicPort` are NOT exposed on the REST
+    projection of `ServerChannelRuntimeMBean`. Only `publicURL`
+    surfaces the network triplet. Confirm both: schema validates
+    AND the absent-fields claim holds against live data."""
+    body = _get(client, "/domainRuntime/serverRuntimes/AdminServer/serverChannelRuntimes")
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/serverChannelRuntimes",
+    )
+    items = body.get("items") or []
+    assert items, "no channels on AdminServer (every WLS install has at least Default[t3])"
+    forbidden = {"listenAddress", "listenPort", "protocol", "publicAddress", "publicPort"}
+    leaks = {f for c in items for f in (forbidden & c.keys())}
+    assert not leaks, (
+        f"quirk 07 contradicted: REST projection now exposes {leaks!r} on a channel runtime. "
+        "Update overlays/quirks/07-channel-missing-fields.yaml."
+    )
+    # Positive invariant: every channel must have publicURL (the
+    # documented surrogate for the missing triplet).
+    missing_url = [c.get("name") for c in items if not c.get("publicURL")]
+    assert not missing_url, f"channels without publicURL: {missing_url}"
+
+
+def test_server_channel_individual_with_brackets(client, spec, components) -> None:
+    """Channel names contain bracket characters (`Default[t3]`) — must
+    be percent-encoded in the URL. Validates the channel runtime
+    schema against the live response."""
+    body = _get(
+        client,
+        f"/domainRuntime/serverRuntimes/AdminServer/serverChannelRuntimes/"
+        f"{urllib.parse.quote('Default[t3]', safe='')}",
+    )
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes/{serverName}/serverChannelRuntimes/{channelName}",
+    )
+    assert body.get("publicURL", "").startswith("t3://"), body.get("publicURL")
+
+
+def test_server_runtimes_collection_quirk_08(client, spec, components) -> None:
+    """Quirk 08: `GET /domainRuntime/serverRuntimes` requires
+    `X-Requested-By` when at least one managed server is RUNNING.
+    The session fixture always sends the header — verify the
+    happy-path: 200 + AdminServer present + schema valid."""
+    body = _get(client, "/domainRuntime/serverRuntimes")
+    items = body.get("items") or []
+    names = {it.get("name") for it in items}
+    assert "AdminServer" in names, f"AdminServer absent from collection: {names}"
+    _validate(
+        body, spec, components,
+        "/domainRuntime/serverRuntimes",
+    )
