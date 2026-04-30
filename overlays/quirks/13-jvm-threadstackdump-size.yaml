@@ -23,11 +23,19 @@ inject:
     monitoring traffic per cycle.
 
     **Always exclude this field from monitoring polls.** Recommended
-    idiom:
+    idiom — the URL matters because `excludeFields` only accepts
+    top-level property names of the queried resource (see quirk
+    `excludefields-scope-mismatch`):
 
-    - `?excludeFields=threadStackDump&links=none`, or
-    - `?fields=heapFreeCurrent,heapSizeCurrent,uptime,javaVersion,...`
-      (allow-list).
+    - at the JVMRuntime URL itself:
+      `GET …/serverRuntimes/{serverName}/JVMRuntime?excludeFields=threadStackDump&links=none`,
+      or
+    - at any URL, allow-list the cheap fields you need:
+      `?fields=heapFreeCurrent,heapSizeCurrent,uptime,javaVersion,…`.
+
+    `excludeFields=threadStackDump` against the `/serverRuntimes`
+    collection or a `/serverRuntimes/{serverName}` item URL returns
+    HTTP 400 — `threadStackDump` is not a property of `ServerRuntime`.
   x_extensions:
     x-weblogic-large-payload: true
     x-weblogic-recommended-exclude: true

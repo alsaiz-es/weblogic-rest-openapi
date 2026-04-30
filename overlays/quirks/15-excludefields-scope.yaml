@@ -1,0 +1,41 @@
+id: excludefields-scope-mismatch
+title: "?excludeFields rejects sub-bean property names with HTTP 400"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: global
+inject:
+  description_append: |
+    **Quirk — `excludeFields` validates against the queried resource's
+    own schema.** Verified empirically against WLS 14.1.2: passing the
+    name of a property that does not belong to the resource at the
+    request URL produces `400 Bad Request` rather than being ignored.
+
+    Concrete failure mode that bit a real client:
+    `GET /management/weblogic/14.1.2.0.0/domainRuntime/serverRuntimes?excludeFields=threadStackDump`
+    returns 400. `threadStackDump` is a property of `JVMRuntime`, not
+    of `ServerRuntime`, so the collection endpoint refuses the
+    parameter even though every item in the collection contains a
+    `JVMRuntime` sub-bean.
+
+    Working alternatives:
+
+    - **Apply `excludeFields` at the owning sub-bean URL.** For the
+      thread-stack-dump case:
+      `…/serverRuntimes/{serverName}/JVMRuntime?excludeFields=threadStackDump`.
+    - **Use `fields=…` (allow-list) at any URL.** This form names the
+      properties you want kept, so cross-bean recursion is irrelevant.
+    - **Per-item requests.** Iterate `serverRuntimes/{serverName}`
+      instead of the collection when you need different field shaping
+      per server.
+
+    The `ExcludeFieldsParam` description in `components.parameters`
+    repeats the rule so consumers see it on every endpoint that
+    accepts the parameter.
+  x_extensions:
+    x-weblogic-excludefields-flat-scope: true
+external_doc: docs/QUIRKS.md#excludefields-scope-mismatch
