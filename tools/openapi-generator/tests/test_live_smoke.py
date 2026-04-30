@@ -2,7 +2,7 @@
 
 Opt-in (CI-friendly default: skipped). Requires:
 
-- `WLS_HOST`        e.g. `192.168.1.29`
+- `WLS_HOST`        e.g. `wls-admin.example.com`
 - `WLS_PORT`        default `7001` (set to `7002` for HTTPS)
 - `WLS_SCHEME`      default `http`
 - `WLS_USER`        default `weblogic`

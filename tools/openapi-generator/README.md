@@ -111,7 +111,7 @@ uv sync --group dev
 uv run pytest tests/
 
 # Level 3 only (against a real WLS domain).
-WLS_HOST=192.168.1.29 WLS_USER=weblogic WLS_PASS=welcome1 \
+WLS_HOST=wls-admin.example.com WLS_USER=weblogic WLS_PASS='<password>' \
 WLS_VERSION=14.1.2.0.0 uv run pytest tests/ -m live -v
 ```
 
