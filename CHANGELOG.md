@@ -1,5 +1,62 @@
 # Changelog
 
+## 0.4.3 — 2026-04-30
+
+Test-coverage release: expands the live smoke suite from 5 endpoints
+to 14, adding schema-validation-against-live-response (not just
+status checks) on the dimensions most likely to drift between the
+generated spec and runtime — polymorphism and the documented quirks.
+
+Verified end-to-end against the lab WLS 14.1.2 instance: every test
+passes on the first run.
+
+### Added
+
+- **9 new live smoke tests** in `tools/openapi-generator/tests/test_live_smoke.py`,
+  each validating the live response body against the OAS 3.0 response
+  schema using the level-2 OAS → JSON Schema adapter (now extracted
+  to `tests/_oas_jsonschema.py` and shared between the offline and
+  live suites):
+
+  Polymorphism:
+  - `test_application_runtimes_collection` — `ApplicationRuntime` collection envelope.
+  - `test_application_runtime_individual` — discovers an app dynamically and validates the per-app schema.
+  - `test_component_runtimes_polymorphic` — exercises the
+    `componentRuntimes` discriminator routing
+    (`WebAppComponentRuntime` / `EJBComponentRuntime` /
+    `AppClientComponentRuntime` / `ConnectorComponentRuntime`).
+  - `test_jdbc_service_runtime` — `JDBCServiceRuntime`.
+  - `test_jdbc_datasource_collection` — collection envelope.
+  - `test_jdbc_datasource_individual_polymorphic` — discriminator
+    routing across the 4 JDBC datasource subtypes
+    (`Default`/`Oracle`/`UCP`/`Abstract`).
+
+  Documented quirks confirmed live:
+  - `test_server_channel_runtimes_quirk_07` — schema validates AND
+    asserts `listenAddress`, `listenPort`, `protocol`,
+    `publicAddress`, `publicPort` are all absent from the live REST
+    projection (positive: every channel exposes `publicURL`).
+  - `test_server_channel_individual_with_brackets` — exercises the
+    percent-encoding requirement on `Default[t3]`-style channel
+    names.
+  - `test_server_runtimes_collection_quirk_08` — `X-Requested-By`
+    happy path; AdminServer present in the collection.
+
+- **`tests/_oas_jsonschema.py`** — extracted helper module. Both
+  `test_sample_schema.py` (offline) and `test_live_smoke.py` use the
+  same OAS → JSON Schema adapter (`$ref` resolution with cycle
+  protection, `nullable: true` handling, `oneOf + discriminator`
+  routing for polymorphic responses, polymorphic-collection
+  validation for `{items: [...]}` envelopes).
+
+### Notes
+
+- All 14 live tests pass against the lab 14.1.2 build on first run —
+  no nullability or shape drift surfaced. Quirk 07 and quirk 08 both
+  remain accurate to current live behaviour.
+- No spec content changes. Test infrastructure only.
+- Run live with: `WLS_HOST=… WLS_USER=… WLS_PASS=… WLS_VERSION=… uv run pytest tests/ -m live`.
+
 ## 0.4.2 — 2026-04-29
 
 Test infrastructure release: ships levels 2 and 3 of the regression

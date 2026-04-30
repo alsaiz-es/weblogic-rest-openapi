@@ -21,7 +21,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "tests"]
 markers = [
     "live: hits a real WebLogic domain (opt-in via -m live; needs WLS_HOST/WLS_USER/WLS_PASS/WLS_VERSION env vars)",
 ]
