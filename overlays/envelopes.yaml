@@ -45,7 +45,25 @@ components:
       name: excludeFields
       in: query
       required: false
-      description: Comma-separated list of property names to omit from the response.
+      description: |
+        Comma-separated list of property names to omit from the response.
+
+        **Scope rule (verified empirically against WLS 14.1.2):** every
+        name in this list must be a **top-level property of the resource
+        being queried**. Passing the name of a sub-bean's property
+        returns `400 Bad Request` — for example
+        `GET /serverRuntimes?excludeFields=threadStackDump` is rejected
+        because `threadStackDump` is a property of `JVMRuntime`, not of
+        `ServerRuntime`.
+
+        Working patterns when the field you want to exclude lives on a
+        sub-bean:
+
+        - apply `excludeFields` at the sub-bean URL
+          (e.g. `…/serverRuntimes/{serverName}/JVMRuntime?excludeFields=threadStackDump`);
+        - use the allow-list form `fields=…` at the parent URL to opt
+          in to the cheap fields you actually need;
+        - issue per-item requests instead of querying the collection.
       schema:
         type: string
 
