@@ -57,6 +57,50 @@ def load_extension(mbean_name: str) -> dict[str, Any] | None:
         return yaml.safe_load(fh) or {}
 
 
+def _variant_schema_for(action: dict[str, Any], refs: list[str]) -> dict[str, Any]:
+    """Body schema for a single action's parameter list.
+
+    Mutates `refs` to append referenced schema names.
+    """
+    parameters = action.get("parameters") or []
+    if not parameters:
+        return {"type": "object"}
+    body_props: dict[str, Any] = {}
+    required: list[str] = []
+    for p in parameters:
+        inner = _java_to_oas(p["type"])
+        if "$ref" in inner:
+            refs.append(inner["$ref"].rsplit("/", 1)[-1])
+        # Honor `array: true` from extension.yaml. WLS rejects
+        # scalar values for these fields with HTTP 400 — verified
+        # empirically against 14.1.2 on `start`/`stop` of
+        # `AppDeploymentRuntime` (the `targets` parameter).
+        if p.get("array"):
+            body_props[p["name"]] = {"type": "array", "items": inner}
+        else:
+            body_props[p["name"]] = inner
+        required.append(p["name"])
+    schema: dict[str, Any] = {"type": "object", "properties": body_props}
+    if required:
+        schema["required"] = required
+    return schema
+
+
+def _success_response(action: dict[str, Any], refs: list[str]) -> dict[str, Any]:
+    return_type = action.get("type", "void") or "void"
+    if return_type in ("void", ""):
+        return {"204": {"description": "Action completed."}}
+    rs = _java_to_oas(return_type)
+    if "$ref" in rs:
+        refs.append(rs["$ref"].rsplit("/", 1)[-1])
+    return {
+        "200": {
+            "description": "Action result.",
+            "content": {"application/json": {"schema": rs}},
+        }
+    }
+
+
 def _action_op(
     action: dict[str, Any],
     mbean_name: str,
@@ -74,51 +118,9 @@ def _action_op(
     url_name = action.get("remoteName") or action["name"]
     op_path = f"{parent_url}/{url_name}"
 
-    # Request body from parameters[].
     parameters = action.get("parameters") or []
-    if parameters:
-        body_props: dict[str, Any] = {}
-        required: list[str] = []
-        for p in parameters:
-            inner = _java_to_oas(p["type"])
-            if "$ref" in inner:
-                refs.append(inner["$ref"].rsplit("/", 1)[-1])
-            # Honor `array: true` from extension.yaml. WLS rejects
-            # scalar values for these fields with HTTP 400 — verified
-            # empirically against 14.1.2 on `start`/`stop` of
-            # `AppDeploymentRuntime` (the `targets` parameter).
-            if p.get("array"):
-                body_props[p["name"]] = {"type": "array", "items": inner}
-            else:
-                body_props[p["name"]] = inner
-            required.append(p["name"])
-        request_schema: dict[str, Any] = {
-            "type": "object",
-            "properties": body_props,
-        }
-        if required:
-            request_schema["required"] = required
-        body_required = True
-    else:
-        request_schema = {"type": "object"}
-        body_required = True  # WLS still wants the empty {} body.
-
-    # Response shape from `type:`.
-    return_type = action.get("type", "void") or "void"
-    if return_type in ("void", ""):
-        success: dict[str, Any] = {
-            "204": {"description": "Action completed."}
-        }
-    else:
-        rs = _java_to_oas(return_type)
-        if "$ref" in rs:
-            refs.append(rs["$ref"].rsplit("/", 1)[-1])
-        success = {
-            "200": {
-                "description": "Action result.",
-                "content": {"application/json": {"schema": rs}},
-            }
-        }
+    request_schema = _variant_schema_for(action, refs)
+    success = _success_response(action, refs)
 
     schema_name = normalize_schema_name(mbean_name)
     action_name = action["name"]
@@ -139,11 +141,111 @@ def _action_op(
             {"$ref": x_requested_by_ref},
         ],
         "requestBody": {
-            "required": body_required,
+            "required": True,
             "content": {
                 "application/json": {
                     "schema": request_schema,
                     "example": {p["name"]: _example_for_param(p) for p in parameters} if parameters else {},
+                },
+            },
+        },
+        "responses": {
+            **success,
+            "400": {"$ref": "#/components/responses/EditError"},
+            "401": {"$ref": "#/components/responses/Unauthorized"},
+            "404": {"$ref": "#/components/responses/NotFound"},
+        },
+    }
+    return op_path, op, refs
+
+
+def _action_op_merged(
+    group: list[dict[str, Any]],
+    mbean_name: str,
+    parent_url: str,
+    tags: list[str],
+    x_requested_by_ref: str,
+    version_param_ref: str,
+) -> tuple[str, dict[str, Any], list[str]]:
+    """Emit a single POST whose body is `oneOf` over every overload sharing
+    this URL.
+
+    extension.yaml routinely declares multiple Java overloads under the
+    same `remoteName` — `redeploy(targets, applicationPath, plan,
+    deploymentOptions)` and `redeploy(SourcePath, PlanPath)` both mount
+    at `/redeploy`. The earlier behaviour was last-write-wins, which
+    silently dropped half the surface and mismatched the live WLS
+    runtime's accepted signatures (verified empirically on 14.1.2:
+    POSTing the SourcePath/PlanPath body returns 400 with
+    "valid signatures are: redeploy(targets: [string], applicationPath:
+    string, plan: string, deploymentOptions: {...}), redeploy(targets:
+    [string], plan: string, deploymentOptions: {...}), redeploy().").
+
+    `requestBody.required` is set to false for merged endpoints because
+    WLS commonly exposes a no-arg overload at runtime even when
+    extension.yaml only declares the parameterised ones.
+    """
+    refs: list[str] = []
+    url_name = group[0].get("remoteName") or group[0]["name"]
+    op_path = f"{parent_url}/{url_name}"
+
+    variant_schemas: list[dict[str, Any]] = []
+    examples: dict[str, dict[str, Any]] = {}
+    success_per_action: list[dict[str, Any]] = []
+    description_lines: list[str] = []
+
+    for a in group:
+        variant = _variant_schema_for(a, refs)
+        variant["title"] = a["name"]
+        variant_schemas.append(variant)
+        params = a.get("parameters") or []
+        examples[a["name"]] = {
+            "summary": a["name"],
+            "value": {p["name"]: _example_for_param(p) for p in params} if params else {},
+        }
+        success_per_action.append(_success_response(a, refs))
+        d = _strip_html(a.get("descriptionHTML"))
+        if params:
+            sig = ", ".join(f"{p['name']}: {p['type']}{'[]' if p.get('array') else ''}" for p in params)
+            sig_str = f"({sig})"
+        else:
+            sig_str = "()"
+        suffix = f" — {d}" if d else ""
+        description_lines.append(f"- `{a['name']}{sig_str}`{suffix}")
+
+    schema_name = normalize_schema_name(mbean_name)
+    summary = f"{url_name} on {schema_name} (overloaded; {len(group)} variants)"
+    description = (
+        f"Invoke the `{url_name}` operation on `{schema_name}`. "
+        f"Requires `X-Requested-By`.\n\n"
+        f"This URL exposes {len(group)} declared overloads. Submit a body "
+        f"matching one of the variants below, or POST with no body to invoke "
+        f"the no-argument runtime overload (verified against WLS 14.1.2):\n\n"
+        + "\n".join(description_lines)
+    )
+
+    # Pick the first non-empty 200 response among the variants. If none
+    # of them carries a payload, fall back to the first 204.
+    success: dict[str, Any] = next(
+        (s for s in success_per_action if "200" in s),
+        success_per_action[0],
+    )
+
+    op = {
+        "operationId": f"{url_name}__{_url_to_op_id(op_path)}",
+        "tags": tags,
+        "summary": summary,
+        "description": description,
+        "parameters": [
+            {"$ref": version_param_ref},
+            {"$ref": x_requested_by_ref},
+        ],
+        "requestBody": {
+            "required": False,
+            "content": {
+                "application/json": {
+                    "schema": {"oneOf": variant_schemas},
+                    "examples": examples,
                 },
             },
         },
@@ -223,14 +325,29 @@ def collect_actions_for(
     if not actions:
         return {}, []
 
-    paths: dict[str, dict[str, Any]] = {}
-    refs: list[str] = []
+    # Group actions by URL: extension.yaml may declare several Java
+    # overloads sharing the same `remoteName` (e.g. AppDeploymentRuntime
+    # has two `redeploy` actions). Last-write-wins drops information;
+    # collapse collisions into a single POST with `oneOf` body schema.
+    grouped: dict[str, list[dict[str, Any]]] = {}
     for a in actions:
         if not a.get("name"):
             continue
-        url, op, op_refs = _action_op(
-            a, mbean_name, parent_url, tags, x_requested_by_ref, version_param_ref
-        )
+        url_name = a.get("remoteName") or a["name"]
+        url = f"{parent_url}/{url_name}"
+        grouped.setdefault(url, []).append(a)
+
+    paths: dict[str, dict[str, Any]] = {}
+    refs: list[str] = []
+    for url, group in grouped.items():
+        if len(group) == 1:
+            _, op, op_refs = _action_op(
+                group[0], mbean_name, parent_url, tags, x_requested_by_ref, version_param_ref
+            )
+        else:
+            _, op, op_refs = _action_op_merged(
+                group, mbean_name, parent_url, tags, x_requested_by_ref, version_param_ref
+            )
         paths.setdefault(url, {})["post"] = op
         refs.extend(op_refs)
     return paths, refs

@@ -77,12 +77,20 @@ def _find_action_op(
     return found
 
 
-def _body_schema_props(post: dict[str, Any]) -> dict[str, Any]:
-    """Return the request body's `properties` map, or {}."""
+def _body_variant_props(post: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return the property maps for every variant in the request body.
+
+    Single-overload endpoints expose a flat object schema, so the result
+    is a one-element list. Endpoints with overloaded actions (multiple
+    extension.yaml entries sharing a `remoteName`) expose a `oneOf` over
+    per-variant object schemas; we return one property map per variant.
+    """
     body = (post.get("requestBody") or {}).get("content") or {}
     media = body.get("application/json") or {}
     schema = media.get("schema") or {}
-    return schema.get("properties") or {}
+    if isinstance(schema.get("oneOf"), list):
+        return [v.get("properties") or {} for v in schema["oneOf"] if isinstance(v, dict)]
+    return [schema.get("properties") or {}]
 
 
 def _is_array_schema(schema: dict[str, Any]) -> bool:
@@ -156,15 +164,22 @@ def test_action_parameter_array_flag(
     # `start`). Without unique back-pointers we conservatively assert
     # the param-shape invariant on every match: if any one is wrong
     # the spec is wrong somewhere.
-    relevant = [p for p in posts if param in _body_schema_props(p)]
-    if not relevant:
+    #
+    # When a URL bundles overloads (oneOf body), the param need only
+    # appear in *some* variant — but every variant where it appears
+    # must respect the array flag.
+    relevant_variants: list[dict[str, Any]] = []
+    for post in posts:
+        for props in _body_variant_props(post):
+            if param in props:
+                relevant_variants.append(props)
+    if not relevant_variants:
         pytest.skip(
             f"no POST under {spec_file.stem} for {action} carries `{param}` "
             f"(action exists on a different MBean's path)"
         )
 
-    for post in relevant:
-        props = _body_schema_props(post)
+    for props in relevant_variants:
         schema = props[param]
         actual_array = _is_array_schema(schema)
         assert actual_array == is_array, (
