@@ -95,10 +95,20 @@ components:
           format: int64
           nullable: true
         TIMESTAMP:
-          type: integer
-          format: int64
           nullable: true
-          description: Epoch milliseconds (UTC).
+          description: |
+            Epoch milliseconds (UTC).
+
+            **Type varies by version.** WLS 14.1.x and 15.1.x return
+            this column as a JSON **integer**; WLS 12.2.1.x returns it
+            as a JSON **string of digits** (e.g. `"1777669371498"`).
+            Consumers must coerce to a number before using it as a
+            timestamp.
+          oneOf:
+            - type: integer
+              format: int64
+            - type: string
+              pattern: '^[0-9]+$'
         DATE:
           type: string
           nullable: true
@@ -563,14 +573,19 @@ paths:
         `WLDFDataAccessRuntimeMBean/extension.yaml`. It is a runtime
         endpoint exposed for the Remote Console's log viewer (note the
         `enableConsoleRestExtension` query flag). Empirically verified
-        on WLS 14.1.2 — see `x-weblogic-empirically-verified-versions`.
-        12.2.1.4 support is **untested at this writing**; treat as
-        best-effort on that release until confirmed.
+        on WLS 12.2.1.4 and 14.1.2 — see
+        `x-weblogic-empirically-verified-versions`.
+
+        **Cross-version response shape.** The `WLDFLogRecord.TIMESTAMP`
+        column carries a JSON integer on 14.1.x / 15.1.x but a JSON
+        string of digits on 12.2.1.x. The schema models both forms via
+        `oneOf`; consumers must coerce. `RECORDID`, `nextRecordId` and
+        `SEVERITY_VALUE` are integers on both releases.
 
         **Semantically read.** Despite using POST, this action does not
         mutate WLS state — see `x-weblogic-action-kind: read`.
       x-weblogic-action-kind: read
-      x-weblogic-empirically-verified-versions: ["14.1.2.0.0"]
+      x-weblogic-empirically-verified-versions: ["12.2.1.4.0", "14.1.2.0.0"]
       x-weblogic-source: WLS Remote Console internal extension (not in oracle/weblogic-remote-console extension.yaml)
       parameters:
         - $ref: '#/components/parameters/VersionPathParam'
