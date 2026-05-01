@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.4.4 — 2026-05-01
+
+Cross-version validation against the 12.2.1.4 lab (FMW domain: 67
+applications, 9 datasources, Multi-Tenant runtime fields). Surfaces
+nullability fixes that 14.1.2 didn't exercise, plus a request-body
+schema correction on overloaded actions.
+
+### Fixed (discovered by Phase 4g level-3 against 12.2.1.4)
+
+- **`ApplicationRuntime.partitionName`** marked nullable. Multi-Tenant
+  artifact: present on 12.2.1.x, always `null` in non-partitioned
+  domains, fully removed in 14.1.2+. The 4d-7 description overlay
+  noted this for clients but never made the field nullable on the
+  schema side.
+- **`JDBCDataSourceRuntime.lastTask`** (and the polymorphic
+  `Base`/`Default` siblings) marked nullable. Live REST returns
+  `null` when no admin task has run against the datasource — every
+  fresh datasource trips this.
+
+### Fixed (Spectral cross-check)
+
+- **No-args overload branch in merged `oneOf` request bodies** now
+  emits `additionalProperties: false`. Without it the no-args branch
+  (e.g. `start()`) matched any body, so `oas3-valid-media-example`
+  reported "matches more than one schema in oneOf" against the
+  parameterised variant's example. Affected every action with
+  multiple overloads (`start`, `stop`, `redeploy`, `update`,
+  `forceShutdown`, …).
+
+### Verified
+
+- Live 12.2.1.4 (192.168.1.39 lab, FMW domain): **14/14 pass** in
+  11 seconds. ApplicationRuntime collection across 67 apps, JDBC
+  collection across 9 datasources, polymorphic component runtimes,
+  channel quirks, serverRuntimes CSRF gate.
+- Live 14.1.2 (lab): **14/14 pass** unchanged from v0.4.3.
+- Offline: 348 pass / 170 skip (no regressions).
+- Spectral: 0 errors / 0 warnings on every spec.
+
 ## 0.4.3 — 2026-04-30
 
 Test-coverage release: expands the live smoke suite from 5 endpoints

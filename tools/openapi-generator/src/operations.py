@@ -64,7 +64,12 @@ def _variant_schema_for(action: dict[str, Any], refs: list[str]) -> dict[str, An
     """
     parameters = action.get("parameters") or []
     if not parameters:
-        return {"type": "object"}
+        # `additionalProperties: false` is required so the no-args
+        # variant of an overloaded action (e.g. `start()` alongside
+        # `start_targets_deploymentOptions(...)`) is exclusive in
+        # the merged `oneOf`. Without it both branches match the
+        # parameterised body and `oas3-valid-media-example` fails.
+        return {"type": "object", "additionalProperties": False}
     body_props: dict[str, Any] = {}
     required: list[str] = []
     for p in parameters:

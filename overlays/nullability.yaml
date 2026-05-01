@@ -104,3 +104,12 @@ overrides:
     property: sessionCookieComment
   - schema: WebAppComponentRuntime
     property: sessionCookieDomain
+  # Discovered by Phase 4g level-3 live smoke against 12.2.1.4 lab.
+  - schema: ApplicationRuntime
+    property: partitionName
+  - schema: JDBCDataSourceRuntime
+    property: lastTask
+  - schema: JDBCDataSourceRuntimeBase
+    property: lastTask
+  - schema: JDBCDataSourceRuntimeDefault
+    property: lastTask
