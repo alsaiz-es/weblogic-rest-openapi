@@ -1,0 +1,52 @@
+id: action-kind-read
+title: "Action endpoints that use POST but are semantically read-only — `x-weblogic-action-kind: read`"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+  - "14.1.1.0.0"
+  - "14.1.2.0.0"
+  - "15.1.1.0.0"
+attachments:
+  - type: path
+    path: "/domainRuntime/getServerHttpURL"
+    method: post
+  - type: path
+    path: "/domainRuntime/domainSecurityRuntime/hasSecurityValidationWarnings"
+    method: post
+  - type: path
+    path: "/domainRuntime/domainSecurityRuntime/refreshCache"
+    method: post
+inject:
+  description_append: |
+    **Action kind — `read`.** WLS REST exposes a number of MBean
+    operations as `POST` endpoints because the underlying Java method
+    is an MBean operation rather than a getter. Many of those
+    operations do not modify any WLS state; they compute and return
+    a value (resolve a server's HTTP URL, evaluate a security
+    validation flag, repopulate an internal cache from authoritative
+    config that has not changed semantics, …).
+
+    Such endpoints are flagged with `x-weblogic-action-kind: read`.
+    Consumers can rely on this marker to:
+
+    - exempt the endpoint from heuristics that assume `POST == mutation`
+      (CSRF auditing, audit-log labelling, change-tracking dashboards,
+      smoke gates that block side-effecting calls);
+    - skip retry-on-idempotency safeguards — these calls are safe to
+      retry and can be issued from monitoring loops without raising
+      change events;
+    - generate read-only typed clients without losing the operation.
+
+    See sibling quirks for other kinds: `action-kind-lifecycle`
+    (server start/stop/suspend, deployment lifecycle), and the merged
+    `redeploy/start/stop/update` overload endpoints, which already
+    advertise their nature through their `oneOf` request-body shape.
+
+    `refreshCache` is included here because in practice it does not
+    change the externally observable state of the security domain —
+    it forces the AdminServer to re-read its own cached projection
+    of the security providers' data. From the client's standpoint
+    the operation is idempotent and side-effect-free.
+  x_extensions:
+    x-weblogic-action-kind: read
+external_doc: docs/QUIRKS.md#action-kind-taxonomy

@@ -59,6 +59,107 @@ components:
         request asked for.
       additionalProperties: true
 
+    WLDFLogRecordSearchRequest:
+      type: object
+      description: |
+        Time-windowed log-record query. `since` and `until` are ISO-8601
+        timestamps; either may be omitted (open window). `limit` caps the
+        number of records returned in this page.
+      properties:
+        since:
+          type: string
+          format: date-time
+        until:
+          type: string
+          format: date-time
+        limit:
+          type: integer
+          minimum: 0
+          description: Maximum number of records to return in this page.
+      required:
+        - limit
+
+    WLDFLogRecord:
+      type: object
+      description: |
+        One log-record row from a `WLDFDataAccessRuntime` archive.
+
+        **Property names are uppercase** — they mirror the WLDF
+        column projection at the data-access layer, not the camelCase
+        envelope WLS uses elsewhere. All fields are nullable: a given
+        archive type (server log, http access log, harvested data store)
+        only populates the columns it has.
+      properties:
+        RECORDID:
+          type: integer
+          format: int64
+          nullable: true
+        TIMESTAMP:
+          type: integer
+          format: int64
+          nullable: true
+          description: Epoch milliseconds (UTC).
+        DATE:
+          type: string
+          nullable: true
+        SEVERITY:
+          type: string
+          nullable: true
+        SEVERITY_VALUE:
+          type: integer
+          nullable: true
+        SUBSYSTEM:
+          type: string
+          nullable: true
+        MACHINE:
+          type: string
+          nullable: true
+        SERVER:
+          type: string
+          nullable: true
+        THREAD:
+          type: string
+          nullable: true
+        USERID:
+          type: string
+          nullable: true
+        TXID:
+          type: string
+          nullable: true
+        CONTEXTID:
+          type: string
+          nullable: true
+        MSGID:
+          type: string
+          nullable: true
+        MESSAGE:
+          type: string
+          nullable: true
+        SUPP_ATTRS:
+          type: string
+          nullable: true
+        RID:
+          type: string
+          nullable: true
+      additionalProperties: true
+
+    WLDFLogRecordSearchResponse:
+      type: object
+      description: |
+        Page of records plus a forward cursor. `nextRecordId` is `null`
+        when the page reached the tail of the archive within the window.
+      properties:
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/WLDFLogRecord'
+        nextRecordId:
+          type: integer
+          format: int64
+          nullable: true
+      required:
+        - records
+
     ChangeManagerState:
       type: object
       description: |
@@ -434,3 +535,97 @@ paths:
           description: Reconciliation succeeded.
         '401':
           $ref: '#/components/responses/Unauthorized'
+
+  /domainRuntime/serverRuntimes/{serverName}/WLDFRuntime/WLDFAccessRuntime/WLDFDataAccessRuntimes/{WLDFDataAccessName}/search:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Identifier of the parent `serverRuntimes` item.
+      - name: WLDFDataAccessName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Identifier of the WLDF data-access archive (server log, http log, harvested store, …).
+    post:
+      operationId: searchWLDFDataAccessRuntime
+      tags: [domainRuntime]
+      summary: Page records from a WLDF data-access archive.
+      description: |
+        Time-windowed search over a `WLDFDataAccessRuntime` archive.
+        Returns a page of records plus a `nextRecordId` cursor for
+        forward iteration.
+
+        **Source.** This action is not declared in the harvested
+        `WLDFDataAccessRuntimeMBean/extension.yaml`. It is a runtime
+        endpoint exposed for the Remote Console's log viewer (note the
+        `enableConsoleRestExtension` query flag). Empirically verified
+        on WLS 14.1.2 — see `x-weblogic-empirically-verified-versions`.
+        12.2.1.4 support is **untested at this writing**; treat as
+        best-effort on that release until confirmed.
+
+        **Semantically read.** Despite using POST, this action does not
+        mutate WLS state — see `x-weblogic-action-kind: read`.
+      x-weblogic-action-kind: read
+      x-weblogic-empirically-verified-versions: ["14.1.2.0.0"]
+      x-weblogic-source: WLS Remote Console internal extension (not in oracle/weblogic-remote-console extension.yaml)
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/XRequestedByHeader'
+        - name: internal
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: Console-internal flag. Observed value `true` in working calls.
+        - name: expandedValues
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Console-internal flag. Observed value `false` in working calls.
+        - name: saveChanges
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Console-internal flag. Observed value `false` in working calls.
+        - name: enableConsoleRestExtension
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: |
+            Required to opt into the Remote Console's REST extension surface
+            (which is what exposes this `search` action). Observed value
+            `true` in working calls; omitting it returns 404.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WLDFLogRecordSearchRequest'
+            example:
+              since: '2026-04-29T08:00:00.000Z'
+              until: '2026-04-29T09:00:00.000Z'
+              limit: 25
+      responses:
+        '200':
+          description: Page of records.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WLDFLogRecordSearchResponse'
+        '400':
+          $ref: '#/components/responses/EditError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'

@@ -1,0 +1,51 @@
+id: aggregate-serverruntimes-fragile-12c
+title: "GET /domainRuntime/serverRuntimes (collection) is fragile on 12.2.1.x — fan out per server instead"
+applies_to_versions:
+  - "12.2.1.3.0"
+  - "12.2.1.4.0"
+attachments:
+  - type: path
+    path: "/domainRuntime/serverRuntimes"
+    method: get
+inject:
+  description_append: |
+    **Quirk — collection aggregation is brittle on 12.2.1.x.** The
+    AdminServer fans out internally over JMX-RMI to every managed
+    server to assemble this response. On 12.2.1.x the fan-out is
+    sequential within the same request thread, with no per-target
+    timeout shorter than the JMX-RMI default. A single slow or
+    blocked managed server stretches the latency of the whole
+    collection call into the tens of seconds — minutes when a peer
+    is unreachable or hung — even when every other server is
+    healthy.
+
+    The legacy admin console exhibited the same behaviour: pages
+    that read the full `serverRuntimes` set were the first to feel
+    the impact of one bad managed server. The 12c REST projection
+    inherits the pattern unchanged.
+
+    **Recommended pattern:**
+
+    1. Use `/domainRuntime/serverLifeCycleRuntimes` as the cheap
+       backbone — it does not cross-talk to managed servers and
+       returns lifecycle state for every member of the domain in a
+       single call.
+    2. Fan out from the **client** to per-server URLs
+       (`/domainRuntime/serverRuntimes/{serverName}`), in parallel,
+       with a short per-call timeout (5–10 s for reads). One bad
+       server then surfaces as a single timeout instead of holding
+       up everyone else.
+    3. Pair the per-server reads with `?fields=name,state,…`
+       allow-listing to keep payloads predictable and avoid
+       expensive sub-bean materialisation (see quirk
+       `excludefields-scope-mismatch` and quirk
+       `jvm-threadstackdump-size`).
+
+    14.1.x improved the cross-tier fan-out concurrency and is less
+    fragile here, which is why this quirk does not apply to those
+    versions — but the per-server pattern is still the safer
+    default for monitoring loops on any release.
+  x_extensions:
+    x-weblogic-fragile-aggregate: true
+    x-weblogic-recommended-pattern: per-server-fanout
+external_doc: docs/QUIRKS.md#aggregate-serverruntimes-fragile-12c
