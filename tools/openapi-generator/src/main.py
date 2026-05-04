@@ -392,6 +392,15 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
 
     nullability_stats = apply_nullability(doc)
 
+    # Splice in properties that the live REST projection returns but
+    # that Oracle's harvested catalog does not declare (e.g.
+    # JVMRuntime.processCpuLoad). Runs after nullability so that any
+    # other overlay's nullable: true overrides on harvested properties
+    # have already landed.
+    from harvested_gaps import apply_harvested_gaps
+
+    harvested_gaps_stats = apply_harvested_gaps(doc)
+
     # Phase 4d-7: link live JSON samples from samples/<version>/ onto
     # operations. Canonical sample → native examples block on the
     # appropriate response; overflow + unmatched-status samples →
@@ -427,6 +436,7 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
             "quirks": quirks_stats,
             "descriptions": descriptions_stats,
             "nullability": nullability_stats,
+            "harvested_gaps": harvested_gaps_stats,
             "samples": samples_stats,
             "prune": prune_stats,
             "enum_extraction": {

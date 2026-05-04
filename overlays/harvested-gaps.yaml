@@ -1,0 +1,42 @@
+# Properties that the live WLS REST projection returns but that
+# Oracle's harvested MBean catalog does not declare. Verified
+# empirically against running domains under `samples/` or with
+# `?fields=<name>` probes.
+#
+# Each entry adds the property to the named schema's `properties`
+# map (resolving allOf wrappers like the rest of the overlay layer).
+# A `x-weblogic-empirically-verified-versions` extension is stamped
+# on the injected fragment so the version provenance survives in
+# the spec.
+#
+# Format: list of { schema, property, fragment, verified_versions } entries.
+# `verified_versions` is informational; the applier is unconditional —
+# add a version filter only if a property turns out to be absent on
+# some release.
+
+additions:
+  - schema: JVMRuntime
+    property: processCpuLoad
+    verified_versions:
+      - "12.2.1.4.0"
+      - "14.1.2.0.0"
+    fragment:
+      type: number
+      format: double
+      nullable: true
+      readOnly: true
+      description: |
+        Process CPU load for the JVM, reported as a fraction between
+        0.0 and 1.0 when the platform exposes it (delegates to
+        `com.sun.management.OperatingSystemMXBean.getProcessCpuLoad()`).
+
+        **Harvested gap.** Not declared in
+        `weblogic-bean-types/.../JVMRuntimeMBean.yaml`, but returned
+        by the live REST projection on every release where it has
+        been probed. Verified at
+        `GET /domainRuntime/serverRuntimes/{serverName}/JVMRuntime?fields=processCpuLoad`
+        against 12.2.1.4 and 14.1.2.
+
+        Sibling JMX attributes (`SystemCpuLoad`, `SystemLoadAverage`,
+        `AvailableProcessors`, `ProcessCpuTime`) were probed and did
+        **not** come back populated, so they are not modelled here.
