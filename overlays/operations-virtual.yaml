@@ -644,3 +644,155 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # ServletRuntime collection under WebAppComponentRuntime
+  #
+  # Structural gap: the harvested catalog declares `Servlets` containment
+  # on `WebAppComponentRuntimeMBean` (a *subtype* of
+  # `ComponentRuntimeMBean`), but the path-builder only walks
+  # containments on the parent base type when emitting paths under
+  # `componentRuntimes/{componentName}`. Result: collections that live
+  # only on a subtype (servlets, ejbRuntimes, …) never get an emitted
+  # path even though they exist at runtime.
+  #
+  # Verified empirically against WLS 12.2.1.4: GET on the collection
+  # below returns `200 { items: ServletRuntime[] }` with the per-servlet
+  # counters (invocationTotalCount, executionTime*) that the
+  # WebAppComponentRuntime root does NOT expose. Asking for
+  # `?fields=...,servlets` on either `componentRuntimes` or
+  # `componentRuntimes/{componentName}` does NOT expand the array;
+  # the dedicated sub-path is the only way to read the servlets list.
+  #
+  # Modelled here as a virtual op pending a path-builder fix that
+  # walks subtype containments. See sibling subtype-only collections
+  # (`EJBRuntimes` on EJBComponentRuntime, etc.) — they are likely
+  # missing for the same reason and can be added the same way as they
+  # are verified.
+  # ---------------------------------------------------------------------------
+
+  /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}/componentRuntimes/{componentName}/servlets:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Identifier of the parent `serverRuntimes` item.
+      - name: applicationName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Identifier of the parent `applicationRuntimes` item.
+      - name: componentName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Identifier of the parent `componentRuntimes` item (must be a `WebAppComponentRuntime`).
+    get:
+      operationId: listServletRuntime__domainRuntime_serverRuntimes__by_componentName_servlets
+      tags: [domainRuntime]
+      summary: List ServletRuntime
+      description: |
+        Per-servlet counters for the named web-application component:
+        `invocationTotalCount`, `executionTimeAverage`,
+        `executionTimeHigh`, `executionTimeLow`, `executionTimeTotal`,
+        `reloadTotalCount`, `pooledServletInUseCount`, etc.
+
+        The parent `componentRuntimes/{componentName}` MUST be a
+        `WebAppComponentRuntime`. Other subtypes
+        (`EJBComponentRuntime`, `ConnectorComponentRuntime`,
+        `AppClientComponentRuntime`) do not expose a `Servlets`
+        containment and will return `404`.
+
+        **Source.** This path is not declared in the harvested catalog
+        because the `Servlets` containment lives on the
+        `WebAppComponentRuntimeMBean` *subtype* and the path-builder
+        currently walks only base-type containments under
+        `componentRuntimes/{componentName}`. Verified empirically
+        against WLS 12.2.1.4 — the live REST projection returns
+        `200 { items: ServletRuntime[] }`. See
+        `x-weblogic-empirically-verified-versions`.
+      x-weblogic-action-kind: read
+      x-weblogic-empirically-verified-versions: ["12.2.1.4.0"]
+      x-weblogic-source: subtype-only containment missed by the path-builder (WebAppComponentRuntimeMBean.Servlets)
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/FieldsParam'
+        - $ref: '#/components/parameters/ExcludeFieldsParam'
+        - $ref: '#/components/parameters/LinksParam'
+        - $ref: '#/components/parameters/ExcludeLinksParam'
+      responses:
+        '200':
+          description: Collection of `ServletRuntime`.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ServletRuntime'
+                  links:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Link'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Parent component is not a `WebAppComponentRuntime`.
+
+  /domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}/componentRuntimes/{componentName}/servlets/{servletName}:
+    parameters:
+      - name: serverName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: applicationName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: componentName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: servletName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Identifier of the servlet within the web component.
+    get:
+      operationId: getServletRuntime__domainRuntime_serverRuntimes__servlets_by_servletName
+      tags: [domainRuntime]
+      summary: Get ServletRuntime
+      description: |
+        Read a single servlet's counters. See the collection endpoint
+        for the broader context — this path is virtual for the same
+        subtype-containment reason.
+      x-weblogic-action-kind: read
+      x-weblogic-empirically-verified-versions: ["12.2.1.4.0"]
+      x-weblogic-source: subtype-only containment missed by the path-builder (WebAppComponentRuntimeMBean.Servlets)
+      parameters:
+        - $ref: '#/components/parameters/VersionPathParam'
+        - $ref: '#/components/parameters/FieldsParam'
+        - $ref: '#/components/parameters/ExcludeFieldsParam'
+        - $ref: '#/components/parameters/LinksParam'
+        - $ref: '#/components/parameters/ExcludeLinksParam'
+      responses:
+        '200':
+          description: '`ServletRuntime` bean.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServletRuntime'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
