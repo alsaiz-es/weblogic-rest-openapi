@@ -17,7 +17,7 @@ references (`127.0.0.1`) are left as-is per project convention.
   `serverChannelRuntimes_collection_server1.json` — channel runtime
   shapes; field set is identical between AdminServer and `server1`.
 - `applicationRuntimes_collection_AdminServer.json`,
-  `applicationRuntime_individual_AdminServer_jamagent.json`,
+  `applicationRuntime_individual_AdminServer_exampleApp.json`,
   `applicationRuntime_individual_AdminServer_bea_wls_internal.json`,
   `applicationRuntimes_collection_server1.json` — application runtime
   shapes; same caveat (field-set identical across servers).

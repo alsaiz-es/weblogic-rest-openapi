@@ -43,10 +43,10 @@
                 "subsystemName": null,
                 "symptoms": []
             },
-            "name": "jamagent",
+            "name": "exampleApp",
             "type": "ApplicationRuntime",
             "activeVersionState": 2,
-            "applicationName": "jamagent"
+            "applicationName": "exampleApp"
         },
         {
             "applicationVersion": null,

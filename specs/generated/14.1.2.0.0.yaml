@@ -11922,7 +11922,7 @@ paths:
                       applicationName: wls-management-services
                     - identity:
                       - applicationRuntimes
-                      - jamagent
+                      - exampleApp
                       applicationVersion:
                       internal: false
                       overallHealthState:
@@ -11933,10 +11933,10 @@ paths:
                         state: ok
                         subsystemName:
                         symptoms: []
-                      name: jamagent
+                      name: exampleApp
                       type: ApplicationRuntime
                       activeVersionState: 2
-                      applicationName: jamagent
+                      applicationName: exampleApp
                     - identity:
                       - applicationRuntimes
                       - jms-internal-notran-adp
@@ -12034,7 +12034,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       x-weblogic-sample-paths:
-      - path: samples/14.1.2/applicationRuntime_individual_AdminServer_jamagent.json
+      - path: samples/14.1.2/applicationRuntime_individual_AdminServer_exampleApp.json
         summary: Java Mission Agent application instance.
     parameters:
     - name: serverName
@@ -22074,7 +22074,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[iiop][1]
-                      publicURL: iiop://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001
+                      publicURL: iiop://[2001:db8::1]:7001
                       channelName: Default[iiop][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -22088,7 +22088,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[ldap][1]
-                      publicURL: ldap://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001
+                      publicURL: ldap://[2001:db8::1]:7001
                       channelName: Default[ldap][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -22200,7 +22200,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[t3][1]
-                      publicURL: t3://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001
+                      publicURL: t3://[2001:db8::1]:7001
                       channelName: Default[t3][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -22214,7 +22214,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[http][1]
-                      publicURL: http://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001
+                      publicURL: http://[2001:db8::1]:7001
                       channelName: Default[http][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -22228,7 +22228,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[snmp][1]
-                      publicURL: snmp://[fdb1:d835:cec5:7d2:a00:27ff:fe81:fb27%enp0s3]:7001
+                      publicURL: snmp://[2001:db8::1]:7001
                       channelName: Default[snmp][1]
                       acceptCount: 0
                       bytesSentCount: 0

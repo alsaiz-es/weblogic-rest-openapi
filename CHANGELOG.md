@@ -31,7 +31,7 @@ schema correction on overloaded actions.
 
 ### Verified
 
-- Live 12.2.1.4 (192.168.1.39 lab, FMW domain): **14/14 pass** in
+- Live 12.2.1.4 (wls-admin.example.com lab, FMW domain): **14/14 pass** in
   11 seconds. ApplicationRuntime collection across 67 apps, JDBC
   collection across 9 datasources, polymorphic component runtimes,
   channel quirks, serverRuntimes CSRF gate.
@@ -611,7 +611,7 @@ the components are needed. Verified on both 12.2.1.4 and 14.1.2.
 - **`applicationRuntimes` mixes user and framework apps.** A plain
   `base_domain` returns 6 internal applications on `AdminServer`
   (`bea_wls_internal`, `wls-management-services`, `mejb`,
-  `jms-internal-xa-adp`, `jms-internal-notran-adp`) plus `jamagent`
+  `jms-internal-xa-adp`, `jms-internal-notran-adp`) plus `exampleApp`
   on the AdminServer specifically. The `internal: true|false` field
   is the only practical way to separate user deployments
   client-side; there is no server-side filter.
@@ -690,7 +690,7 @@ from managed-server ports at all).
 `serverChannelRuntime_individual_AdminServer_t3.json`,
 `serverChannelRuntimes_collection_server1.json`,
 `applicationRuntimes_collection_AdminServer.json`,
-`applicationRuntime_individual_AdminServer_jamagent.json`,
+`applicationRuntime_individual_AdminServer_exampleApp.json`,
 `applicationRuntime_individual_AdminServer_bea_wls_internal.json`,
 `applicationRuntimes_collection_server1.json`,
 `jmsRuntime_AdminServer.json`,

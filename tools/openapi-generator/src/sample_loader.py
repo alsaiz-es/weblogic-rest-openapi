@@ -89,9 +89,9 @@ _SAMPLES_14_1_2: list[tuple[str, str, str, str, str, str]] = [
     ("applicationRuntime_individual_AdminServer_bea_wls_internal.json",
      "/domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}", "get", "canonical", "200",
      "Framework-internal application (`bea_wls_internal`)."),
-    ("applicationRuntime_individual_AdminServer_jamagent.json",
+    ("applicationRuntime_individual_AdminServer_exampleApp.json",
      "/domainRuntime/serverRuntimes/{serverName}/applicationRuntimes/{applicationName}", "get", "overflow", "200",
-     "Java Mission Agent application instance."),
+     "User-deployed application instance (`exampleApp`)."),
 
     # Components
     ("componentRuntimes_collection_wls-management-services.json",

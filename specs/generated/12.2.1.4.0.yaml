@@ -42338,7 +42338,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[CLUSTER-BROADCAST][1]
-                      publicURL: CLUSTER-BROADCAST://[fdb1:d835:cec5:7d2:408e:72d4:6802:b47a%enp0s3]:7003
+                      publicURL: CLUSTER-BROADCAST://[2001:db8::2]:7003
                       channelName: Default[CLUSTER-BROADCAST][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -42366,7 +42366,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[t3][1]
-                      publicURL: t3://[fdb1:d835:cec5:7d2:408e:72d4:6802:b47a%enp0s3]:7003
+                      publicURL: t3://[2001:db8::2]:7003
                       channelName: Default[t3][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -42380,7 +42380,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[snmp][1]
-                      publicURL: snmp://[fdb1:d835:cec5:7d2:408e:72d4:6802:b47a%enp0s3]:7003
+                      publicURL: snmp://[2001:db8::2]:7003
                       channelName: Default[snmp][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -42534,7 +42534,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[http][1]
-                      publicURL: http://[fdb1:d835:cec5:7d2:408e:72d4:6802:b47a%enp0s3]:7003
+                      publicURL: http://[2001:db8::2]:7003
                       channelName: Default[http][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -42562,7 +42562,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[iiop][1]
-                      publicURL: iiop://[fdb1:d835:cec5:7d2:408e:72d4:6802:b47a%enp0s3]:7003
+                      publicURL: iiop://[2001:db8::2]:7003
                       channelName: Default[iiop][1]
                       acceptCount: 0
                       bytesSentCount: 0
@@ -42674,7 +42674,7 @@ paths:
                       bytesReceivedCount: 0
                       associatedVirtualTargetName:
                       name: Default[ldap][1]
-                      publicURL: ldap://[fdb1:d835:cec5:7d2:408e:72d4:6802:b47a%enp0s3]:7003
+                      publicURL: ldap://[2001:db8::2]:7003
                       channelName: Default[ldap][1]
                       acceptCount: 0
                       bytesSentCount: 0

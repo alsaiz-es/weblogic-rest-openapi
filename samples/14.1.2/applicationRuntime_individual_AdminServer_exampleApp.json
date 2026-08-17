@@ -1,7 +1,7 @@
 {
     "identity": [
         "applicationRuntimes",
-        "jamagent"
+        "exampleApp"
     ],
     "applicationVersion": null,
     "internal": false,
@@ -15,8 +15,8 @@
         "subsystemName": null,
         "symptoms": []
     },
-    "name": "jamagent",
+    "name": "exampleApp",
     "type": "ApplicationRuntime",
     "activeVersionState": 2,
-    "applicationName": "jamagent"
+    "applicationName": "exampleApp"
 }
