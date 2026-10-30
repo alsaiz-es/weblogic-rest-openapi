@@ -2,6 +2,8 @@
 
 Oracle WebLogic Server exposes a comprehensive RESTful management interface for administration, monitoring, deployment, and configuration. **Oracle does not publish an OpenAPI (Swagger) specification** for it.
 
+**Browse it online:** [alsaiz-es.github.io/weblogic-rest-openapi](https://alsaiz-es.github.io/weblogic-rest-openapi/) — one page per MBean with its properties, REST paths, actions and per-version differences, plus every known quirk.
+
 This project provides an **unofficial, community-driven OpenAPI 3.0 specification** for the WebLogic REST Management API across **five WebLogic versions** (12.2.1.3, 12.2.1.4, 14.1.1, 14.1.2, 15.1.1), enabling:
 
 - **API client generation** (Python, Java, Go, TypeScript, …) via OpenAPI tooling.
@@ -95,6 +97,16 @@ python -c "import yaml, json; \
   open('/tmp/spec.json','w'))"
 npx @openapitools/openapi-generator-cli generate \
   -i /tmp/spec.json -g python -o ./client
+```
+
+### Reference site
+
+`tools/site/build_site.py` turns the generated specs and `overlays/quirks/` into static HTML (one page per MBean, one per quirk, `sitemap.xml`). The `Pages` workflow rebuilds and publishes it on every push to `main` that touches them. To build it locally:
+
+```bash
+uv run --with-requirements tools/site/requirements.txt \
+  python tools/site/build_site.py --out _site
+python3 -m http.server -d _site 8000
 ```
 
 ### Regenerating the spec

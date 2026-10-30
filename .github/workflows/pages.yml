@@ -1,0 +1,53 @@
+# Builds the static reference site (tools/site/build_site.py) and publishes
+# it to GitHub Pages. Nothing generated is committed: the site is rebuilt
+# from specs/generated/ and overlays/quirks/ on every push that touches them.
+#
+# One-time setup: Settings → Pages → Build and deployment → Source:
+# "GitHub Actions".
+
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "specs/generated/**"
+      - "overlays/quirks/**"
+      - "tools/site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tools/site/requirements.txt
+      - id: pages
+        uses: actions/configure-pages@v5
+      - run: python tools/site/build_site.py --out _site --base-url "${{ steps.pages.outputs.base_url }}"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -6,3 +6,4 @@ clients/
 output/
 .env
 .claude/
+_site/
