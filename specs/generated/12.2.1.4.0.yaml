@@ -4,10 +4,7 @@ info:
   description: "Generated OpenAPI 3.0 specification for WebLogic Server 12.2.1.4.0.\n\nSchemas are derived mechanically from
     Oracle's WebLogic Remote Console harvested MBean YAMLs ([weblogic-remote-console](https://github.com/oracle/weblogic-remote-console),
     UPL 1.0). UI overlays from the same source provide enums and read-only hints; the rest of the structure is computed from
-    JMX containment.\n\nThis is a Phase 4d-1 build: generated paths, generated schemas, and a minimal envelope/error overlay.
-    Quirks documentation, curated descriptions, live samples, sub-type discriminators, enum extraction, and surface curation
-    are pending in PHASE4D2 through PHASE4D5.\n\n**Tooling**: `tools/openapi-generator/` (Python + uv, ruamel.yaml, openapi-spec-validator).
-    Branch: `feat/openapi-generator`.\n\n**Cross-bean note — `name` is not a single concept.** WebLogic's\nREST projection
+    JMX containment.\n\nOn top of the generated structure, editorial overlays add documented quirks (`x-weblogic-quirks`), operational notes in descriptions, live response samples captured from WebLogic 12.2.1.4 and 14.1.2, nullability corrections found while validating those samples, polymorphic discriminators, and hand-authored subtypes (flagged `x-weblogic-manual-schema`).\n\n**Unofficial.** Not affiliated with, endorsed by, or supported by Oracle. Source, quirks reference and per-version diffs: https://github.com/alsaiz-es/weblogic-rest-openapi. Browsable reference: https://alsaiz-es.github.io/weblogic-rest-openapi/\n\n**Tooling**: `tools/openapi-generator/` (Python + uv, ruamel.yaml, openapi-spec-validator).\n\n**Cross-bean note — `name` is not a single concept.** WebLogic's\nREST projection
     exposes a `name` field on virtually every bean,\ninherited from `WebLogicMBean.Name`. The semantics differ:\n\n- On a
     **runtime** bean (e.g. `ServerRuntime`, `ApplicationRuntime`),\n  `name` is the instance identifier as the running domain
     knows it\n  — typically the configured name plus, in some cases, a partition\n  or version suffix.\n- On an **edit/config**

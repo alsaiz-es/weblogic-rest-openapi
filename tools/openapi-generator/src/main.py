@@ -298,12 +298,18 @@ def build_spec(wls_version: str = "14.1.2.0.0", bulk: bool = False) -> dict[str,
         "harvested MBean YAMLs ([weblogic-remote-console](https://github.com/oracle/weblogic-remote-console), "
         "UPL 1.0). UI overlays from the same source provide enums and read-only "
         "hints; the rest of the structure is computed from JMX containment.\n\n"
-        "This is a Phase 4d-1 build: generated paths, generated schemas, and a "
-        "minimal envelope/error overlay. Quirks documentation, curated descriptions, "
-        "live samples, sub-type discriminators, enum extraction, and surface "
-        "curation are pending in PHASE4D2 through PHASE4D5.\n\n"
+        "On top of the generated structure, editorial overlays add documented "
+        "quirks (`x-weblogic-quirks`), operational notes in descriptions, live "
+        "response samples captured from WebLogic 12.2.1.4 and 14.1.2, nullability "
+        "corrections found while validating those samples, polymorphic "
+        "discriminators, and hand-authored subtypes (flagged "
+        "`x-weblogic-manual-schema`).\n\n"
+        "**Unofficial.** Not affiliated with, endorsed by, or supported by Oracle. "
+        "Source, quirks reference and per-version diffs: "
+        "https://github.com/alsaiz-es/weblogic-rest-openapi. Browsable reference: "
+        "https://alsaiz-es.github.io/weblogic-rest-openapi/\n\n"
         "**Tooling**: `tools/openapi-generator/` (Python + uv, ruamel.yaml, "
-        "openapi-spec-validator). Branch: `feat/openapi-generator`."
+        "openapi-spec-validator)."
     )
     doc = {
         "openapi": "3.0.3",
