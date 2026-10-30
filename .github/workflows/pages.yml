@@ -37,7 +37,7 @@ jobs:
       - run: pip install -r tools/site/requirements.txt
       - id: pages
         uses: actions/configure-pages@v5
-      - run: python tools/site/build_site.py --out _site --base-url "${{ steps.pages.outputs.base_url }}"
+      - run: python tools/site/build_site.py --out _site --base-url "${{ steps.pages.outputs.base_url }}" --google-site-verification Jz0Wvo37_bAJARH7dDKloDwH8_NjF94DfmSdhba2lEU
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
